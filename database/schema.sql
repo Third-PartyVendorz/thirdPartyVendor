@@ -12,7 +12,7 @@ CREATE TABLE User (
 );
 
 CREATE TABLE Assets (
-    asset_id SERIAL PRIMARY KEY,
+    asset_id SERIAL,
     security VARCHAR(255) NOT NULL,
     ticker VARCHAR(10) NOT NULL,
     asset_type VARCHAR(50) NOT NULL,
