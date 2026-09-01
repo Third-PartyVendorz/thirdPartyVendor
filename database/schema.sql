@@ -12,7 +12,7 @@ CREATE TABLE User (
 );
 
 CREATE TABLE Assets (
-    asset_id SERIAL PRIMARY KEY,
+    asset_id SERIAL,
     security VARCHAR(255) NOT NULL,
     ticker VARCHAR(10) NOT NULL,
     asset_type VARCHAR(50) NOT NULL,
@@ -35,7 +35,7 @@ CREATE TABLE Order (
 --     May not need updated at but could be useful for tracking order status changes from this table
 --     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES User(user_id) ON DELETE CASCADE,
-    FOREIGN KEY (asset_id) REFERENCES Assets(asset_id) ON DELETE CASCADE
+    FOREIGN KEY (asset_id, user_id) REFERENCES Assets(asset_id, user_id) ON DELETE CASCADE
 );
 
 -- Will likely need to clean this table up but for now should suffice:
@@ -49,4 +49,19 @@ CREATE TABLE Trade (
     trade_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (order_id) REFERENCES Order(order_id) ON DELETE CASCADE
 );
+
+-- Steps to set up db locally
+
+-- docker pull postgres:17
+
+-- docker run -d \
+-- --name tpv-postgres \
+-- -e POSTGRES_DB=tpvDB\
+-- -e POSTGRES_USER=postgres \
+-- -e POSTGRES_PASSWORD=postgres \
+-- -p 5432:5432 \
+-- postgres:17
+
+-- make sure to pull everytine you start working to get latest db changes
+
 
