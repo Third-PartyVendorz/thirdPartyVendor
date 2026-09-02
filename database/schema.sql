@@ -56,12 +56,15 @@ CREATE TABLE Trade (
 
 -- docker run -d \
 -- --name tpv-postgres \
--- -e POSTGRES_DB=tpvDB\
+-- -e POSTGRES_DB=tpvdb \
 -- -e POSTGRES_USER=postgres \
 -- -e POSTGRES_PASSWORD=postgres \
 -- -p 5432:5432 \
 -- postgres:17
 
+
+-- if db doesnt get created locally, run: docker exec -it tpv-postgres psql -U postgres -c "CREATE DATABASE tpvdb;"
+-- run mvn spring-boot:run to start app
 -- make sure to pull everytine you start working to get latest db changes
 
 
