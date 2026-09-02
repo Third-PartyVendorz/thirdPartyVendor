@@ -1,1 +1,0 @@
-docker exec -it tpv-postgres psql -U postgres -c "CREATE DATABASE tpvdb;"
