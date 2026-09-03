@@ -1,4 +1,4 @@
-CREATE TABLE assets (
+CREATE TABLE holdings (
     asset_id SERIAL,
     security VARCHAR(255) NOT NULL,
     ticker VARCHAR(10) NOT NULL,
