@@ -32,3 +32,13 @@ mvn spring-boot:run
 ```
 
 > Make sure to `git pull` every time you start working to get the latest DB migrations.
+
+### 3. Access Database
+
+```bash
+docker exec -it tpv-postgres psql -U postgres
+
+\c tpvdb
+```
+
+
