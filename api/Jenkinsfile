@@ -1,10 +1,23 @@
 pipeline {
     agent any
-    
+    tools {
+        maven 'Maven3'
+    }
     stages {
-        stage('Test') {
+        // stage('Test') {
+        //     steps {
+        //         echo 'Jenkins pipeline is working!'
+        //     }
+        // }
+
+        stage('Checkout') {
             steps {
-                echo 'Jenkins pipeline is working!'
+                checkout scm
+            }
+        }
+        stage('Build') {
+            steps {
+                sh 'mvn -B clean package'
             }
         }
     }

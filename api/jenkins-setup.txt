@@ -1,0 +1,4 @@
+Set script path to:
+
+api/Jenkinsfile
+
