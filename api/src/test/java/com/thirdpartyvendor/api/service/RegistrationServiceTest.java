@@ -48,7 +48,7 @@ class RegistrationServiceTest {
 		assertEquals("Jane", response.firstName());
 		assertEquals("Doe", response.lastName());
 		assertEquals("jane.doe@example.com", response.email());
-		assertEquals("user", response.role());
+		assertEquals("user", response.userRole());
 	}
 
 	@Test

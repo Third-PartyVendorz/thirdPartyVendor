@@ -13,11 +13,12 @@ import com.thirdpartyvendor.api.dto.RegisterRequest;
 import com.thirdpartyvendor.api.dto.RegisterResponse;
 import com.thirdpartyvendor.api.entity.AppUser;
 import com.thirdpartyvendor.api.repository.AppUserRepository;
+import com.thirdpartyvendor.api.entity.UserRole;
 
 @Service
 public class RegistrationService {
 
-	private static final String DEFAULT_ROLE = "user";
+	private static final UserRole DEFAULT_ROLE = UserRole.USER;
 
 	private final AppUserRepository appUserRepository;
 	private final PasswordEncoder passwordEncoder;
