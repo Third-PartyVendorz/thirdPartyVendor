@@ -1,0 +1,21 @@
+Default dashboard:
+
+- Automated analytics started at beginning of month
+
+
+Manual reporting:
+
+- Admin can manually generate analytics report and specify parameters
+
+
+
+Analytics API:
+
+- Small lightweight Flask endpoint for analytics
+    - Logic stays in python --> separate from Spring
+    - Fetch data is only purpose, no real DB writes
+    
+
+- DB connection logic in python code
+    - Connect right to DB and fetch data
+    - Flask utilizes this DB module
