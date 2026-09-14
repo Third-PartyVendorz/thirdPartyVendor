@@ -23,5 +23,12 @@ pipeline {
                 // sh 'mvn -B clean package'
             }
         }
+        stage('Test') {
+            steps {
+                dir('api') {
+                    sh 'mvn -B test'
+                }
+            }
+        }
     }
 }
