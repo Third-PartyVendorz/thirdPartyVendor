@@ -18,6 +18,20 @@ docker run -d \
   postgres:17
 ```
 
+If the container already exists but is stopped, start it again with:
+
+```bash
+docker start tpv-postgres
+```
+
+If you want it to come back automatically after a normal reboot, run:
+
+```bash
+docker update --restart unless-stopped tpv-postgres
+```
+
+If you recreate the container from scratch, include `--restart unless-stopped` on the `docker run` command.
+
 If the database doesn't get created automatically, run:
 
 ```bash
