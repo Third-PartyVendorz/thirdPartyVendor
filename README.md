@@ -33,7 +33,24 @@ mvn spring-boot:run
 
 > Make sure to `git pull` every time you start working to get the latest DB migrations.
 
-### 3. Access Database
+### 3. Register a User
+
+Once the api is running, create a user with:
+
+```bash
+curl -X POST http://localhost:8081/auth/register \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "firstName": "Jane",
+    "lastName": "Doe",
+    "phoneNumber": "555-0102",
+    "dateOfBirth": "1992-08-22",
+    "email": "jane.doe@example.com",
+    "password": "secret123"
+  }'
+```
+
+### 4. Access Database
 
 ```bash
 docker exec -it tpv-postgres psql -U postgres
