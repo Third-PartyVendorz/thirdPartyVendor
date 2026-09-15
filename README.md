@@ -47,6 +47,8 @@ mvn spring-boot:run
 
 > Make sure to `git pull` every time you start working to get the latest DB migrations.
 
+> The api reads local development settings from `api/.env`, including the datasource URL, datasource credentials, and JWT secret. Each developer can keep their own local values there, and the file is ignored by git.
+
 ### 3. Register a User
 
 Once the api is running, create a user with:
@@ -64,7 +66,28 @@ curl -X POST http://localhost:8081/auth/register \
   }'
 ```
 
-### 4. Access Database
+### 4. Sign In
+
+Use the authentication endpoint to get a JWT after registering:
+
+```bash
+curl -X POST http://localhost:8081/auth/authenticate \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "email": "jane.doe@example.com",
+    "password": "secret123"
+  }'
+```
+
+The response returns a JWT token. Send it on protected requests with an `Authorization` header:
+
+```bash
+Authorization: Bearer <jwt-token>
+```
+
+If the token expires, the api returns `401 Unauthorized`. The frontend should clear the stored auth state and redirect the user back to the home/sign-in page.
+
+### 5. Access Database
 
 ```bash
 docker exec -it tpv-postgres psql -U postgres
