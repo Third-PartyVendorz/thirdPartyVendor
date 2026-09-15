@@ -47,7 +47,7 @@ mvn spring-boot:run
 
 > Make sure to `git pull` every time you start working to get the latest DB migrations.
 
-> The api reads local development credentials from `api/.env`. Each developer can keep their own local values there, and the file is ignored by git.
+> The api reads local development settings from `api/.env`, including the datasource URL, datasource credentials, and JWT secret. Each developer can keep their own local values there, and the file is ignored by git.
 
 ### 3. Register a User
 
