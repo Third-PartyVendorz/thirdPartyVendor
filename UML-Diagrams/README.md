@@ -32,7 +32,7 @@ mmdc -i "UML-Diagrams/<type-of-uml>-UML/<type-of-UML>-uml.mmd" -o "UML-Diagrams/
 Or if you're already in the UML-Diagrams folder:
 
 ```bash
-mmdc -i object-uml.mmd -o object-uml.png
+mmdc -i <type-of-uml>-uml.mmd -o <type-of-uml>-uml.png
 ```
 
 The PNG will be generated in the same directory.
