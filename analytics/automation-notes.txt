@@ -19,3 +19,6 @@ Analytics API:
 - DB connection logic in python code
     - Connect right to DB and fetch data
     - Flask utilizes this DB module
+
+
+- Will also need automation tests 
