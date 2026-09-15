@@ -12,7 +12,7 @@ try:
     )
     print("Connection successful")
     
-    query = "SELECT * FROM Users;"
+    query = "SELECT * FROM Orders;"
     
     cur = conn.cursor()
     cur.execute(query)

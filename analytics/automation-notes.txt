@@ -22,3 +22,38 @@ Analytics API:
 
 
 - Will also need automation tests 
+
+
+
+Implementation strategy:
+
+- Module for db functions
+- Module for analytics functions
+- Driver script to execute the separate functionality
+    - Driver script interacts with tests to flag errors in data
+    - Lightweight FLASK API endpoints that enable external communication with 
+      desired functionality
+
+
+
+
+In our analytics driver analytics are going to be returned in two ways:
+
+- Matplotlib graphs saved to a file in the analytics folder
+
+- Raw analytics data
+
+- In our Flask API we are going to passthis raw data to frontend
+    - On frontend we will form same graphs as matplotlib with JS library(chart.js)
+
+
+
+
+
+- More interesting analytics:
+    - Avg time between order and trade
+    - Trade volume by market hour
+    - Volume of buy and sell orders
+    - Avg difference between order and execution price
+    - Avg trade quantity
+    
