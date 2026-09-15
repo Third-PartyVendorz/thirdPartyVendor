@@ -1,0 +1,232 @@
+classDiagram
+    class User {
+        -userId UUID
+        -role String
+        -email String
+        -userName String
+        -phoneNumber String
+        -firstName String
+        -lastName String
+        -dateOfBirth DateTime
+        -address String
+        -ssn String
+        -accountBalance double
+        -currency String
+        -createdAt DateTime
+        -lastLogin DateTime
+        -isActive boolean
+
+        +register()
+        +authenticate(email String, password String)
+        +deactivateAccount()
+    }
+
+    class Trade {
+        -tradeId UUID
+        -orderId UUID
+        -assetId UUID
+        -executionPrice double
+        -time DateTime
+        -status String
+
+        +executeTrade()
+        +validateTrade()
+    }
+
+    class Session {
+        -sessionId UUID
+        -userId UUID
+        -loginTime DateTime
+        -expiration DateTime
+        -isRevoked boolean
+
+        +createSession()
+        +revokeSession()
+        +isSessionValid()
+    }
+
+    class Order {
+        -orderId UUID
+        -userId UUID
+        -assetId UUID
+        -quantity double
+        -intentPrice double
+        -status String
+        -orderType String
+        -timestamp DateTime
+
+        +submitOrder()
+        +validateOrder()
+        +executeOrder()
+        +cancelOrder()
+    }
+
+    class ComplianceReport {
+        -reportId UUID
+        -userId UUID
+        -reportType String
+        -periodStart DateTime
+        -periodEnd DateTime
+        -content String
+        -created DateTime
+        -status String
+        
+        +generateReport()
+        +submitReport()
+        +archiveReport()
+    }
+
+    class Fee {
+        -feeId UUID
+        -userId UUID
+        -feeType String
+        -amount double
+        -appliedDate DateTime
+        -description String
+
+        +calculateFee()
+        +applyFee()
+    }
+
+    class MarketData {
+        -dataId UUID
+        -assetId UUID
+        -timestamp DateTime
+        -lastPrice double
+        -bidPrice double
+        -askPrice double
+        -volume int
+        -openPrice double
+
+        +updateMarketData()
+        +recordMarketData()
+    }
+
+    class TradingRule {
+        -ruleId UUID
+        -ruleName String
+        -rulePriority int
+        -isActive boolean
+        -description String
+
+        +validateOrder(Order)
+        +checkCashRequirement(Order)
+        +evaluateRule(Order)
+    }
+
+    class AuditLog {
+        -auditId UUID
+        -userId UUID
+        -orderId UUID
+        -action String
+        -timestamp DateTime
+        -previousValue String
+        -newValue String
+
+        +logAction()
+    }
+
+    class Asset {
+        -assetId UUID
+        -userId UUID
+        -name String
+        -ticker String
+        -type String
+        -shares double
+        -isTradeable boolean
+        -purchasePrice double
+        -purchaseDate DateTime
+
+        +validateTradeability()
+        +updateShares(double)
+    }
+
+    class Statement {
+        -statementId UUID
+        -userId UUID
+        -periodStart DateTime
+        -periodEnd DateTime
+        -beginningBalance double
+        -endingBalance double
+        -created DateTime  
+
+        +generateStatement()
+        +getTransactionsSummary()
+    }
+
+    class Settlement {
+        -settlementId UUID
+        -orderId UUID
+        -settlementDate DateTime
+        -quantity double
+        -price double
+        -totalAmount double
+        -status String
+        -created DateTime
+
+        +createSettlement()
+        +finalizeSettlement()
+        +recordSettlement()
+    }
+
+    class CashFlow {
+        -cashFlowId UUID
+        -userId UUID
+        -transactionType String
+        -amount double
+        -transactionDate DateTime
+        -status String
+        -description String
+        -relatedOrderId UUID
+
+        +recordCashFlow()
+        +processTransaction()
+    }
+
+    class OrderIntent {
+        -intentId UUID
+        -orderId UUID
+        -recordedTime DateTime
+        -quantity int
+        -intendedPrice double
+        -executionStatus String
+
+        +recordIntent()
+        +updateExecutionStatus()
+    }
+
+    %% Relationships
+
+    %% User 
+    User "1" -- "N" Session : creates
+    User "1" -- "N" Order : places
+    User "1" -- "N" Trade : executes
+    User "1" -- "N" Asset : owns
+    User "1" -- "N" Fee : pays
+    User "1" -- "N" ComplianceReport : receives
+    User "1" -- "N" AuditLog : generates
+    User "1" -- "N" CashFlow : initiates
+
+    %% Order 
+    Order "1" -- "N" Trade : creates
+    Order "1" -- "N" Settlement : settles
+    Order "1" -- "1" OrderIntent : records
+
+    %% Asset 
+    Asset "1" -- "N" Trade : involved in
+    Asset "1" -- "N" MarketData : tracked by
+
+    %% Settlement 
+    Settlement "N" -- "1" Order : settles
+
+    %% Statement 
+    Statement "1" -- "N" CashFlow : contains
+
+    %% MarketData 
+    MarketData "N" -- "1" Asset : updates price
+
+    %% AuditLog 
+    AuditLog "N" -- "1" Order : logs activity
+
+    %% TradingRule 
+    TradingRule "N" -- "N" Order : validates
