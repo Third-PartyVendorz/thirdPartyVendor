@@ -1,8 +1,11 @@
 from datetime import datetime
 
 def get_date_tag():
-    now = datetime.now()
-    return now.month, now.year, f"{now.year}_{now.month:02d}"
+    # now = datetime.now()
+    # return now.month, now.year, f"{now.year}_{now.month:02d}"
+    a = "09"
+    b = "2024"
+    return a, b, f"{b}_{a}"
 
 def get_previous_month_trades_query():
     month, year, date_tag = get_date_tag()
@@ -11,7 +14,8 @@ def get_previous_month_trades_query():
         year -= 1
     else:
         month -= 1
-        
+    
+    date_tag = f"{year}_{month:02d}"
     return f"""
     WITH filtered_trades AS (
         SELECT t.*
@@ -40,5 +44,3 @@ def get_current_month_trades_query():
     JOIN orders o ON ft.order_id = o.order_id
     JOIN holdings h ON o.user_id = h.user_id AND o.asset_id = h.asset_id;
     """
-    
-
