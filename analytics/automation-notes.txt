@@ -57,3 +57,10 @@ In our analytics driver analytics are going to be returned in two ways:
     - Avg difference between order and execution price
     - Avg trade quantity
     
+
+
+Test API endpoint with:
+
+curl -X POST http://127.0.0.1:5000/analytics \
+  -H "Content-Type: application/json" \
+  -d '{}'
