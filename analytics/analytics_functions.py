@@ -7,6 +7,8 @@ def json_to_dataframe(json_data):
 
 # ----- Buy/Sell counts -----
 def buy_sell_count(df):
+    # print(df.columns)
+    
     buy_count = df[df['order_intent'] == 'BUY'].shape[0]
     sell_count = df[df['order_intent'] == 'SELL'].shape[0]
     return buy_count, sell_count
@@ -22,6 +24,7 @@ def visualize_buy_sell_count(buy_count, sell_count, date_tag):
 
 # ----- Buy/Sell volume -----
 def buy_sell_volume(df):
+    print(df.columns)
     buy_volume = df[df['order_intent'] == 'BUY']['quantity'].sum()
     sell_volume = df[df['order_intent'] == 'SELL']['quantity'].sum()
     return buy_volume, sell_volume

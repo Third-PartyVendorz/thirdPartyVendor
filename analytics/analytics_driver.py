@@ -13,6 +13,7 @@ def run_analytics_job():
 
     #save raw data as csv file
     df = pd.DataFrame(results)
+    print(df.columns)
     df.to_csv(f'../analytics/raw-data/raw_data_{date_tag}.csv', index=False)
 
     #Pass results to analytics functions

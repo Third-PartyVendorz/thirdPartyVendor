@@ -1,4 +1,0 @@
-trade_id,order_id,execution_price,execution_quantity,trade_timestamp,user_id,asset_id,order_intent,quantity,order_price,status,created_at,security,ticker,asset_type,num_shares
-1,1,150.3000,10.0000,2026-09-15 20:13:50.936322,1,1,BUY,10.0000,150.2500,FILLED,2026-09-15 20:13:50.936322,Apple Inc.,AAPL,equity,10.0000
-2,2,41950.0000,0.5000,2026-09-15 20:13:50.936322,1,2,BUY,0.5000,42000.0000,FILLED,2026-09-15 20:13:50.936322,Bitcoin,BTC,crypto,0.5000
-3,4,430.0500,20.0000,2026-09-15 20:13:50.936322,3,4,SELL,20.0000,430.1000,FILLED,2026-09-15 20:13:50.936322,SPDR S&P 500 ETF Trust,SPY,etf,20.0000
