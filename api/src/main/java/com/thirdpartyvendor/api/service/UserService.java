@@ -90,6 +90,28 @@ public class UserService {
 		userRepository.save(user);
 	}
 
+	public void freezeAccount(Long userId, AppUser currentUser) {
+		AuthorizationUtil.requireAdmin(currentUser);
+
+		AppUser user = userRepository.findById(userId)
+			.orElseThrow(() -> new UserNotFoundException("User not found"));
+
+		user.setFrozen(true);
+
+		userRepository.save(user);
+	}
+
+	public void unfreezeAccount(Long userId, AppUser currentUser) {
+		AuthorizationUtil.requireAdmin(currentUser);
+
+		AppUser user = userRepository.findById(userId)
+			.orElseThrow(() -> new UserNotFoundException("User not found"));
+
+		user.setFrozen(false);
+
+		userRepository.save(user);
+	}
+
 	// TODO: functionality for deleting user
 
 	public static class UserNotFoundException extends RuntimeException {

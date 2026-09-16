@@ -57,6 +57,10 @@ public class AppUser {
 	@Enumerated(EnumType.STRING)
 	private UserRole role;
 
+	@Column(name = "frozen", nullable = false)
+	private boolean frozen;
+
+
 	@PrePersist
 	void onCreate() {
 		LocalDateTime now = LocalDateTime.now();
