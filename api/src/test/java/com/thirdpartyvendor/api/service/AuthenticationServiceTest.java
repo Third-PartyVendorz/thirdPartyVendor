@@ -17,6 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.thirdpartyvendor.api.dto.AuthenticationRequest;
 import com.thirdpartyvendor.api.dto.AuthenticationResponse;
 import com.thirdpartyvendor.api.entity.AppUser;
+import com.thirdpartyvendor.api.entity.UserRole;
 import com.thirdpartyvendor.api.repository.AppUserRepository;
 
 class AuthenticationServiceTest {
@@ -34,7 +35,7 @@ class AuthenticationServiceTest {
 		user.setId(1L);
 		user.setEmail("jane.doe@example.com");
 		user.setPasswordHash(passwordEncoder.encode("secret123"));
-		user.setRole("user");
+		user.setRole(UserRole.USER);
 
 		when(appUserRepository.findByEmail("jane.doe@example.com")).thenReturn(Optional.of(user));
 
@@ -52,7 +53,7 @@ class AuthenticationServiceTest {
 		user.setId(1L);
 		user.setEmail("jane.doe@example.com");
 		user.setPasswordHash(passwordEncoder.encode("secret123"));
-		user.setRole("user");
+		user.setRole(UserRole.USER);
 
 		when(appUserRepository.findByEmail("jane.doe@example.com")).thenReturn(Optional.of(user));
 
