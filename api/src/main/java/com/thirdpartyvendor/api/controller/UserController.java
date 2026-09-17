@@ -28,7 +28,7 @@ public class UserController {
 			.getAuthentication().getPrincipal();
 	}
 
-	@PutMapping
+	@PutMapping("/edit")
 	public ResponseEntity<?> editAccount(
 		@PathVariable Long userId,
 		@RequestBody EditAccountRequest editAccountRequest
@@ -38,7 +38,7 @@ public class UserController {
 		return ResponseEntity.ok("Account updated successfully");
 	}
 
-	@PutMapping("/password")
+	@PutMapping("/changePassword")
 	public ResponseEntity<?> changePassword(
 		@PathVariable Long userId,
 		@RequestBody ChangePasswordRequest passwordRequest
