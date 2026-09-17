@@ -24,6 +24,11 @@ import lombok.Setter;
 @Table(name = "users")
 public class AppUser {
 
+	public enum UserRole {
+		USER,
+		ADMIN
+	}
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "user_id")

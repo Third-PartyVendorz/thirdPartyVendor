@@ -1,7 +1,6 @@
 package com.thirdpartyvendor.api.util;
 
 import com.thirdpartyvendor.api.entity.AppUser;
-import com.thirdpartyvendor.api.entity.UserRole;
 
 public class AuthorizationUtil {
 
@@ -11,11 +10,11 @@ public class AuthorizationUtil {
 
 	public static boolean isOwnUserOrAdmin(Long targetUserId, AppUser currentUser) {
 		return currentUser.getId().equals(targetUserId) || 
-		       currentUser.getRole() == UserRole.ADMIN;
+		       currentUser.getRole() == AppUser.UserRole.ADMIN;
 	}
 
 	public static boolean isAdmin(AppUser currentUser) {
-		return currentUser.getRole() == UserRole.ADMIN;
+		return currentUser.getRole() == AppUser.UserRole.ADMIN;
 	}
 
 	public static void requireOwnUser(Long targetUserId, AppUser currentUser) {
