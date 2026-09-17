@@ -67,3 +67,15 @@ curl -X POST http://127.0.0.1:5000/analytics \
 
 
 Python code written as Java Code
+
+
+
+
+
+
+
+
+
+Need to add error handling and testing:
+- Error handling for empty data
+- ...

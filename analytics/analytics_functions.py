@@ -80,6 +80,82 @@ def visualize_trade_volume_by_market_hour(volume_by_interval, date_tag):
     plt.close()
 # --------------------
 
+# ----- Trade Count by Day of the Month -----
+def trade_count_by_day_of_month(df):
+    # Parse timestamps without modifying the original dataframe
+    timestamps = pd.to_datetime(df['trade_timestamp'])
+    
+    # Extract day of the month
+    day_of_month = timestamps.dt.day
+    
+    # Group by day of the month and count trades
+    trade_count_by_day = df.groupby(day_of_month).size()
+    
+    return trade_count_by_day
+
+def visualize_trade_count_by_day_of_month(trade_count_by_day, date_tag):
+    plt.figure(figsize=(12, 6))
+    plt.bar(trade_count_by_day.index, trade_count_by_day.values)
+    plt.title(f'Trade Count by Day of the Month ({date_tag})')
+    plt.xlabel('Day of the Month')
+    plt.ylabel('Trade Count')
+    plt.xticks(trade_count_by_day.index)
+    plt.tight_layout()
+    plt.savefig(f'visuals/trade_count_by_day_of_month_{date_tag}.png')
+    plt.close()
+# --------------------
+
+# ----- Trade Volume by Day of the Month -----
+def trade_volume_by_day_of_month(df):
+    # Parse timestamps without modifying the original dataframe
+    timestamps = pd.to_datetime(df['trade_timestamp'])
+    
+    # Extract day of the month
+    day_of_month = timestamps.dt.day
+    
+    # Group by day of the month and sum trade volumes
+    trade_volume_by_day = df.groupby(day_of_month)['quantity'].sum()
+    
+    #Going to add another group by for trade volume by day and side (buy/sell)
+    trade_volume_by_day_and_side = df.groupby([day_of_month, 'order_intent'])['quantity'].sum()
+    
+    return trade_volume_by_day, trade_volume_by_day_and_side
+
+# def visualize_trade_volume_by_day_of_month(trade_volume_by_day, date_tag):
+#     plt.figure(figsize=(12, 6))
+#     plt.bar(trade_volume_by_day.index, trade_volume_by_day.values)
+#     plt.title(f'Trade Volume by Day of the Month ({date_tag})')
+#     plt.xlabel('Day of the Month')
+#     plt.ylabel('Trade Volume')
+#     plt.xticks(trade_volume_by_day.index)
+#     plt.tight_layout()
+#     plt.savefig(f'visuals/trade_volume_by_day_of_month_{date_tag}.png')
+#     plt.close()
+    
+def visualize_trade_volume_by_day_of_month(trade_volume_by_day_and_side, date_tag):
+    # Unstack to get buy and sell volumes as separate columns for each day
+    volume_by_day = trade_volume_by_day_and_side.unstack(fill_value=0)
+    
+    plt.figure(figsize=(12, 6))
+    
+    # Get buy and sell columns if they exist, fill missing days with 0
+    buy_data = volume_by_day.get('BUY', pd.Series(0, index=volume_by_day.index))
+    sell_data = volume_by_day.get('SELL', pd.Series(0, index=volume_by_day.index))
+    
+    # Create stacked bar chart with buy (green) bottom and sell (red) on top
+    plt.bar(volume_by_day.index, buy_data, label='BUY', color='green')
+    plt.bar(volume_by_day.index, sell_data, bottom=buy_data, label='SELL', color='red')
+    
+    plt.title(f'Trade Volume by Day of the Month ({date_tag})')
+    plt.xlabel('Day of the Month')
+    plt.ylabel('Trade Volume')
+    plt.xticks(volume_by_day.index)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(f'visuals/trade_volume_by_day_of_month_{date_tag}.png')
+    plt.close()
+# --------------------
+
 # ----- Main analytics function -----
 def perform_analytics(df, date_tag):
     formatted_payload = {}
@@ -89,12 +165,20 @@ def perform_analytics(df, date_tag):
     visualize_buy_sell_volume(buy_volume, sell_volume, date_tag)
     volume_by_interval = trade_volume_by_market_hour(df)
     visualize_trade_volume_by_market_hour(volume_by_interval, date_tag)
+    trade_count_by_day = trade_count_by_day_of_month(df)
+    visualize_trade_count_by_day_of_month(trade_count_by_day, date_tag)
+    trade_volume_by_day, trade_volume_by_day_and_side = trade_volume_by_day_of_month(df)
+    visualize_trade_volume_by_day_of_month(trade_volume_by_day_and_side, date_tag)
+    
     formatted_payload = {
         "buy_count": buy_count,
         "sell_count": sell_count,
         "buy_volume": buy_volume,
         "sell_volume": sell_volume,
-        "volume_by_market_interval": volume_by_interval.to_dict()
+        "volume_by_market_interval": volume_by_interval.to_dict(),
+        "trade_count_by_day_of_month": trade_count_by_day.to_dict(),
+        "trade_volume_by_day_of_month": trade_volume_by_day.to_dict()
     }
     return formatted_payload
+
 # --------------------
