@@ -26,13 +26,13 @@ npm install -g @mermaid-js/mermaid-cli
 Run the following command from the project root directory:
 
 ```bash
-mmdc -i "UML-Diagrams/object-uml.mmd" -o "UML-Diagrams/object-uml.png"
+mmdc -i "UML-Diagrams/<type-of-uml>-UML/<type-of-UML>-uml.mmd" -o "UML-Diagrams/<type-of-UML>-uml.png"
 ```
 
 Or if you're already in the UML-Diagrams folder:
 
 ```bash
-mmdc -i object-uml.mmd -o object-uml.png
+mmdc -i <type-of-uml>-uml.mmd -o <type-of-uml>-uml.png
 ```
 
 The PNG will be generated in the same directory.
@@ -42,28 +42,22 @@ The PNG will be generated in the same directory.
 ### Custom Size
 
 ```bash
-mmdc -i "UML-Diagrams/object-uml.mmd" -o "UML-Diagrams/object-uml.png" -w 1920 -H 1080
+mmdc -i "UML-Diagrams/<type-of-uml>-UML/<type-of-UML>-uml.mmd" -o "UML-Diagrams/<type-of-UML>-uml.png" -w 1920 -H 1080
 ```
 
 ### Higher Resolution (Retina)
 
 ```bash
-mmdc -i "UML-Diagrams/object-uml.mmd" -o "UML-Diagrams/object-uml.png" --scale 2
+mmdc -i "UML-Diagrams/<type-of-uml>-UML/<type-of-UML>-uml.mmd" -o "UML-Diagrams/<type-of-UML>-uml.png" --scale 2
 ```
 
 ### Different Theme
 
 ```bash
-mmdc -i "UML-Diagrams/object-uml.mmd" -o "UML-Diagrams/object-uml.png" --theme dark
+mmdc -i "UML-Diagrams/<type-of-uml>-UML/<type-of-UML>-uml.mmd" -o "UML-Diagrams/<type-of-UML>-uml.png" --theme dark
 ```
 
 Available themes: `default`, `forest`, `dark`, `neutral`
-
-### Combine Options
-
-```bash
-mmdc -i "UML-Diagrams/object-uml.mmd" -o "UML-Diagrams/object-uml.png" -w 1920 -H 1080 --scale 2 --theme dark
-```
 
 ## Diagram Overview
 

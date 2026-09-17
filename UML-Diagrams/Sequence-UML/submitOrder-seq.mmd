@@ -1,0 +1,64 @@
+%%{init: {'sequence': {'mirrorActors': false}}}%%
+sequenceDiagram
+    actor U as User
+    participant O as Order
+    participant A as Asset
+    participant M as MarketData
+    participant T as TradingRule
+    participant I as OrderIntent
+    participant R as Trade
+    participant S as Settlement
+    participant C as CashFlow
+    participant AL as AuditLog
+
+    U->>O: submitOrder(userId, assetId, quantity, intendedPrice)
+    
+    O->>O: validateOrder()
+
+    O->>A: validateTradeability()
+
+    A-->>O: tradeable = true/false
+    
+    alt Asset not tradeable
+        O-->>U: order rejected
+    else Asset is tradeable
+        O->>M: getCurrentPrice(assetId)
+        
+        M-->>O: marketPrice data
+        
+        O->>T: validateOrder(order)
+        
+        T-->>O: isValid = true/false
+        
+        alt Rules validation fails
+            O-->>U: order rejected
+        else Rules validation passes
+            O->>I: recordIntent(orderId, quantity, intendedPrice)
+            
+            I-->>O: intentId created
+            
+            O->>O: executeOrder()
+            
+            O->>R: executeTrade(orderId, assetId, executionPrice)
+            
+            R-->>O: Trade created with tradeId
+            
+            O->>S: createSettlement(orderId, quantity, executionPrice)
+            
+            S->>S: recordSettlement()
+            
+            S-->>O: settlementId created
+            
+            O->>C: recordCashFlow(userId, amount, orderRelated)
+            
+            C->>C: processTransaction()
+            
+            C-->>O: transaction recorded
+            
+            O->>AL: logAction(userId, orderId, "ORDER_SUBMITTED")
+            
+            AL-->>O: auditId created
+            
+            O-->>U: Order submitted successfully
+        end
+    end
