@@ -1,9 +1,9 @@
 -- Seed data for users, holdings, orders, and trades
 
-INSERT INTO users (user_id, first_name, last_name, email, password_hash, role, phone_number, date_of_birth) VALUES
-    (1, 'Fredrick', 'Robert', 'frobert@frogpond.com', '$2b$12$KIXQeYqM8n1s7kZbT6RJ2eYQwGZ2p1lWc9k4X8dQ9vJ0F1yZQ2ZlO', 'user', '555-0101', '1990-05-15'),
-    (2, 'Jane', 'Doe', 'jane.doe@example.com', '$2b$12$3fZQ1oT9nqzZ8vG7B5dO7uWn4yFhE5cQmX0yA2sR7pL6tK9uH1jSa', 'user', '555-0102', '1992-08-22'),
-    (3, 'Admin', 'User', 'admin@brokerage.com', '$2b$12$Yq7fE0n2b1sT4rX9mP6cO.uJ3zK8dR5vL1wA0hN9qS2yG7xF4bC3e', 'admin', '555-0103', '1985-03-10');
+INSERT INTO users (user_id, first_name, last_name, email, password_hash, role, phone_number, date_of_birth, is_active, is_frozen) VALUES
+    (1, 'Fredrick', 'Robert', 'frobert@frogpond.com', '$2b$12$KIXQeYqM8n1s7kZbT6RJ2eYQwGZ2p1lWc9k4X8dQ9vJ0F1yZQ2ZlO', 'user', '555-0101', '1990-05-15', TRUE, FALSE),
+    (2, 'Jane', 'Doe', 'jane.doe@example.com', '$2b$12$3fZQ1oT9nqzZ8vG7B5dO7uWn4yFhE5cQmX0yA2sR7pL6tK9uH1jSa', 'user', '555-0102', '1992-08-22', TRUE, FALSE),
+    (3, 'Admin', 'User', 'admin@brokerage.com', '$2b$12$Yq7fE0n2b1sT4rX9mP6cO.uJ3zK8dR5vL1wA0hN9qS2yG7xF4bC3e', 'admin', '555-0103', '1985-03-10', TRUE, FALSE);
 
 INSERT INTO holdings (asset_id, security, ticker, asset_type, num_shares, user_id) VALUES
     (1, 'Apple Inc.', 'AAPL', 'equity', 10.0000, 1),

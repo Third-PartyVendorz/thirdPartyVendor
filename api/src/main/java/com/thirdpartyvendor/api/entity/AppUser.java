@@ -62,8 +62,11 @@ public class AppUser {
 	@Enumerated(EnumType.STRING)
 	private UserRole role;
 
-	@Column(name = "frozen", nullable = false)
+	@Column(name = "is_frozen", nullable = false)
 	private boolean frozen;
+
+	@Column(name = "is_active", nullable = false)
+	private boolean active;
 
 
 	@PrePersist
