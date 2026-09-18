@@ -17,7 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.thirdpartyvendor.api.dto.AuthenticationRequest;
 import com.thirdpartyvendor.api.dto.AuthenticationResponse;
 import com.thirdpartyvendor.api.entity.AppUser;
-import com.thirdpartyvendor.api.entity.UserRole;
+import com.thirdpartyvendor.api.entity.AppUser.UserRole;
 import com.thirdpartyvendor.api.repository.AppUserRepository;
 
 class AuthenticationServiceTest {
