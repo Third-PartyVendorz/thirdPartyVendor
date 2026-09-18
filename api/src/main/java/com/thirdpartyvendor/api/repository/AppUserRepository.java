@@ -9,4 +9,6 @@ import com.thirdpartyvendor.api.entity.AppUser;
 public interface AppUserRepository extends JpaRepository<AppUser, Long> {
 
 	Optional<AppUser> findByEmail(String email);
+
+	Optional<AppUser> findByEmailAndActiveTrue(String email);
 }

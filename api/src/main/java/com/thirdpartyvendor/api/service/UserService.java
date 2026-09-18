@@ -1,5 +1,6 @@
 package com.thirdpartyvendor.api.service;
 
+import java.util.Locale;
 import java.util.Optional;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,24 +35,25 @@ public class UserService {
 		AppUser user = userRepository.findById(userId)
 			.orElseThrow(() -> new UserNotFoundException("User not found"));
 
-
-		if (updateRequest.email() != null) {
-			Optional<AppUser> userWithSameEmail = userRepository.findByEmail(updateRequest.email());
+		String requestEmail = updateRequest.email().trim().toLowerCase(Locale.ROOT);
+		
+		if (requestEmail != null) {
+			Optional<AppUser> userWithSameEmail = userRepository.findByEmail(requestEmail);
 			if (!userWithSameEmail.isEmpty()) {
-				if (!userWithSameEmail.get().getEmail().equals(updateRequest.email())) {
+				if (!userWithSameEmail.get().getEmail().equals(requestEmail)) {
 					throw new EmailAlreadyInUseException("Email is already in use");
 				}
 			}
 				
-			user.setEmail(updateRequest.email());
+			user.setEmail(requestEmail);
 		}
 
 		if (updateRequest.firstName() != null) {
-			user.setFirstName(updateRequest.firstName());
+			user.setFirstName(updateRequest.firstName().trim());
 		}
 
 		if (updateRequest.lastName() != null) {
-			user.setLastName(updateRequest.lastName());
+			user.setLastName(updateRequest.lastName().trim());
 		}
 		
 		if (updateRequest.dateOfBirth() != null) {
@@ -59,7 +61,7 @@ public class UserService {
 		}
 
 		if (updateRequest.phoneNumber() != null) {
-			user.setPhoneNumber(updateRequest.phoneNumber());
+			user.setPhoneNumber(updateRequest.phoneNumber().trim());
 		}
 
 		userRepository.save(user);
@@ -77,15 +79,15 @@ public class UserService {
 		AppUser user = userRepository.findById(userId)
 			.orElseThrow(() -> new UserNotFoundException("User not found"));
 
-		if (!passwordEncoder.matches(passwordRequest.currentPassword(), user.getPasswordHash())) {
+		if (!passwordEncoder.matches(passwordRequest.currentPassword().trim(), user.getPasswordHash())) {
 			throw new PasswordException("Incorrect current password");
 		}
 
-		if (!passwordRequest.newPassword().equals(passwordRequest.confirmNewPassword())) {
+		if (!passwordRequest.newPassword().trim().equals(passwordRequest.confirmNewPassword().trim())) {
 			throw new PasswordException("New passwords don't match");
 		}
 
-		user.setPasswordHash(passwordEncoder.encode(passwordRequest.newPassword()));
+		user.setPasswordHash(passwordEncoder.encode(passwordRequest.newPassword().trim()));
 
 		userRepository.save(user);
 	}
@@ -112,7 +114,16 @@ public class UserService {
 		userRepository.save(user);
 	}
 
-	// TODO: functionality for deleting user
+	public void softDeleteUser(Long userId, AppUser currenUser) {
+		AuthorizationUtil.requireOwnUserOrAdmin(userId, currenUser);
+
+		AppUser user = userRepository.findById(userId)
+			.orElseThrow(() -> new UserNotFoundException("User not found"));
+
+		user.setActive(false);
+
+		userRepository.save(user);
+	}
 
 	public static class UserNotFoundException extends RuntimeException {
 		public UserNotFoundException(String message) {
