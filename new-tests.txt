@@ -19,6 +19,9 @@ RegistrationServiceTest.java New Tests:
         - User attempts to login with weak credentials??????????
 
 
+    
+
+
 
 
     What is handled on frontend vs backend?
@@ -34,3 +37,6 @@ RegistrationServiceTest.java New Tests:
 
 
 AuthenticationServiceTest.java New Tests:
+
+    - This is sign in and ensuring that users are performing actions that are aligned with their role(admin/user)
+
