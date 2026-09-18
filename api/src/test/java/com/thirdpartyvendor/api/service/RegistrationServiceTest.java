@@ -10,6 +10,9 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -69,4 +72,72 @@ class RegistrationServiceTest {
 		assertEquals(HttpStatus.CONFLICT, exception.getStatusCode());
 	}
     // TODO: once roles are implemented, verify admin users can only be created by an admin
+
+
+	@Test
+	void attemptsToRegisterWithNoFirstName(){
+		ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> registrationService.register(new RegisterRequest(
+			"",
+			"Doe",
+			"555-0102",
+			LocalDate.of(1992, 8, 22),
+			"jane.doe@example.com",
+			"secret123")));
+
+		assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+	}
+
+	@Test
+	void attemptsToRegisterWithInvalidLastName(){
+		ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> registrationService.register(new RegisterRequest(
+			"Jane",
+			"",
+			"555-0102",
+			LocalDate.of(1992, 8, 22),
+			"jane.doe@example.com",
+			"secret123")));
+
+		assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+	}
+
+	@Test
+	void userAttemptsToRegisterWithNonNumericPhoneNumber(){
+		when(appUserRepository.save(org.mockito.ArgumentMatchers.any(AppUser.class))).thenAnswer(invocation -> {
+			AppUser user = invocation.getArgument(0);
+			user.setId(1L);
+			return user;
+		});
+		
+		ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> registrationService.register(new RegisterRequest(
+			"Jane",
+			"Doe",
+			"poo-poop",
+			LocalDate.of(1992, 8, 22),
+			"jane.doe@example.com",
+			"secret123")));
+
+		assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+	}
+
+	@ParameterizedTest
+	@ValueSource(strings = {"jane.doeexample.com", "jane.doe@.com", "jane.doe@com", "jane.doe@example"})
+	void attemptsToRegisterWithInvalidEmail(String email){
+
+		when(appUserRepository.save(org.mockito.ArgumentMatchers.any(AppUser.class))).thenAnswer(invocation -> {
+			AppUser user = invocation.getArgument(0);
+			user.setId(1L);
+			return user;
+		});
+
+		ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> registrationService.register(new RegisterRequest(
+			"Jane",
+			"Doe",
+			"555-0102",
+			LocalDate.of(1992, 8, 22),
+			email,
+			"secret123")));
+
+		assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+	}
+
 }
