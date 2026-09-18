@@ -18,6 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.thirdpartyvendor.api.dto.RegisterRequest;
 import com.thirdpartyvendor.api.dto.RegisterResponse;
 import com.thirdpartyvendor.api.entity.AppUser;
+import com.thirdpartyvendor.api.entity.AppUser.UserRole;
 import com.thirdpartyvendor.api.repository.AppUserRepository;
 
 class RegistrationServiceTest {
@@ -48,7 +49,7 @@ class RegistrationServiceTest {
 		assertEquals("Jane", response.firstName());
 		assertEquals("Doe", response.lastName());
 		assertEquals("jane.doe@example.com", response.email());
-		assertEquals("user", response.userRole());
+		assertEquals(UserRole.USER, response.userRole());
 	}
 
 	@Test
