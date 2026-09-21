@@ -34,13 +34,13 @@ public class AuthenticationService {
 
 	public AuthenticationResponse authenticate(AuthenticationRequest request) {
 		String email = normalizeEmail(request.email());
-		String password = request.password();
+		String password = request.password() == null ? null : request.password().trim();
 
 		if (email == null || email.isBlank() || password == null || password.isBlank()) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email and password are required");
 		}
 
-		AppUser user = appUserRepository.findByEmail(email)
+		AppUser user = appUserRepository.findByEmailAndActiveTrue(email)
 			.orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password"));
 
 		if (!passwordEncoder.matches(password, user.getPasswordHash())) {
