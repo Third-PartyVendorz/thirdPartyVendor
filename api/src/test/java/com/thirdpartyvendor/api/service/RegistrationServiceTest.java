@@ -71,8 +71,6 @@ class RegistrationServiceTest {
 
 		assertEquals(HttpStatus.CONFLICT, exception.getStatusCode());
 	}
-    // TODO: once roles are implemented, verify admin users can only be created by an admin
-
 
 	@Test
 	void attemptsToRegisterWithNoFirstName(){
@@ -88,7 +86,7 @@ class RegistrationServiceTest {
 	}
 
 	@Test
-	void attemptsToRegisterWithInvalidLastName(){
+	void attemptsToRegisterWithNoLastName(){
 		ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> registrationService.register(new RegisterRequest(
 			"Jane",
 			"",
