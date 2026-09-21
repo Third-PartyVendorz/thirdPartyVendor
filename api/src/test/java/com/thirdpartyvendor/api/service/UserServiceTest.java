@@ -46,10 +46,9 @@ class UserServiceTest {
 		userService = new UserService(appUserRepository, passwordEncoder);
 	}
 
-	// ==================== editUser Tests ====================
 
 	@Test
-	void editUser_UpdatesEmailSuccessfully() {
+	void editUserUpdatesEmailSuccessfully() {
 		Long userId = 1L;
 		AppUser currentUser = createUser(userId, "john", "doe", "555-0000", LocalDate.of(1990, 1, 1), "john@example.com", "defaultPassword123", UserRole.USER, false);
 		AppUser userToUpdate = createUser(userId, "john", "doe", "555-0000", LocalDate.of(1990, 1, 1), "john@example.com", "defaultPassword123", UserRole.USER, false);
@@ -67,7 +66,7 @@ class UserServiceTest {
 	}
 
 	@Test
-	void editUser_UpdatesFirstNameSuccessfully() {
+	void editUserUpdatesFirstNameSuccessfully() {
 		Long userId = 1L;
 		AppUser currentUser = createUser(userId, "john", "doe", "555-0000", LocalDate.of(1990, 1, 1), "john@example.com", "defaultPassword123", UserRole.USER, false);
 		AppUser userToUpdate = createUser(userId, "john", "doe", "555-0000", LocalDate.of(1990, 1, 1), "john@example.com", "defaultPassword123", UserRole.USER, false);
@@ -84,7 +83,7 @@ class UserServiceTest {
 	}
 
 	@Test
-	void editUser_UpdatesLastNameSuccessfully() {
+	void editUserUpdatesLastNameSuccessfully() {
 		Long userId = 1L;
 		AppUser currentUser = createUser(userId, "john", "doe", "555-0000", LocalDate.of(1990, 1, 1), "john@example.com", "defaultPassword123", UserRole.USER, false);
 		AppUser userToUpdate = createUser(userId, "john", "doe", "555-0000", LocalDate.of(1990, 1, 1), "john@example.com", "defaultPassword123", UserRole.USER, false);
@@ -101,7 +100,7 @@ class UserServiceTest {
 	}
 
 	@Test
-	void editUser_UpdatesDateOfBirthSuccessfully() {
+	void editUserUpdatesDateOfBirthSuccessfully() {
 		Long userId = 1L;
 		AppUser currentUser = createUser(userId, "john", "doe", "555-0000", LocalDate.of(1990, 1, 1), "john@example.com", "defaultPassword123", UserRole.USER, false);
 		AppUser userToUpdate = createUser(userId, "john", "doe", "555-0000", LocalDate.of(1990, 1, 1), "john@example.com", "defaultPassword123", UserRole.USER, false);
@@ -119,7 +118,7 @@ class UserServiceTest {
 	}
 
 	@Test
-	void editUser_UpdatesPhoneNumberSuccessfully() {
+	void editUserUpdatesPhoneNumberSuccessfully() {
 		Long userId = 1L;
 		AppUser currentUser = createUser(userId, "john", "doe", "555-0000", LocalDate.of(1990, 1, 1), "john@example.com", "defaultPassword123", UserRole.USER, false);
 		AppUser userToUpdate = createUser(userId, "john", "doe", "555-0000", LocalDate.of(1990, 1, 1), "john@example.com", "defaultPassword123", UserRole.USER, false);
@@ -136,7 +135,7 @@ class UserServiceTest {
 	}
 
 	@Test
-	void editUser_UpdatesMultipleFieldsSuccessfully() {
+	void editUserUpdatesMultipleFieldsSuccessfully() {
 		Long userId = 1L;
 		AppUser currentUser = createUser(userId, "john", "doe", "555-0000", LocalDate.of(1990, 1, 1), "john@example.com", "defaultPassword123", UserRole.USER, false);
 		AppUser userToUpdate = createUser(userId, "john", "doe", "555-0000", LocalDate.of(1990, 1, 1), "john@example.com", "defaultPassword123", UserRole.USER, false);
@@ -160,7 +159,7 @@ class UserServiceTest {
 	}
 
 	@Test
-	void editUser_AllowsSameEmailForSameUser() {
+	void editUserAllowsSameEmailForSameUser() {
 		Long userId = 1L;
 		AppUser currentUser = createUser(userId, "john", "doe", "555-0000", LocalDate.of(1990, 1, 1), "john@example.com", "defaultPassword123", UserRole.USER, false);
 		AppUser userToUpdate = createUser(userId, "john", "doe", "555-0000", LocalDate.of(1990, 1, 1), "john@example.com", "defaultPassword123", UserRole.USER, false);
@@ -176,7 +175,7 @@ class UserServiceTest {
 	}
 
 	@Test
-	void editUser_RejectsDuplicateEmail() {
+	void editUserRejectsDuplicateEmail() {
 		Long userId = 1L;
 		Long otherUserId = 2L;
 		AppUser currentUser = createUser(userId, "john", "doe", "555-0000", LocalDate.of(1990, 1, 1), "john@example.com", "defaultPassword123", UserRole.USER, false);
@@ -195,7 +194,7 @@ class UserServiceTest {
 	}
 
 	@Test
-	void editUser_ThrowsUserNotFoundExceptionWhenUserDoesNotExist() {
+	void editUserThrowsUserNotFoundExceptionWhenUserDoesNotExist() {
 		Long userId = 1L;
 		AppUser currentUser = createUser(userId, "john", "doe", "555-0000", LocalDate.of(1990, 1, 1), "john@example.com", "defaultPassword123", UserRole.USER, false);
 		EditAccountRequest request = new EditAccountRequest(null, null, "555-0000", null, "newemail@example.com");
@@ -210,7 +209,7 @@ class UserServiceTest {
 	}
 
 	@Test
-	void editUser_IgnoresNullFieldsInRequest() {
+	void editUserIgnoresNullFieldsInRequest() {
 		Long userId = 1L;
 		AppUser currentUser = createUser(userId, "john", "doe", "555-0000", LocalDate.of(1990, 1, 1), "john@example.com", "defaultPassword123", UserRole.USER, false);
 		AppUser userToUpdate = createUser(userId, "john", "doe", "555-0000", LocalDate.of(1990, 1, 1), "john@example.com", "defaultPassword123", UserRole.USER, false);
@@ -227,10 +226,9 @@ class UserServiceTest {
 		assertEquals("Original", captor.getValue().getFirstName());
 	}
 
-	// ==================== changePassword Tests ====================
 
 	@Test
-	void changePassword_SuccessfullyChangesPassword() {
+	void changePasswordSuccessfullyChangesPassword() {
 		Long userId = 1L;
 		String oldPassword = "oldPassword123";
 		String newPassword = "newPassword456";
@@ -251,7 +249,7 @@ class UserServiceTest {
 	}
 
 	@Test
-	void changePassword_ThrowsExceptionForIncorrectCurrentPassword() {
+	void changePasswordThrowsExceptionForIncorrectCurrentPassword() {
 		Long userId = 1L;
 		String oldPassword = "oldPassword123";
 		String wrongPassword = "wrongPassword000";
@@ -271,7 +269,7 @@ class UserServiceTest {
 	}
 
 	@Test
-	void changePassword_ThrowsExceptionWhenNewPasswordsDoNotMatch() {
+	void changePasswordThrowsExceptionWhenNewPasswordsDoNotMatch() {
 		Long userId = 1L;
 		String oldPassword = "oldPassword123";
 		String newPassword1 = "newPassword456";
@@ -291,7 +289,7 @@ class UserServiceTest {
 	}
 
 	@Test
-	void changePassword_ThrowsUserNotFoundExceptionWhenUserDoesNotExist() {
+	void changePasswordThrowsUserNotFoundExceptionWhenUserDoesNotExist() {
 		Long userId = 1L;
 		AppUser currentUser = createUser(userId, "john", "doe", "555-0000", LocalDate.of(1990, 1, 1), "john@example.com", "defaultPassword123", UserRole.USER, false);
 		ChangePasswordRequest request = new ChangePasswordRequest("oldPassword", "newPassword", "newPassword");
@@ -306,7 +304,7 @@ class UserServiceTest {
 	}
 
 	@Test
-	void changePassword_ValidatesOldPasswordBeforeMatchingNewPasswords() {
+	void changePasswordValidatesOldPasswordBeforeMatchingNewPasswords() {
 		Long userId = 1L;
 		String oldPassword = "oldPassword123";
 		String wrongPassword = "wrongPassword000";
@@ -326,14 +324,13 @@ class UserServiceTest {
 		assertEquals("Incorrect current password", exception.getMessage());
 	}
 
-	// ==================== freezeAccount Tests ====================
 
 	@Test
-	void freezeAccount_SuccessfullyFreezesAccount() {
+	void freezeAccountSuccessfullyFreezesAccount() {
 		Long userId = 1L;
 		AppUser admin = createUser(2L, "admin", "user", "555-0000", LocalDate.of(1990, 1, 1), "admin@example.com", "defaultPassword123", UserRole.ADMIN, false);
 		AppUser userToFreeze = createUser(userId, "john", "doe", "555-0000", LocalDate.of(1990, 1, 1), "john@example.com", "defaultPassword123", UserRole.USER, false);
-		userToFreeze.setFrozen(false);
+		// userToFreeze.setFrozen(false);
 
 		when(appUserRepository.findById(userId)).thenReturn(Optional.of(userToFreeze));
 		when(appUserRepository.save(any(AppUser.class))).thenReturn(userToFreeze);
@@ -346,7 +343,7 @@ class UserServiceTest {
 	}
 
 	@Test
-	void freezeAccount_ThrowsUserNotFoundExceptionWhenUserDoesNotExist() {
+	void freezeAccountThrowsUserNotFoundExceptionWhenUserDoesNotExist() {
 		Long userId = 1L;
 		AppUser admin = createUser(2L, "admin", "user", "555-0000", LocalDate.of(1990, 1, 1), "admin@example.com", "defaultPassword123", UserRole.ADMIN, false);
 
@@ -360,7 +357,7 @@ class UserServiceTest {
 	}
 
 	@Test
-	void freezeAccount_EnforcesAdminAuthorizationCheck() {
+	void freezeAccountEnforcesAdminAuthorizationCheck() {
 		Long userId = 1L;
 		AppUser nonAdmin = createUser(2L, "john", "doe", "555-0000", LocalDate.of(1990, 1, 1), "john@example.com", "defaultPassword123", UserRole.USER, false);
 
@@ -371,10 +368,9 @@ class UserServiceTest {
 		assertThrows(Exception.class, () -> userService.freezeAccount(userId, nonAdmin));
 	}
 
-	// ==================== unfreezeAccount Tests ====================
 
 	@Test
-	void unfreezeAccount_SuccessfullyUnfreezesAccount() {
+	void unfreezeAccountSuccessfullyUnfreezesAccount() {
 		Long userId = 1L;
 		AppUser admin = createUser(2L, "admin", "user", "555-0000", LocalDate.of(1990, 1, 1), "admin@example.com", "defaultPassword123", UserRole.ADMIN, false);
 		AppUser userToUnfreeze = createUser(userId, "john", "doe", "555-0000", LocalDate.of(1990, 1, 1), "john@example.com", "defaultPassword123", UserRole.USER, false);
@@ -391,7 +387,7 @@ class UserServiceTest {
 	}
 
 	@Test
-	void unfreezeAccount_ThrowsUserNotFoundExceptionWhenUserDoesNotExist() {
+	void unfreezeAccountThrowsUserNotFoundExceptionWhenUserDoesNotExist() {
 		Long userId = 1L;
 		AppUser admin = createUser(2L, "admin", "user", "555-0000", LocalDate.of(1990, 1, 1), "admin@example.com", "defaultPassword123", UserRole.ADMIN, false);
 
@@ -405,32 +401,13 @@ class UserServiceTest {
 	}
 
 	@Test
-	void unfreezeAccount_EnforcesAdminAuthorizationCheck() {
+	void unfreezeAccountEnforcesAdminAuthorizationCheck() {
 		Long userId = 1L;
 		AppUser nonAdmin = createUser(2L, "john", "doe", "555-0000", LocalDate.of(1990, 1, 1), "john@example.com", "defaultPassword123", UserRole.USER, false);
 
 		// AuthorizationUtil.requireAdmin will throw an exception for non-admin users
 		assertThrows(Exception.class, () -> userService.unfreezeAccount(userId, nonAdmin));
 	}
-
-	// ==================== Helper Methods ====================
-
-	/**
-	 * Helper method to create a test AppUser with standard fields.
-	 */
-	// private AppUser createUser(Long id, String firstName, String lastName, String email, UserRole role) {
-	// 	AppUser user = new AppUser();
-	// 	user.setId(id);
-	// 	user.setFirstName(firstName);
-	// 	user.setLastName(lastName);
-	// 	user.setEmail(email);
-	// 	user.setRole(role);
-	// 	user.setPhoneNumber("555-0000");
-	// 	user.setDateOfBirth(LocalDate.of(1990, 1, 1));
-	// 	user.setPasswordHash(passwordEncoder.encode("defaultPassword123"));
-	// 	user.setFrozen(false);
-	// 	return user;
-	// }
 
     private AppUser createUser(Long id, String firstName, String lastName, String phoneNumber, LocalDate dateOfBirth, String email, String password, UserRole role, boolean frozen) {
 		AppUser user = new AppUser();
