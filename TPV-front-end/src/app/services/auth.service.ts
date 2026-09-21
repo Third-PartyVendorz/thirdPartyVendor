@@ -19,4 +19,8 @@ export class AuthService {
     return this.http.post<AuthenticationResponse>('/auth/authenticate', authenticationRequest);
   }
 
+  getAuthToken() {
+    return localStorage.getItem('authToken');
+  }
+
 }
