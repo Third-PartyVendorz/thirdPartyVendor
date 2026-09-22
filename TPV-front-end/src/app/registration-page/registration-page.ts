@@ -32,6 +32,7 @@ export class RegistrationPage {
     this.authService.authenticate(request).subscribe({
       next: (response: AuthenticationResponse) => {
         this.authService.setAuthToken(response.jwtToken);
+        // remove console logging once proper logging is implemented
         console.log("Authentication successful: ", response);
       },
       error: (error) => {
