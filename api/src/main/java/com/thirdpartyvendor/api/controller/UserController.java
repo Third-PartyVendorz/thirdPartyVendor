@@ -2,6 +2,7 @@ package com.thirdpartyvendor.api.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -48,5 +49,12 @@ public class UserController {
 		return ResponseEntity.ok("Password changed successfully");
 	}
 
-	// TODO: add route for deleting user
+	@DeleteMapping("/delete") 
+	public ResponseEntity<?> deleteUser(
+		@PathVariable Long userId
+	) {
+		AppUser currentUser = getCurrentUser();
+		userService.softDeleteUser(userId, currentUser);
+		return ResponseEntity.ok("Account updated successfully");
+	}
 }

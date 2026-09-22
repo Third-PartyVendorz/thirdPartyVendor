@@ -1,0 +1,42 @@
+RegistrationServiceTest.java New Tests:
+
+    - User attempts to register without a DOB --> Should raise exception
+
+    - This can be handled on frontend, do we also build out tests?:
+    - User registers with an invalid DOB: --> Should raise exception
+        - Has not yet happened yet
+        - Incorrectly formatted
+        - ...
+
+    - User attempts to register with an invalid email: --> Should raise exception --> May need new logic here
+        - Inproperly formatted:
+            - no @ sign
+            - no trailing --> .com, .net, .something
+    
+    - Invalid registration flow --> Should raise exception --> May need new logic here
+        - User attempts to login with empty credentials
+            - User cannot have blank first or last name
+        - User attempts to login with weak credentials??????????
+
+
+    
+
+
+
+
+    What is handled on frontend vs backend?
+
+
+
+    
+
+
+
+
+
+
+
+AuthenticationServiceTest.java New Tests:
+
+    - This is sign in and ensuring that users are performing actions that are aligned with their role(admin/user)
+
