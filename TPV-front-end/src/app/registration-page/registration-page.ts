@@ -8,6 +8,7 @@ import { AuthenticationRequest } from '../dto/AuthenticationRequest';
 
 @Component({
   imports: [],
+  standalone: true,
   selector: 'app-registration-page',
   styleUrl: './registration-page.scss',
   templateUrl: './registration-page.html',
@@ -26,10 +27,11 @@ export class RegistrationPage {
     });
   }
 
+  //TODO: move to login component once created
   authenticate(request: AuthenticationRequest) {
     this.authService.authenticate(request).subscribe({
       next: (response: AuthenticationResponse) => {
-        localStorage.setItem('authToken', response.jwtToken);
+        this.authService.setAuthToken(response.jwtToken);
         console.log("Authentication successful: ", response);
       },
       error: (error) => {
