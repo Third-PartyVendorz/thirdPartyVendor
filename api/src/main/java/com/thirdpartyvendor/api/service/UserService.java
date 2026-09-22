@@ -40,7 +40,7 @@ public class UserService {
 		if (requestEmail != null) {
 			Optional<AppUser> userWithSameEmail = userRepository.findByEmail(requestEmail);
 			if (!userWithSameEmail.isEmpty()) {
-				if (!userWithSameEmail.get().getEmail().equals(requestEmail)) {
+				if (!userWithSameEmail.get().getId().equals(userId)) {
 					throw new EmailAlreadyInUseException("Email is already in use");
 				}
 			}
