@@ -34,31 +34,18 @@ sequenceDiagram
             O-->>U: order rejected
         else Rules validation passes
             O->>I: recordIntent(orderId, quantity, intendedPrice)
-            
-            I-->>O: intentId created
-            
-            O->>O: executeOrder()
-            
-            O->>R: executeTrade(orderId, assetId, executionPrice)
-            
-            R-->>O: Trade created with tradeId
-            
-            O->>S: createSettlement(orderId, quantity, executionPrice)
-            
-            S->>S: recordSettlement()
-            
-            S-->>O: settlementId created
-            
-            O->>C: recordCashFlow(userId, amount, orderRelated)
-            
+            I-->>O: intentId created      
+            O->>O: executeOrder()          
+            O->>R: executeTrade(orderId, assetId, executionPrice)           
+            R-->>O: Trade created with tradeId           
+            O->>S: createSettlement(orderId, quantity, executionPrice)          
+            S->>S: recordSettlement()          
+            S-->>O: settlementId created           
+            O->>C: recordCashFlow(userId, amount, orderRelated)          
             C->>C: processTransaction()
-            
             C-->>O: transaction recorded
-            
-            O->>AL: logAction(userId, orderId, "ORDER_SUBMITTED")
-            
-            AL-->>O: auditId created
-            
+            O->>AL: logAction(userId, orderId, "ORDER_SUBMITTED")            
+            AL-->>O: auditId created            
             O-->>U: Order submitted successfully
         end
     end
