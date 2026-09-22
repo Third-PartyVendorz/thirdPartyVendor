@@ -11,7 +11,10 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                sh 'npm install'
+                dir('TPV-front-end') {
+                    sh 'npm install'
+                }
+                // sh 'npm install'
             }
         }
         
