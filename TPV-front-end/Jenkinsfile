@@ -1,0 +1,13 @@
+pipeline {
+    agent any
+    tools {nodejs "NodeJS"}
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+                echo 'Jenkins pipeline is working!'
+            }
+        }
+
+    }
+}
