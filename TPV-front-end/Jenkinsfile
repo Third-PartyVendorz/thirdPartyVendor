@@ -1,6 +1,7 @@
 pipeline {
     agent any
     tools {nodejs "NodeJS"}
+    //ensure that your NodeJS version is 22.22.3 in the tools tab in Jenkins UI
     stages {
         stage('Checkout') {
             steps {
