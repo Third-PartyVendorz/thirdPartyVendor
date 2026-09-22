@@ -51,6 +51,7 @@ public class RegistrationService {
 		user.setEmail(email);
 		user.setPasswordHash(passwordEncoder.encode(password));
 		user.setRole(DEFAULT_ROLE);
+		user.setActive(true);
 
 		AppUser savedUser = appUserRepository.save(user);
 		return new RegisterResponse(savedUser.getId(), savedUser.getFirstName(), savedUser.getLastName(), savedUser.getEmail(), savedUser.getRole());
