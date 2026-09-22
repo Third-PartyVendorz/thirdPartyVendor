@@ -362,10 +362,7 @@ class UserServiceTest {
 		AppUser nonAdmin = createUser(2L, "john", "doe", "555-0000", LocalDate.of(1990, 1, 1), "john@example.com", "defaultPassword123", UserRole.USER, false);
 
 		// AuthorizationUtil.requireAdmin will throw an exception for non-admin users
-		// This test verifies that the authorization check is enforced
-		// Note: This assumes AuthorizationUtil is being called. If AuthorizationUtil
-		// is mocked or not actually throwing, this test may need adjustment.
-		assertThrows(Exception.class, () -> userService.freezeAccount(userId, nonAdmin));
+		assertThrows(AuthorizationUtil.ForbiddenException.class, () -> userService.freezeAccount(userId, nonAdmin));
 	}
 
 
@@ -406,7 +403,7 @@ class UserServiceTest {
 		AppUser nonAdmin = createUser(2L, "john", "doe", "555-0000", LocalDate.of(1990, 1, 1), "john@example.com", "defaultPassword123", UserRole.USER, false);
 
 		// AuthorizationUtil.requireAdmin will throw an exception for non-admin users
-		assertThrows(Exception.class, () -> userService.unfreezeAccount(userId, nonAdmin));
+		assertThrows(AuthorizationUtil.ForbiddenException.class, () -> userService.unfreezeAccount(userId, nonAdmin));
 	}
 
     private AppUser createUser(Long id, String firstName, String lastName, String phoneNumber, LocalDate dateOfBirth, String email, String password, UserRole role, boolean frozen) {
