@@ -20,13 +20,17 @@ pipeline {
         
         stage('Build') {
             steps {
-                sh 'npm run build'
+                dir('TPV-front-end') {
+                    sh 'npm run build'
+                }
             }
         }
 
         stage('Test') {
             steps {
-                sh 'npm test'
+                dir('TPV-front-end') {
+                    sh 'npm test'
+                }
             }
         }
 
