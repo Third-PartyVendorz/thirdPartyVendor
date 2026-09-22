@@ -35,9 +35,10 @@ public class UserService {
 		AppUser user = userRepository.findById(userId)
 			.orElseThrow(() -> new UserNotFoundException("User not found"));
 
-		String requestEmail = updateRequest.email().trim().toLowerCase(Locale.ROOT);
+		// String requestEmail = updateRequest.email().trim().toLowerCase(Locale.ROOT);
 		
-		if (requestEmail != null) {
+		if (updateRequest.email() != null) {
+			String requestEmail = updateRequest.email().trim().toLowerCase(Locale.ROOT);
 			Optional<AppUser> userWithSameEmail = userRepository.findByEmail(requestEmail);
 			if (!userWithSameEmail.isEmpty()) {
 				if (!userWithSameEmail.get().getId().equals(userId)) {
