@@ -46,3 +46,9 @@ Steps:
     - Grab Auth token From SecurityContextHolder
 
 - Inject OrderService in OrderController --> Link Service functionality to endpoint
+
+
+
+
+
+Do we pass securitycontext from controller as argument or access diretly in OrderService?
