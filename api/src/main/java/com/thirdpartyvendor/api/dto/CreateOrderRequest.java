@@ -7,5 +7,6 @@ public record CreateOrderRequest(
     Long assetId,
     OrderIntent orderIntent,
     BigDecimal quantity,
-    BigDecimal orderPrice
+    BigDecimal orderPrice,
+    String orderCurrency
 ) {}
