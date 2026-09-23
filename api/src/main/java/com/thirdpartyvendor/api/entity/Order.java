@@ -62,6 +62,9 @@ public class Order {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "order_currency", nullable = false)
+    private String orderCurrency;
+
     @PrePersist()
     void onCreate() {
         createdAt = LocalDateTime.now();
