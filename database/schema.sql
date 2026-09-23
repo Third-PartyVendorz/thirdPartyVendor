@@ -1,53 +1,72 @@
--- First draft of schema
-
-CREATE TABLE User (
+CREATE TABLE users (
     user_id SERIAL PRIMARY KEY,
---     username VARCHAR(50) UNIQUE NOT NULL,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    phone_number VARCHAR(20) UNIQUE,
+    date_of_birth DATE NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
---     Will need to apply password hashing encryption for security reasons
     password_hash VARCHAR(255) NOT NULL,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    is_frozen BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     role VARCHAR(50) NOT NULL
 );
 
-CREATE TABLE Assets (
-    asset_id SERIAL,
+CREATE TABLE holdings (
+    asset_id BIGINT,
     security VARCHAR(255) NOT NULL,
     ticker VARCHAR(10) NOT NULL,
     asset_type VARCHAR(50) NOT NULL,
     num_shares NUMERIC(15, 4) NOT NULL,
     user_id INT NOT NULL,
---     Compound primary key
     PRIMARY KEY (asset_id, user_id),
-    FOREIGN KEY (user_id) REFERENCES User(user_id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
-CREATE TABLE Order (
-    order_id SERIAL PRIMARY KEY,
+CREATE TABLE orders (
+    order_id BIGINT PRIMARY KEY,
     user_id INT NOT NULL,
-    asset_id INT NOT NULL,
+    asset_id BIGINT NOT NULL,
     order_intent VARCHAR(10) NOT NULL,
-    quantity NUMERIC(15, 4) NOT NULL,
-    order_price NUMERIC(15, 4) NOT NULL,
+    quantity NUMERIC(15, 4),
+    order_price NUMERIC(15, 4),
+    order_currency VARCHAR(3),
     status VARCHAR(20) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
---     May not need updated at but could be useful for tracking order status changes from this table
---     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES User(user_id) ON DELETE CASCADE,
-    FOREIGN KEY (asset_id, user_id) REFERENCES Assets(asset_id, user_id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
--- Will likely need to clean this table up but for now should suffice:
--- Do we need to have quantity here? Do we need asset_id here? --> Can we pull right from order?
---
-CREATE TABLE Trade (
-    trade_id SERIAL PRIMARY KEY,
-    order_id INT NOT NULL,
+CREATE TABLE trade (
+    trade_id BIGINT PRIMARY KEY,
+    order_id BIGINT NOT NULL,
     execution_price NUMERIC(15, 4) NOT NULL,
     execution_quantity NUMERIC(15, 4) NOT NULL,
     trade_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (order_id) REFERENCES Order(order_id) ON DELETE CASCADE
+    trade_currency VARCHAR(3),
+    FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE
+);
+
+CREATE TABLE cash_holdings (
+    cash_id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL,
+    currency_code CHAR(3) NOT NULL,
+    balance NUMERIC(20, 6) NOT NULL DEFAULT 0,
+    last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    UNIQUE (user_id, currency_code)
+);
+
+CREATE TABLE exchange_log (
+    exchange_id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL,
+    from_currency CHAR(3) NOT NULL,
+    to_currency CHAR(3) NOT NULL,
+    from_amount NUMERIC(20, 6) NOT NULL,
+    to_amount NUMERIC(20, 6) NOT NULL,
+    exchange_rate NUMERIC(15, 8) NOT NULL,
+    exchange_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
 
