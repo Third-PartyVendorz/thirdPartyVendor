@@ -2,21 +2,13 @@ Get all orders associated with a user
 
 With security context get authenticed user --> via their token
 
-
-
 Entities folder --> This is wehre the java code maps onto our SQL
-
-
-
 
 inject order service in order controller
 
 inject order repository and other stuff in order service
 
-
-
 Will need to add a method in the OrderRepository 
-
 
 Token --> ID --> Query
 
@@ -39,3 +31,18 @@ This block:
 			}
 
 Specifically the SecurityContextHolder
+
+
+
+
+
+Steps:
+
+- Add get orders method in OrderRepository
+
+- Inject Order Repository in OrderService
+
+- Build out necessary logic in Order service
+    - Grab Auth token From SecurityContextHolder
+
+- Inject OrderService in OrderController --> Link Service functionality to endpoint
