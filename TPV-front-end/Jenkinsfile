@@ -1,0 +1,39 @@
+pipeline {
+    agent any
+    tools {nodejs "NodeJS"}
+    //ensure that your NodeJS version is 22.22.3 in the tools tab in Jenkins UI
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+                echo 'Jenkins pipeline is working!'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                dir('TPV-front-end') {
+                    sh 'npm install'
+                }
+                // sh 'npm install'
+            }
+        }
+        
+        stage('Build') {
+            steps {
+                dir('TPV-front-end') {
+                    sh 'npm run build'
+                }
+            }
+        }
+
+        stage('Test') {
+            steps {
+                dir('TPV-front-end') {
+                    sh 'npm test'
+                }
+            }
+        }
+
+    }
+}
