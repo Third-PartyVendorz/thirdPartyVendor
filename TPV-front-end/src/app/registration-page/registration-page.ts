@@ -16,6 +16,21 @@ import { AuthenticationRequest } from '../dto/AuthenticationRequest';
 export class RegistrationPage {
   constructor(private authService: AuthService) {}
 
+  onRegister(event: Event) {
+    event.preventDefault();
+    const form = event.target as HTMLFormElement;
+    const formData = new FormData(form);
+    
+    const request: RegisterRequest = {
+      firstName: formData.get('firstName') as string,
+      lastName: formData.get('lastName') as string,
+      email: formData.get('email') as string,
+      password: formData.get('password') as string,
+    } as RegisterRequest;
+    
+    this.register(request);
+  }
+
   register(request: RegisterRequest) {
     this.authService.register(request).subscribe({
       next: (response: RegisterResponse) => {
