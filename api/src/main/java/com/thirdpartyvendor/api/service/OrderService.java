@@ -17,7 +17,7 @@ public class OrderService {
     }
 
     public List<Order> getOrders(Long userId){
-        return orderRepository.findById(userId);
+        return orderRepository.findByUserId(userId);
     }
 
 

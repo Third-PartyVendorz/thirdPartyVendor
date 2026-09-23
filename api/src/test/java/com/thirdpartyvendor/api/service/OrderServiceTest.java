@@ -14,15 +14,60 @@ import static org.mockito.Mockito.doThrow;
 
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.List;
+import java.util.Arrays;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 
-
+import com.thirdpartyvendor.api.entity.Order;
+import com.thirdpartyvendor.api.repository.OrderRepository;
 
 class OrderServiceTest {
+
+    private OrderRepository orderRepository;
+    private OrderService orderService;
+
+    @BeforeEach
+    void setUp() {
+        orderRepository = mock(OrderRepository.class);
+        orderService = new OrderService(orderRepository);
+    }
+
+    @Test
+    @DisplayName("Test getOrders by userId returns correct orders")
+    void testGetOrdersByUserId() {
+        // Arrange
+        Long userId = 1L;
+        Order order1 = new Order();
+        order1.setId(1L);
+        order1.setUserId(userId);
+        order1.setAssetId(100L);
+        order1.setOrderIntent(Order.OrderIntent.BUY);
+        order1.setStatus(Order.OrderStatus.PENDING);
+        
+        Order order2 = new Order();
+        order2.setId(2L);
+        order2.setUserId(userId);
+        order2.setAssetId(101L);
+        order2.setOrderIntent(Order.OrderIntent.SELL);
+        order2.setStatus(Order.OrderStatus.EXECUTED);
+        
+        List<Order> dummyOrders = Arrays.asList(order1, order2);
+        when(orderRepository.findByUserId(userId)).thenReturn(dummyOrders);
+        
+        // Act
+        List<Order> result = orderService.getOrders(userId);
+        
+        // Assert
+        assertEquals(2, result.size());
+        assertEquals(order1.getId(), result.get(0).getId());
+        assertEquals(order2.getId(), result.get(1).getId());
+        verify(orderRepository).findByUserId(userId);
+    }
 
 }
