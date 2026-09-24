@@ -1,5 +1,6 @@
 package com.thirdpartyvendor.api.controller;
 
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -9,6 +10,8 @@ import com.thirdpartyvendor.api.dto.OrderResponse;
 import com.thirdpartyvendor.api.dto.CreateOrderRequest;
 import com.thirdpartyvendor.api.entity.AppUser;
 import com.thirdpartyvendor.api.service.OrderService;
+
+import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,10 +35,10 @@ public class OrderController {
             return ResponseEntity.status(HttpStatus.CREATED).body(orderService.createOrder(createOrderRequest, currentUser.getId()));
     }
   
-  @GetMapping
-public List<OrderResponse> getOrders(@AuthenticationPrincipal Long userId) {
-    return orderService.getOrders(userId);
-}
+    @GetMapping
+    public List<OrderResponse> getOrders(@AuthenticationPrincipal Long userId) {
+        return orderService.getOrders(userId);
+    }
 
     
 }
