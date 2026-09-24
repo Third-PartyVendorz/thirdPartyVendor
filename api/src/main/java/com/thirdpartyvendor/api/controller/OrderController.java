@@ -31,6 +31,11 @@ public class OrderController {
         ) {
             return ResponseEntity.status(HttpStatus.CREATED).body(orderService.createOrder(createOrderRequest, currentUser.getId()));
     }
+  
+  @GetMapping
+public List<OrderResponse> getOrders(@AuthenticationPrincipal Long userId) {
+    return orderService.getOrders(userId);
+}
 
     
 }
