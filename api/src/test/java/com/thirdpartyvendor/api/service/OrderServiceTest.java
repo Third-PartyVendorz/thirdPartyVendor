@@ -49,6 +49,8 @@ class OrderServiceTest {
 
     //Get Orders Tests
 
+    //Need to add tests in getOrders for quantity and price
+
     @Test
     @DisplayName("Test getOrders by userId returns correct orders")
     void testGetOrdersByUserId() {
