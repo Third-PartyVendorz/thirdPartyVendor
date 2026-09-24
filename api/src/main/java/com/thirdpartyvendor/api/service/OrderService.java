@@ -93,7 +93,7 @@ public class OrderService {
         return orderCurrency.trim().toUpperCase(Locale.ROOT);
     }
   
-      public List<OrderResponse> getOrders(Long userId) {
+    public List<OrderResponse> getOrders(Long userId) {
         return orderRepository.findByUserId(userId).stream().map(order -> new OrderResponse(
             order.getId(),
             order.getUserId(),
