@@ -5,50 +5,6 @@
     font-family: 'Inter', sans-serif;
 }
 
-.registration-page {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    background-image: url('../../assets/login-page-background.jpg');
-    background-size: cover;
-    background-position: center;
-}
-
-.left-column {
-    flex: 1.2;
-    
-}
-
-.right-column {
-    flex: 1;
-}
-
-nav {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-.navbar {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #033D6C;
-    color: #ffffff;
-    font-size: 25px;
-    font-weight: 600;
-    height: 60px;
-}
-
-.login-container {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    width: 100%;
-    padding: 20px;
-}
-
 .login-card {
     background: #ffffff;
     padding: 40px 32px;
@@ -100,7 +56,7 @@ nav {
     background-color: #022B4A;
 }
 
-.right-column h2 {
+h2 {
     font-size: 24px;
     padding: 5px;
 }

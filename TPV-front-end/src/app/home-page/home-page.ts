@@ -4,17 +4,16 @@ import { RegisterRequest } from '../dto/RegisterRequest';
 import { RegisterResponse } from '../dto/RegisterResponse';
 import { AuthenticationResponse } from '../dto/AuthenticationResponse';
 import { AuthenticationRequest } from '../dto/AuthenticationRequest';
-
+import { LoginContainer } from '../login-container/login-container';
 
 @Component({
-  imports: [],
-  standalone: true,
-  selector: 'app-registration-page',
-  styleUrl: './registration-page.scss',
-  templateUrl: './registration-page.html',
+  imports: [LoginContainer],
+  selector: 'app-home-page',
+  styleUrl: './home-page.scss',
+  templateUrl: './home-page.html',
 })
-export class RegistrationPage {
-  constructor(private authService: AuthService) {}
+export class HomePage {
+constructor(private authService: AuthService) {}
 
   onRegister(event: Event) {
     event.preventDefault();
@@ -56,3 +55,4 @@ export class RegistrationPage {
     });
   }
 }
+
