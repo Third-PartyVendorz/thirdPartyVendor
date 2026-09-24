@@ -41,7 +41,6 @@ class OrderServiceTest {
     @Test
     @DisplayName("Test getOrders by userId returns correct orders")
     void testGetOrdersByUserId() {
-        // Arrange
         Long userId = 1L;
         Order order1 = new Order();
         order1.setId(1L);
@@ -60,13 +59,26 @@ class OrderServiceTest {
         List<Order> dummyOrders = Arrays.asList(order1, order2);
         when(orderRepository.findByUserId(userId)).thenReturn(dummyOrders);
         
-        // Act
         List<Order> result = orderService.getOrders(userId);
         
-        // Assert
         assertEquals(2, result.size());
         assertEquals(order1.getId(), result.get(0).getId());
         assertEquals(order2.getId(), result.get(1).getId());
+        verify(orderRepository).findByUserId(userId);
+    }
+
+    @Test
+    @DisplayName("Test that getOrders returns empty list for a user with no orders")
+    void testgetOrdersReturnsEmptyWhenUserNoOrders(){
+        Long userId = 1L;
+        List<Order> dummyOrders = Arrays.asList();
+        when(orderRepository.findByUserId(userId)).thenReturn(dummyOrders);
+
+        List<Order> result = orderService.getOrders(userId);
+
+        // assertEquals(0, result.size(), "List should be empty");
+        assertTrue(result.isEmpty(), "List should be empty");
+
         verify(orderRepository).findByUserId(userId);
     }
 
