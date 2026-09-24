@@ -1,6 +1,7 @@
 package com.thirdpartyvendor.api.service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import com.thirdpartyvendor.api.client.MarketDataAPIClient;
 import com.thirdpartyvendor.api.dto.ForexRequest;
@@ -78,6 +79,21 @@ public class ForexService {
             savedLog.getExchangeRate(),
             savedLog.getExchangeTimestamp()
         );
+    }
+
+    public List<ForexResponse> findExchangesByUser(Long userId) {
+        return forexLogRepository.findByUserId(userId).stream()
+            .map(log -> new ForexResponse(
+                log.getExchangeId(),
+                log.getUserId(),
+                log.getFromCurrency(),
+                log.getToCurrency(),
+                log.getFromAmount(),
+                log.getToAmount(),
+                log.getExchangeRate(),
+                log.getExchangeTimestamp()
+            ))
+            .toList();
     }
 
     public static class InsufficientCashException extends RuntimeException {

@@ -8,7 +8,11 @@ import com.thirdpartyvendor.api.dto.ForexResponse;
 import com.thirdpartyvendor.api.entity.AppUser;
 import com.thirdpartyvendor.api.service.ForexService;
 
+import java.util.List;
+
 import org.springframework.security.core.context.SecurityContextHolder;
+
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -37,6 +41,12 @@ public class ForexController {
     public ForexResponse submitExchange(@RequestBody ForexRequest forexRequest) {
         AppUser user = getCurrentUser();
         return forexService.executeExchange(forexRequest, user.getId());
+    }
+
+    @GetMapping
+    public List<ForexResponse> getExchangesByUser() {
+        AppUser user = getCurrentUser();
+        return forexService.findExchangesByUser(user.getId());
     }
     
 }
