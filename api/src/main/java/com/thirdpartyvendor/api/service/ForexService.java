@@ -6,9 +6,7 @@ import com.thirdpartyvendor.api.client.MarketDataAPIClient;
 import com.thirdpartyvendor.api.dto.ForexRequest;
 import com.thirdpartyvendor.api.dto.ForexResponse;
 import com.thirdpartyvendor.api.dto.MarketQuoteAPIResponse;
-import com.thirdpartyvendor.api.entity.CashHolding;
 import com.thirdpartyvendor.api.entity.ForexLog;
-import com.thirdpartyvendor.api.repository.CashHoldingsRepository;
 import com.thirdpartyvendor.api.repository.ForexLogRepository;
 
 import jakarta.transaction.Transactional;
@@ -16,12 +14,12 @@ import jakarta.transaction.Transactional;
 public class ForexService {
 
     private final ForexLogRepository forexLogRepository;
-    private final CashHoldingsRepository cashHoldingsRepository;
+    private final CashHoldingsService cashHoldingsService;
     private final MarketDataAPIClient marketDataAPIClient;
 
-    public ForexService(ForexLogRepository forexLogRepository, CashHoldingsRepository cashHoldingsRepository, MarketDataAPIClient marketDataAPIClient) {
+    public ForexService(ForexLogRepository forexLogRepository, CashHoldingsService cashHoldingsService, MarketDataAPIClient marketDataAPIClient) {
         this.forexLogRepository = forexLogRepository;
-        this.cashHoldingsRepository = cashHoldingsRepository;
+        this.cashHoldingsService = cashHoldingsService;
         this.marketDataAPIClient = marketDataAPIClient;
     }
 
@@ -31,39 +29,29 @@ public class ForexService {
         String fromCurrency = forexRequest.fromCurrency();
         String toCurrency = forexRequest.toCurrency();
 
+        BigDecimal amountToConvert = forexRequest.amount();
+        
+        // validate amount is positive
+        if (amountToConvert.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new ExchangeAmountExcpetion("Exchange amount must be positive");
+        }
+
+        // validate user has sufficient cash in the fromCurrency and deduct it
+        cashHoldingsService.updateCashHolding(fromCurrency, amountToConvert.negate(), userId);
+            
+        // ensure the holding in the to currency exists, create holding entry if not exists
+        cashHoldingsService.ensureCashHoldingExists(toCurrency, userId);
+
         // fetch exchange rate
         MarketQuoteAPIResponse quoteResponse = marketDataAPIClient
             .fetchForexQuote(fromCurrency, toCurrency);
 
-        // fetch the holding in the from currency, throw exception if not exists
-        CashHolding fromHolding = cashHoldingsRepository.findByUserIdAndCurrencyCode(userId, fromCurrency)
-            .orElseThrow(() -> new CashHoldingNotFoundException("User has no cash holding in currency " + fromCurrency));
-            
-        // fetch the holding in the to currency, create holding entry if not exists
-        CashHolding toHolding = cashHoldingsRepository.findByUserIdAndCurrencyCode(userId, toCurrency)
-            .orElseGet(() -> {
-                CashHolding newHolding = new CashHolding();
-                newHolding.setUserId(userId);
-                newHolding.setCurrencyCode(toCurrency);
-                newHolding.setBalance(BigDecimal.ZERO);
-                return cashHoldingsRepository.save(newHolding);
-            });
-
         // convert
-        BigDecimal amountToConvert = forexRequest.amount();
         BigDecimal exchangeRate = quoteResponse.data().price();
         BigDecimal convertedAmount = amountToConvert.multiply(exchangeRate);
 
-        // calculate new balances
-        BigDecimal newFromBalance = fromHolding.getBalance().subtract(amountToConvert);
-        BigDecimal newToBalance = toHolding.getBalance().add(convertedAmount);
-
-        // save new balances
-        fromHolding.setBalance(newFromBalance);
-        cashHoldingsRepository.save(fromHolding);
-
-        toHolding.setBalance(newToBalance);
-        cashHoldingsRepository.save(toHolding);
+        // add converted amount to the toCurrency holding
+        cashHoldingsService.updateCashHolding(toCurrency, convertedAmount, userId);
 
         // create log entry for the exchange
         ForexLog forexLog = new ForexLog();
@@ -89,9 +77,15 @@ public class ForexService {
         );
     }
 
-    public static class CashHoldingNotFoundException extends RuntimeException {
-		public CashHoldingNotFoundException(String message) {
+    public static class InsufficientCashException extends RuntimeException {
+		public InsufficientCashException(String message) {
 			super(message);
 		}
 	}
+
+    public static class ExchangeAmountExcpetion extends RuntimeException {
+        public ExchangeAmountExcpetion(String message) {
+			super(message);
+		}
+    }
 }
