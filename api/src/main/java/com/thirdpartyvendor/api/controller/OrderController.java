@@ -9,6 +9,7 @@ import java.util.List;
 
 import com.thirdpartyvendor.api.entity.Order;
 import com.thirdpartyvendor.api.service.OrderService;
+import com.thirdpartyvendor.api.dto.OrderResponse;
 
 
 @RestController
@@ -22,7 +23,7 @@ public class OrderController {
 	}
 
 @GetMapping
-public List<Order> getOrders(@AuthenticationPrincipal Long userId) {
+public List<OrderResponse> getOrders(@AuthenticationPrincipal Long userId) {
     return orderService.getOrders(userId);
 }
 
