@@ -29,8 +29,10 @@ public class CashHoldingsService {
         this.cashHoldingsRepository = cashHoldingsRepository;
     }
     
-    public boolean isValidCurrencyCode(String currencyCode) {
-        return currencies.containsKey(currencyCode);
+    public void validateCurrencyCode(String currencyCode) {
+        if (!currencies.containsKey(currencyCode)) {
+            throw new InvalidCurrencyException("Invalid currency code: " + currencyCode);
+        }
     }
     
     public void updateCashHolding(String currencyCode, BigDecimal delta, Long userId) {
@@ -61,4 +63,10 @@ public class CashHoldingsService {
                 return cashHoldingsRepository.save(newHolding);
             });
     }
+
+    public static class InvalidCurrencyException extends RuntimeException {
+		public InvalidCurrencyException(String message) {
+			super(message);
+		}
+	}
 }

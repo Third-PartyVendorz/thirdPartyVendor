@@ -26,8 +26,11 @@ public class ForexService {
     @Transactional 
     public ForexResponse executeExchange(ForexRequest forexRequest, Long userId) {
 
-        String fromCurrency = forexRequest.fromCurrency();
-        String toCurrency = forexRequest.toCurrency();
+        String fromCurrency = forexRequest.fromCurrency().trim();
+        String toCurrency = forexRequest.toCurrency().trim();
+
+        cashHoldingsService.validateCurrencyCode(fromCurrency);
+        cashHoldingsService.validateCurrencyCode(toCurrency);
 
         BigDecimal amountToConvert = forexRequest.amount();
         
