@@ -100,6 +100,7 @@ class OrderServiceTest {
         CreateOrderRequest createOrderRequest = new CreateOrderRequest(
             100L,
             Order.OrderIntent.BUY,
+            //Either quantity or order price must be null --> Include test for each
             null,
             BigDecimal.valueOf(500.0),
             "USD"
