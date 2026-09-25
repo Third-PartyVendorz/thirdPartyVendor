@@ -35,6 +35,8 @@ import com.thirdpartyvendor.api.dto.OrderResponse;
 import com.thirdpartyvendor.api.dto.CreateOrderRequest;
 
 
+import org.springframework.web.server.ResponseStatusException;
+
 
 class OrderServiceTest {
 
@@ -95,6 +97,7 @@ class OrderServiceTest {
     //Creat order tests
 
     //Validate succesful test --> Intended behavior
+    //Either quantity or order price must be null --> Include test for each
     @Test
     @DisplayName("Test createOrder successfully creates an order")
     void testCreateOrderSuccessfully() {
@@ -102,27 +105,20 @@ class OrderServiceTest {
         CreateOrderRequest createOrderRequest = new CreateOrderRequest(
             100L,
             Order.OrderIntent.BUY,
-            //Either quantity or order price must be null --> Include test for each
             null,
             BigDecimal.valueOf(500.0),
             "USD"
         );
-        // createOrderRequest.setAssetId(100L);
-        // createOrderRequest.setOrderIntent(Order.OrderIntent.BUY);
-        // createOrderRequest.setQuantity(10);
-        // createOrderRequest.setOrderPrice(500.0);
-        // createOrderRequest.setOrderCurrency("USD");
 
         Order newOrder = new Order();
-
         Long userId = 1L;
         newOrder.setId(1L);
         newOrder.setUserId(userId);
         newOrder.setAssetId(createOrderRequest.assetId());
         newOrder.setOrderIntent(createOrderRequest.orderIntent());
-        newOrder.setStatus(Order.OrderStatus.PENDING);
-
-
+        newOrder.setQuantity(createOrderRequest.quantity());
+        newOrder.setOrderPrice(createOrderRequest.orderPrice());
+        newOrder.setOrderCurrency(createOrderRequest.orderCurrency());
 
         when(orderRepository.save(any(Order.class))).thenReturn(newOrder);
         OrderResponse result = orderService.createOrder(createOrderRequest, userId);
@@ -131,18 +127,32 @@ class OrderServiceTest {
         verify(orderRepository).save(any(Order.class));
     }
 
-    //Tests order creation with empty/missing fields
-    // @Test
-    // @DisplayName("Test createOrder with missing fields")
-    // void testCreateOrderWithMissingFields() {
+    @Test
+    @DisplayName("Test createOrder with missing fields")
+    void testCreateOrderWithMissingFields() {
         
-    // }
+        CreateOrderRequest createOrderRequest = new CreateOrderRequest(
+            100L,
+            Order.OrderIntent.BUY,
+            null,
+            BigDecimal.valueOf(500.0),
+            null
+        );
 
-    // //Tests order creation with invalid fields
+        Long userId = 1L;
+        
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
+            orderService.createOrder(createOrderRequest, userId);
+        });
+        assertEquals("Order currency is required", exception.getReason());
+        verify(orderRepository, never()).save(any(Order.class));
+    }
+
+    //Tests order creation with invalid fields
     // @Test
     // @DisplayName("Test createOrder with invalid fields")
     // void testCreateOrderWithInvalidFields() {
-    //     // Implement the test logic for order creation with invalid fields here
+        
     // }
 
 
