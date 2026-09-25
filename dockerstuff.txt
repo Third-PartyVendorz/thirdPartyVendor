@@ -1,3 +1,5 @@
+Run from api subfolder:
+
 docker build -t thirdparty:latest .
 
 docker run -d \
@@ -10,6 +12,7 @@ docker run -d \
   --name tpv-api \
   thirdparty:latest
 
+If not registered:
 
 curl -X POST http://localhost:8081/auth/register \
   -H "Content-Type: application/json" \
@@ -31,6 +34,8 @@ curl -X POST http://localhost:8081/auth/register \
   }' | jq -r '.jwtToken')
 
 echo "JWT Token: $TOKEN"
+
+Copy token:
 
 eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhLm9AZXhhbXBsZS5jb20iLCJ1c2VySWQiOjUsInJvbGUiOiJVU0VSIiwiaWF0IjoxNzkwMzU5NzM0LCJleHAiOjE3OTA0NDYxMzR9.lKDkB3vcgk0oOwJ7uNAZTr1oNvXMpPXC65QaOdXEW9gDZBMnZaMfpvWsdYacPeKzUro2NWZ9bLMIm66qiPAu4g
 
