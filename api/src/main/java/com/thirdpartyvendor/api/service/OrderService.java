@@ -107,5 +107,30 @@ public class OrderService {
         )).collect(Collectors.toList());
     }
 
+    public OrderResponse cancelOrder(Long orderId, Long userId) {
+        Order order = orderRepository.findById(userId)
+            .orElseThrow(() -> new OrderNotFoundException("Order not found"));
+        order.setStatus(OrderStatus.CANCELLED);
+        orderRepository.save(order);
+
+        return new OrderResponse(
+            order.getId(),
+            order.getUserId(),
+            order.getAssetId(),
+            order.getOrderIntent(),
+            order.getQuantity(),
+            order.getOrderPrice(),
+            order.getStatus(),
+            order.getCreatedAt(),
+            order.getOrderCurrency()
+        );
+    }
+
+    public static class OrderNotFoundException extends RuntimeException {
+		public OrderNotFoundException(String message) {
+			super(message);
+		}
+	}
+
 
 }

@@ -1,6 +1,8 @@
 package com.thirdpartyvendor.api.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,6 +41,15 @@ public class OrderController {
     public List<OrderResponse> getOrders(@AuthenticationPrincipal Long userId) {
         return orderService.getOrders(userId);
     }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<OrderResponse> cancelOrder(
+        @PathVariable Long id,
+        @AuthenticationPrincipal AppUser currentUser
+    ) {
+        return ResponseEntity.ok(orderService.cancelOrder(id, currentUser.getId()));
+    }
+    
 
     
 }
