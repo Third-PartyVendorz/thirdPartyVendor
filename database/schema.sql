@@ -48,9 +48,9 @@ CREATE TABLE trade (
 );
 
 CREATE TABLE cash_holdings (
-    cash_id SERIAL PRIMARY KEY,
-    user_id INT NOT NULL,
-    currency_code CHAR(3) NOT NULL,
+    cash_id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    currency_code VARCHAR(3) NOT NULL,
     balance NUMERIC(20, 6) NOT NULL DEFAULT 0,
     last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
@@ -58,10 +58,10 @@ CREATE TABLE cash_holdings (
 );
 
 CREATE TABLE exchange_log (
-    exchange_id SERIAL PRIMARY KEY,
-    user_id INT NOT NULL,
-    from_currency CHAR(3) NOT NULL,
-    to_currency CHAR(3) NOT NULL,
+    exchange_id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    from_currency VARCHAR(3) NOT NULL,
+    to_currency VARCHAR(3) NOT NULL,
     from_amount NUMERIC(20, 6) NOT NULL,
     to_amount NUMERIC(20, 6) NOT NULL,
     exchange_rate NUMERIC(15, 8) NOT NULL,

@@ -3,6 +3,8 @@ package com.thirdpartyvendor.api.service;
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.springframework.stereotype.Service;
+
 import com.thirdpartyvendor.api.client.MarketDataAPIClient;
 import com.thirdpartyvendor.api.dto.ForexRequest;
 import com.thirdpartyvendor.api.dto.ForexResponse;
@@ -12,6 +14,7 @@ import com.thirdpartyvendor.api.repository.ForexLogRepository;
 
 import jakarta.transaction.Transactional;
 
+@Service 
 public class ForexService {
 
     private final ForexLogRepository forexLogRepository;
