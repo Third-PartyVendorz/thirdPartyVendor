@@ -1,0 +1,84 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+}
+
+.login-card {
+    background: #ffffff;
+    padding: 40px 32px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333333;
+    margin-bottom: 6px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #cccccc;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+}
+
+.form-group input:focus {
+    border-color: #033D6C;
+    box-shadow: 0 0 0 2px rgba(3, 61, 108, 0.2);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.register-button {
+    width: 100%;
+    padding: 12px;
+    background-color: #033D6C;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.register-button:hover {
+    background-color: #022B4A;
+}
+
+h2 {
+    font-size: 24px;
+    padding: 5px;
+}
+
+.tabs {
+    display: flex;
+    margin-bottom: 1rem;
+}
+
+.tabs button {
+    padding: 10px 20px;
+    border: none;
+    background-color: #f0f0f0;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.tabs button.active {
+    background-color: #033D6C;
+    color: #ffffff;
+}
+
+.tabs button:not(.active):hover {
+    background-color: #e0e0e0;
+}

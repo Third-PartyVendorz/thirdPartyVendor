@@ -1,0 +1,65 @@
+<h2>Register</h2>
+
+<div class="auth-card">
+    <div class="tabs">
+        <button [class.active]="activeTab === 'login'"
+        (click)="showLogin()">Login</button>
+
+        <button [class.active]="activeTab === 'register'"
+        (click)="showRegister()">Register</button>
+    </div>
+</div>
+
+<!-- <ng-container *ngIf="activeTab === 'register'">
+    <div class="row">
+        <div>
+            <label>First name</label>
+            <input type="text" name="firstName" />
+        </div>
+        <div>
+            <label>Last name</label>
+            <input type="text" name="lastName" />
+        </div>
+    </div>
+</ng-container>
+
+<ng-container *ngIf="activeTab === 'login'">
+    <div class="row">
+        <div>
+            <label>First name</label>
+            <input type="text" name="firstName" />
+        </div>
+        <div>
+            <label>Last name</label>
+            <input type="text" name="lastName" />
+        </div>
+    </div>
+</ng-container> -->
+
+<form class="login-card">
+    <div class="form-group">
+        <label for="first-name">First Name</label>
+        <input type="text" id="first-name" name="firstName" required autocomplete="given-name">
+    </div>
+    <div class="form-group">
+        <label for="last-name">Last Name</label>
+        <input type="text" id="last-name" name="lastName" required autocomplete="family-name">
+    </div>
+    <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required autocomplete="email">
+    </div>
+    <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required>
+    </div>
+    <div class="form-group">
+        <label for="phone-number">Phone Number</label>
+        <input type="tel" id="phone-number" name="phone-number" required>
+    </div>
+    <div class="form-group">
+        <label for="date-of-birth">Date of Birth</label>
+        <input type="date" id="dob" name="date-of-birth" required>
+    </div>
+    <button type="submit" class="register-button">Register</button>
+</form>
