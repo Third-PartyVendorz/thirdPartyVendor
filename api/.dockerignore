@@ -1,0 +1,29 @@
+# Build artifacts and outputs
+target/
+
+# CI/CD and build configuration
+Jenkinsfile
+jenkins-setup.txt
+
+# Git-related files
+.git
+.gitignore
+.gitattributes
+
+# IDE and editor files
+.idea/
+.vscode/
+*.iml
+*.swp
+*.swo
+
+# Environment and secrets
+.env
+.env.local
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Maven wrapper (optional - use if your Dockerfile expects to download Maven)
+.mvn/

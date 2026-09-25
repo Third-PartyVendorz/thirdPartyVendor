@@ -36,8 +36,8 @@ public class OrderController {
     }
   
     @GetMapping
-    public List<OrderResponse> getOrders(@AuthenticationPrincipal Long userId) {
-        return orderService.getOrders(userId);
+    public List<OrderResponse> getOrders(@AuthenticationPrincipal AppUser currentUser) {
+        return orderService.getOrders(currentUser.getId());
     }
 
     

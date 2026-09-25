@@ -1,0 +1,52 @@
+docker build -t thirdparty:latest .
+
+docker run -d \
+  -p 8081:8081 \
+  -e SPRING_DATASOURCE_URL=jdbc:postgresql://172.17.0.3:5432/tpvdb \
+  -e SPRING_DATASOURCE_USERNAME=postgres \
+  -e SPRING_DATASOURCE_PASSWORD=postgres \
+  -e APP_JWT_SECRET=3deb18f27146742f1d6d7ccd218818bb1ee80ca7ce2b5737d70a391fdf226c54 \
+  -e APP_JWT_EXPIRATION_MS=86400000 \
+  --name tpv-api \
+  thirdparty:latest
+
+
+curl -X POST http://localhost:8081/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "firstName": "A",
+    "lastName": "O",
+    "phoneNumber": "555-0113",
+    "dateOfBirth": "1990-05-15",
+    "email": "A.O@example.com",
+    "password": "SecurePassword123!"
+  }'
+
+
+  TOKEN=$(curl -s -X POST http://localhost:8081/auth/authenticate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "A.O@example.com",
+    "password": "SecurePassword123!"
+  }' | jq -r '.jwtToken')
+
+echo "JWT Token: $TOKEN"
+
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhLm9AZXhhbXBsZS5jb20iLCJ1c2VySWQiOjUsInJvbGUiOiJVU0VSIiwiaWF0IjoxNzkwMzU5NzM0LCJleHAiOjE3OTA0NDYxMzR9.lKDkB3vcgk0oOwJ7uNAZTr1oNvXMpPXC65QaOdXEW9gDZBMnZaMfpvWsdYacPeKzUro2NWZ9bLMIm66qiPAu4g
+
+
+curl -X POST http://localhost:8081/orders \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhLm9AZXhhbXBsZS5jb20iLCJ1c2VySWQiOjUsInJvbGUiOiJVU0VSIiwiaWF0IjoxNzkwMzU5NzM0LCJleHAiOjE3OTA0NDYxMzR9.lKDkB3vcgk0oOwJ7uNAZTr1oNvXMpPXC65QaOdXEW9gDZBMnZaMfpvWsdYacPeKzUro2NWZ9bLMIm66qiPAu4g" \
+  -d '{
+    "assetId": 1,
+    "orderIntent": "BUY",
+    "quantity": 1.5,
+    "orderPrice": null,
+    "orderCurrency": "USD"
+  }'
+
+
+
+curl -X GET http://localhost:8081/orders \
+  -H "Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhLm9AZXhhbXBsZS5jb20iLCJ1c2VySWQiOjUsInJvbGUiOiJVU0VSIiwiaWF0IjoxNzkwMzU5NzM0LCJleHAiOjE3OTA0NDYxMzR9.lKDkB3vcgk0oOwJ7uNAZTr1oNvXMpPXC65QaOdXEW9gDZBMnZaMfpvWsdYacPeKzUro2NWZ9bLMIm66qiPAu4g" 
