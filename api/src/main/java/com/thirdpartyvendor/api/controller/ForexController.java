@@ -10,8 +10,9 @@ import com.thirdpartyvendor.api.service.ForexService;
 
 import java.util.List;
 
-import org.springframework.security.core.context.SecurityContextHolder;
-
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,21 +33,14 @@ public class ForexController {
         this.forexService = forexService;
     }
 
-    private AppUser getCurrentUser() {
-		return (AppUser) SecurityContextHolder.getContext()
-			.getAuthentication().getPrincipal();
-	}
-
     @PostMapping
-    public ForexResponse submitExchange(@RequestBody ForexRequest forexRequest) {
-        AppUser user = getCurrentUser();
-        return forexService.executeExchange(forexRequest, user.getId());
+    public ResponseEntity<ForexResponse> submitExchange(@RequestBody ForexRequest forexRequest, @AuthenticationPrincipal AppUser currentUser) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(forexService.executeExchange(forexRequest, currentUser.getId()));
     }
 
     @GetMapping
-    public List<ForexResponse> getExchangesByUser() {
-        AppUser user = getCurrentUser();
-        return forexService.findExchangesByUser(user.getId());
+    public List<ForexResponse> getExchangesByUser(@AuthenticationPrincipal AppUser currentUser) {
+        return forexService.findExchangesByUser(currentUser.getId());
     }
     
 }

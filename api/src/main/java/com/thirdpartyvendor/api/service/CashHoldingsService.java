@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.thirdpartyvendor.api.dto.CashHoldingResponse;
 import com.thirdpartyvendor.api.dto.CurrencyData;
 import com.thirdpartyvendor.api.entity.CashHolding;
 import com.thirdpartyvendor.api.repository.CashHoldingsRepository;
@@ -12,6 +13,7 @@ import com.thirdpartyvendor.api.service.ForexService.InsufficientCashException;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 
 
@@ -62,6 +64,15 @@ public class CashHoldingsService {
                 newHolding.setBalance(BigDecimal.ZERO);
                 return cashHoldingsRepository.save(newHolding);
             });
+    }
+
+    public List<CashHoldingResponse> getCashHoldingsByUser(Long userId) {
+        return cashHoldingsRepository.findByUserId(userId).stream()
+            .map(holding -> new CashHoldingResponse(
+                holding.getCurrencyCode(),
+                holding.getBalance()
+            ))
+            .toList();
     }
 
     public static class InvalidCurrencyException extends RuntimeException {
