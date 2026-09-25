@@ -15,32 +15,6 @@
     background-position: center;
 }
 
-.left-column {
-    flex: 1.2;
-    
-}
-
-.right-column {
-    flex: 1;
-}
-
-nav {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-.navbar {
-    display: flex;
-    align-items: center;
-    background-color: #033D6C;
-    color: #ffffff;
-    font-size: 30px;
-    font-weight: 600;
-    height: 60px;
-    padding: 1rem 2rem;
-}
-
 .login-container {
     display: flex;
     flex-direction: row;
@@ -49,13 +23,31 @@ nav {
     padding: 20px;
 }
 
-.left-column h1 {
-    font-size: 28px;
-    margin-bottom: 20px;
+.hero-section {
+    flex: 1.2;
     color: #ffffff;
 }
 
-.left-column p {
-    font-size: 16px;
+.right-column {
+    flex: 1;
+}
+
+nav {
+    display: flex;
+    gap: 1.5rem;
+    background-color: #033D6C;
     color: #ffffff;
+    font-size: 30px;
+    font-weight: 600;
+    height: 60px;
+    padding: 1rem 2rem;
+}
+
+.hero-section h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.hero-section p {
+    font-size: 16px;
 }

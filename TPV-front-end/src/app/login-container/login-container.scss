@@ -60,3 +60,25 @@ h2 {
     font-size: 24px;
     padding: 5px;
 }
+
+.tabs {
+    display: flex;
+    margin-bottom: 1rem;
+}
+
+.tabs button {
+    padding: 10px 20px;
+    border: none;
+    background-color: #f0f0f0;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.tabs button.active {
+    background-color: #033D6C;
+    color: #ffffff;
+}
+
+.tabs button:not(.active):hover {
+    background-color: #e0e0e0;
+}
