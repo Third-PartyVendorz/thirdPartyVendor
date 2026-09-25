@@ -56,7 +56,6 @@ public class RegistrationService {
 		AppUser savedUser = appUserRepository.save(user);
 		return new RegisterResponse(savedUser.getId(), savedUser.getFirstName(), savedUser.getLastName(), savedUser.getEmail(), savedUser.getRole());
 	}
-
 	private String requireText(String value, String message) {
 		if (!StringUtils.hasText(value)) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
