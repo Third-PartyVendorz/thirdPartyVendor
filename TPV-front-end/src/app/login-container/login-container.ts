@@ -2,9 +2,12 @@ import { Component } from '@angular/core';
 import { AuthService } from '../services/auth.service';
 import { RegisterRequest } from '../dto/RegisterRequest';
 import { RegisterResponse } from '../dto/RegisterResponse';
+import { CommonModule } from '@angular/common';
+import { AuthenticationRequest } from '../dto/AuthenticationRequest';
+import { AuthenticationResponse } from '../dto/AuthenticationResponse';
 
 @Component({
-  imports: [],
+  imports: [CommonModule],
   selector: 'app-login-container',
   styleUrl: './login-container.scss',
   templateUrl: './login-container.html',
@@ -39,6 +42,18 @@ export class LoginContainer {
     this.register(request);
   }
 
+  onLogin(event: Event) {
+    event.preventDefault();
+    const form = event.target as HTMLFormElement;
+    const formData = new FormData(form);
+
+    const request: AuthenticationRequest = {
+      email: String(formData.get('email') ?? ''),
+      password: String(formData.get('password') ?? ''),
+    };
+    this.authenticate(request);
+  }
+
   register(request: RegisterRequest) {
     this.authService.register(request).subscribe({
       next: (response: RegisterResponse) => {
@@ -48,5 +63,16 @@ export class LoginContainer {
         console.error('Registration failed: ', error);
       },
     });
+  }
+
+  authenticate (request: AuthenticationRequest) {
+    this.authService.authenticate(request).subscribe({
+      next: (response: AuthenticationResponse) => {
+        console.log('Login Successful');
+      },
+      error: (error) => {
+        console.error('Login failed: ', error);
+      }
+    })
   }
 }
