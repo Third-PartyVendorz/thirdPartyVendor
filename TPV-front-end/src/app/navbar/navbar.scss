@@ -1,0 +1,52 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+}
+
+.navbar {
+    background-color: #033D6C;
+    border-bottom: 4px solid #F8B776;
+    height: 72px;
+    display: flex;
+    align-items: center;
+}
+
+.navbar-content {
+    width: 100%;
+    padding: 0 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.brand h1 {
+    color: #ffffff;
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 300;
+    letter-spacing: 1px;
+}
+
+.profile-button {
+    width: 40px;
+    height: 40px;
+
+    border: none;
+    background: transparent;
+    color: #ffffff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+
+    image {
+        font-size: 2rem;
+    }
+
+    &:hover {
+        transform: scale(1.05);
+    }
+}
