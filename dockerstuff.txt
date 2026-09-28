@@ -46,7 +46,7 @@ curl -X POST http://localhost:8081/orders \
   -d '{
     "assetId": 1,
     "orderIntent": "BUY",
-    "quantity": 1.5,
+    "quantity": 2,
     "orderPrice": null,
     "orderCurrency": "USD"
   }'
