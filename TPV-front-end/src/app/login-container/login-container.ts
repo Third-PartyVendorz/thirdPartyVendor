@@ -5,15 +5,20 @@ import { RegisterResponse } from '../dto/RegisterResponse';
 import { CommonModule } from '@angular/common';
 import { AuthenticationRequest } from '../dto/AuthenticationRequest';
 import { AuthenticationResponse } from '../dto/AuthenticationResponse';
+import { Router } from '@angular/router';
 
 @Component({
+  standalone: true,
   imports: [CommonModule],
   selector: 'app-login-container',
   styleUrl: './login-container.scss',
   templateUrl: './login-container.html',
 })
 export class LoginContainer {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+  ) {}
 
   activeTab: 'login' | 'register' = 'register';
 
@@ -68,6 +73,8 @@ export class LoginContainer {
   authenticate (request: AuthenticationRequest) {
     this.authService.authenticate(request).subscribe({
       next: (response: AuthenticationResponse) => {
+        this.authService.setAuthToken(response.jwtToken);
+        this.router.navigateByUrl('/');
         console.log('Login Successful');
       },
       error: (error) => {
