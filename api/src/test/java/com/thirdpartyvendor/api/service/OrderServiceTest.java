@@ -28,6 +28,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import com.thirdpartyvendor.api.entity.Order;
 import com.thirdpartyvendor.api.repository.OrderRepository;
+import com.thirdpartyvendor.api.validator.OrderValidator;
+
 import static org.mockito.Mockito.mock;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -46,8 +48,8 @@ class OrderServiceTest {
     @BeforeEach
     void setUp() {
         orderRepository = mock(OrderRepository.class);
-        orderService = new OrderService(orderRepository);
-    }
+        OrderValidator orderValidator = mock(OrderValidator.class);
+        orderService = new OrderService(orderRepository, orderValidator);    }
 
     //Get Orders Tests
 
