@@ -37,12 +37,12 @@ docker run -d \
   "$POSTGRES_IMAGE" >/dev/null 2>&1
 
 
-echo "== Stage: Build Images =="
+echo "== Stage: Build Service Image =="
 docker rmi "$SERVICE_IMAGE" >/dev/null 2>&1 || true
 docker build -t "$SERVICE_IMAGE" .
 
 
-echo "== Stage: Run Containers =="
+echo "== Stage: Run Service Container =="
 docker rm -f "$SERVICE_CONTAINER" >/dev/null 2>&1 || true
 docker run -d \
   -p "$SERVICE_PORT":8081 \
@@ -56,29 +56,22 @@ docker run -d \
   "$SERVICE_IMAGE"
 
 
-
-
-
-
-
-
-
-
-
 echo "== Stage: Wait for Service =="
 for i in $(seq 1 30); do
-  code=$(curl -s -o /dev/null -w "%{http_code}" -X POST "http://localhost:$SERVICE_PORT/orders" \
+  code=$(curl -s -o /dev/null -w "%{http_code}" -X POST "http://localhost:$SERVICE_PORT/auth/authenticate" \
     -H "Content-Type: application/json" -d '{}' || true)
   if [ "$code" != "000" ]; then break; fi
+  echo "Attempt $i/30: Service health check returned $code, retrying..."
   sleep 2
 done
 
+
 echo "== Stage: Service Ready =="
 if [ "$code" = "000" ]; then
-  echo "Service did not start in time"
+  echo "Service did not start in time (health check returned: $code)"
   exit 1
 else
-  echo "Service is up and running"
+  echo "Service is up and running (health check returned: $code)"
 fi
 
 
