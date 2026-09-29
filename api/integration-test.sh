@@ -17,16 +17,25 @@ APP_JWT_EXPIRATION_MS=86400000
 
 cleanup() {
   echo "== Teardown =="
+  docker exec -it "$POSTGRES" psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "
+    DELETE FROM orders WHERE user_id IN (SELECT user_id FROM users WHERE email = 'LukeBSheldonB@example.com');
+    DELETE FROM users WHERE email = 'LukeBSheldonB@example.com';
+  " >/dev/null 2>&1 || true
+  # Clean up Docker containers and images
   docker rm -f "$POSTGRES" "$SERVICE_CONTAINER" >/dev/null 2>&1 || true
+  docker network rm "$NETWORK" >/dev/null 2>&1 || true
+  docker rmi "$SERVICE_IMAGE" >/dev/null 2>&1 || true
 }
 trap cleanup EXIT
 
 
 echo "== Stage: Network =="
+docker network rm "$NETWORK" >/dev/null 2>&1 || true
 docker network create "$NETWORK" >/dev/null 2>&1 || true
 
 
 echo "== Start Postgres Container =="
+docker rm -f "$POSTGRES" >/dev/null 2>&1 || true
 docker run -d \
   --name "$POSTGRES" \
   --network "$NETWORK" \
@@ -75,6 +84,42 @@ else
 fi
 
 
+echo "== Stage: End-to-End Authenticated Order =="
+echo "== Register User =="
+curl -X POST http://localhost:$SERVICE_PORT/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "firstName": "Luke",
+    "lastName": "Sheldon",
+    "phoneNumber": "745-3383",
+    "dateOfBirth": "2004-01-01",
+    "email": "LukeBSheldonB@example.com",
+    "password": "SecurePassword123!"
+  }'
+echo "== User Registered =="
 
+echo "== Authenticate User =="
+TOKEN=$(curl -s -X POST http://localhost:$SERVICE_PORT/auth/authenticate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "LukeBSheldonB@example.com",
+    "password": "SecurePassword123!"
+  }' | jq -r '.jwtToken')
+echo "== User Authenticated =="
 
+echo "== Stage: Create Order =="
+curl -X POST http://localhost:$SERVICE_PORT/orders \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{
+    "assetId": 10,
+    "orderIntent": "BUY",
+    "quantity": 100,
+    "orderPrice": null,
+    "orderCurrency": "USD"
+  }'
+echo "== Order Created =="
 
+echo "== Stage: Confirm It Actually Landed in Postgres =="
+docker exec -it $POSTGRES psql -U $POSTGRES_USER -d "$POSTGRES_DB" -c "SELECT o.*, u.* FROM orders o JOIN users u ON o.user_id = u.user_id WHERE u.email = 'lukebsheldonb@example.com';"
+echo "== Confirmed Orders in Postgres =="
