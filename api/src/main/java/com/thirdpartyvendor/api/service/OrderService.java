@@ -10,6 +10,7 @@ import com.thirdpartyvendor.api.dto.CreateOrderRequest;
 import com.thirdpartyvendor.api.dto.OrderResponse;
 import com.thirdpartyvendor.api.entity.Order;
 import com.thirdpartyvendor.api.entity.Order.OrderStatus;
+import com.thirdpartyvendor.api.error.OrderExceptions.OrderNotFoundException;
 import com.thirdpartyvendor.api.repository.OrderRepository;
 import com.thirdpartyvendor.api.validator.OrderValidator;
 
@@ -89,11 +90,5 @@ public class OrderService {
             order.getCreatedAt(),
             order.getOrderCurrency()
         );
-    }
-
-    public static class OrderNotFoundException extends RuntimeException {
-        public OrderNotFoundException(String message) {
-            super(message);
-        }
     }
 }
