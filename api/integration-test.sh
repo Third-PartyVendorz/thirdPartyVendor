@@ -121,5 +121,5 @@ curl -X POST http://localhost:$SERVICE_PORT/orders \
 echo "== Order Created =="
 
 echo "== Stage: Confirm It Actually Landed in Postgres =="
-docker exec -it $POSTGRES psql -U $POSTGRES_USER -d "$POSTGRES_DB" -c "SELECT o.*, u.* FROM orders o JOIN users u ON o.user_id = u.user_id WHERE u.email = 'lukebsheldonb@example.com';"
+docker exec $POSTGRES psql -U $POSTGRES_USER -d "$POSTGRES_DB" -c "SELECT o.*, u.* FROM orders o JOIN users u ON o.user_id = u.user_id WHERE u.email = 'lukebsheldonb@example.com';"
 echo "== Confirmed Orders in Postgres =="
