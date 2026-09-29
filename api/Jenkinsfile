@@ -23,12 +23,22 @@ pipeline {
                 // sh 'mvn -B clean package'
             }
         }
-        stage('Test') {
+        stage('Unit Tests') {
             steps {
                 dir('api') {
                     sh 'mvn -B test'
                 }
             }
+        }
+        stage('Integration Tests') {
+            steps {
+                sh 'bash api/integration-test.sh'
+            }
+        }
+    }
+    post {
+        always {
+            junit 'api/target/surefire-reports/*.xml'
         }
     }
 }
