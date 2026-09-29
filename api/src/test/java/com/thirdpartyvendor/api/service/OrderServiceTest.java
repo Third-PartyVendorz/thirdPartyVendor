@@ -1,6 +1,7 @@
 package com.thirdpartyvendor.api.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -12,6 +13,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -20,6 +23,16 @@ import org.junit.jupiter.api.Test;
 import com.thirdpartyvendor.api.entity.Order;
 import com.thirdpartyvendor.api.repository.OrderRepository;
 import com.thirdpartyvendor.api.validator.OrderValidator;
+import com.thirdpartyvendor.api.dto.CreateOrderRequest;
+import com.thirdpartyvendor.api.dto.OrderResponse;
+import com.thirdpartyvendor.api.error.OrderExceptions.BadOrderException;
+import com.thirdpartyvendor.api.entity.Order;
+import com.thirdpartyvendor.api.repository.OrderRepository;
+import com.thirdpartyvendor.api.validator.OrderValidator;
+
+import static org.mockito.Mockito.mock;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.thirdpartyvendor.api.dto.OrderResponse;
 import com.thirdpartyvendor.api.dto.CreateOrderRequest;
 
@@ -33,9 +46,8 @@ class OrderServiceTest {
     @BeforeEach
     void setUp() {
         orderRepository = mock(OrderRepository.class);
-        orderValidator = mock(OrderValidator.class);
-        orderService = new OrderService(orderRepository, orderValidator);
-    }
+        OrderValidator orderValidator = mock(OrderValidator.class);
+        orderService = new OrderService(orderRepository, orderValidator);    }
 
     // ============= getOrders Tests =============
 
@@ -201,9 +213,11 @@ class OrderServiceTest {
         when(orderRepository.save(any(Order.class))).thenReturn(savedOrder);
         orderService.createOrder(request, 3L);
         
-        verify(orderRepository).save(any(Order.class));
-        // Verify that currency was normalized
-        assertEquals("USD", savedOrder.getOrderCurrency());
+        BadOrderException exception = assertThrows(BadOrderException.class, () -> {
+            orderService.createOrder(createOrderRequest, userId);
+        });
+        assertEquals("Order currency is required", exception.getMessage());
+        verify(orderRepository, never()).save(any(Order.class));
     }
 
     @Test

@@ -1,6 +1,7 @@
 package com.thirdpartyvendor.api.util;
 
 import com.thirdpartyvendor.api.entity.AppUser;
+import com.thirdpartyvendor.api.error.AuthExceptions.ForbiddenException;
 
 public class AuthorizationUtil {
 
@@ -35,9 +36,4 @@ public class AuthorizationUtil {
 		}
 	}
 
-	public static class ForbiddenException extends RuntimeException {
-		public ForbiddenException(String message) {
-			super(message);
-		}
-	}
 }

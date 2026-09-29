@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.thirdpartyvendor.api.dto.CreateOrderRequest;
+import com.thirdpartyvendor.api.error.OrderExceptions.BadOrderException;
 
 @Component
 public class OrderValidator {
@@ -17,34 +18,34 @@ public class OrderValidator {
         }
 
         if (request == null) {
-            throw new ResponseStatusException(HttpStatusCode.valueOf(422), "Order request is required");
+            throw new BadOrderException("Order request is required");
         }
 
         if (request.assetId() == null) {
-            throw new ResponseStatusException(HttpStatusCode.valueOf(422), "Asset id is required");
+            throw new BadOrderException("Asset id is required");
         }
 
         if (request.orderIntent() == null) {
-            throw new ResponseStatusException(HttpStatusCode.valueOf(422), "Order intent is required");
+            throw new BadOrderException("Order intent is required");
         }
 
         boolean hasQuantity = request.quantity() != null;
         boolean hasOrderPrice = request.orderPrice() != null;
 
         if (hasQuantity == hasOrderPrice) {
-            throw new ResponseStatusException(HttpStatusCode.valueOf(422), "Exactly one of quantity or order price must be provided");
+            throw new BadOrderException("Exactly one of quantity or order price must be provided");
         }
 
         if (hasQuantity && request.quantity().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new ResponseStatusException(HttpStatusCode.valueOf(422), "Quantity must be greater than zero");
+            throw new BadOrderException("Quantity must be greater than zero");
         }
 
         if (hasOrderPrice && request.orderPrice().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new ResponseStatusException(HttpStatusCode.valueOf(422), "Order price must be greater than zero");
+            throw new BadOrderException("Order price must be greater than zero");
         }
 
         if (request.orderCurrency() == null || request.orderCurrency().trim().isBlank()) {
-            throw new ResponseStatusException(HttpStatusCode.valueOf(422), "Order currency is required");
+            throw new BadOrderException("Order currency is required");
         }
     }
 }
