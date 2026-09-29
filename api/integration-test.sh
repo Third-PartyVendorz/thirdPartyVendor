@@ -17,7 +17,7 @@ APP_JWT_EXPIRATION_MS=86400000
 
 cleanup() {
   echo "== Teardown =="
-  docker exec -it "$POSTGRES" psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "
+  docker exec "$POSTGRES" psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "
     DELETE FROM orders WHERE user_id IN (SELECT user_id FROM users WHERE email = 'LukeBSheldonB@example.com');
     DELETE FROM users WHERE email = 'LukeBSheldonB@example.com';
   " >/dev/null 2>&1 || true
