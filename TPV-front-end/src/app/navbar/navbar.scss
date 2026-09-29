@@ -2,7 +2,6 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: 'Inter', sans-serif;
 }
 
 .navbar {
@@ -29,10 +28,23 @@
     letter-spacing: 1px;
 }
 
-.profile-button {
-    width: 40px;
-    height: 40px;
+.navbar nav ul {
+    list-style: none;
+    display: flex;
+    gap: 30px;
+}
 
+.navbar nav ul li a {
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.navbar nav ul li a:hover {
+    text-decoration: underline;
+}
+
+.profile-button {
     border: none;
     background: transparent;
     color: #ffffff;
@@ -40,13 +52,14 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.2s ease;
+}
 
-    image {
-        font-size: 2rem;
-    }
+.profile-button:hover {
+    transform: scale(1.05);
+}
 
-    &:hover {
-        transform: scale(1.05);
-    }
+.profile-button img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
 }
