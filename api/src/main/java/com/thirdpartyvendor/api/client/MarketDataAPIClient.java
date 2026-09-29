@@ -12,8 +12,8 @@ public class MarketDataAPIClient {
     private final RestClient restClient;
     
     public MarketDataAPIClient(RestClient.Builder builder, 
-            @Value("${fauxnance.api.url}") String apiUrl,
-            @Value("${fauxnance.api.key}") String apiKey) {
+            @Value("${fauxnance_api_url}") String apiUrl,
+            @Value("${fauxnance_api_key}") String apiKey) {
         
         this.restClient = builder
                 .baseUrl(apiUrl)
