@@ -23,6 +23,15 @@ import com.thirdpartyvendor.api.entity.Order;
 import com.thirdpartyvendor.api.repository.OrderRepository;
 import com.thirdpartyvendor.api.validator.OrderValidator;
 
+import static org.mockito.Mockito.mock;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import com.thirdpartyvendor.api.dto.OrderResponse;
+import com.thirdpartyvendor.api.dto.CreateOrderRequest;
+
+
+import org.springframework.web.server.ResponseStatusException;
+
 
 class OrderServiceTest {
 
@@ -32,8 +41,8 @@ class OrderServiceTest {
     @BeforeEach
     void setUp() {
         orderRepository = mock(OrderRepository.class);
-        orderService = new OrderService(orderRepository, new OrderValidator());
-    }
+        OrderValidator orderValidator = mock(OrderValidator.class);
+        orderService = new OrderService(orderRepository, orderValidator);    }
 
     //Get Orders Tests
 
