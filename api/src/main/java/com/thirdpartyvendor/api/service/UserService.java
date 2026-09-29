@@ -9,6 +9,9 @@ import org.springframework.stereotype.Service;
 import com.thirdpartyvendor.api.dto.ChangePasswordRequest;
 import com.thirdpartyvendor.api.dto.EditAccountRequest;
 import com.thirdpartyvendor.api.entity.AppUser;
+import com.thirdpartyvendor.api.error.UserExceptions.EmailAlreadyInUseException;
+import com.thirdpartyvendor.api.error.UserExceptions.PasswordException;
+import com.thirdpartyvendor.api.error.UserExceptions.UserNotFoundException;
 import com.thirdpartyvendor.api.repository.AppUserRepository;
 import com.thirdpartyvendor.api.util.AuthorizationUtil;
 
@@ -126,21 +129,4 @@ public class UserService {
 		userRepository.save(user);
 	}
 
-	public static class UserNotFoundException extends RuntimeException {
-		public UserNotFoundException(String message) {
-			super(message);
-		}
-	}
-
-	public static class EmailAlreadyInUseException extends RuntimeException {
-		public EmailAlreadyInUseException(String message) {
-			super(message);
-		}
-	}
-
-	public static class PasswordException extends RuntimeException {
-		public PasswordException(String message) {
-			super(message);
-		}
-	}
 }
