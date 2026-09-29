@@ -1,18 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-NETWORK=tpv-net
-POSTGRES=tpv-postgres
-POSTGRES_IMAGE=postgres:17
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=postgres
-POSTGRES_DB=tpvdb
-POSTGRES_PORT=5432
-SERVICE_IMAGE=thirdparty:latest
-SERVICE_CONTAINER=tpv-api
-SERVICE_PORT=8081
-APP_JWT_SECRET=3deb18f27146742f1d6d7ccd218818bb1ee80ca7ce2b5737d70a391fdf226c54
-APP_JWT_EXPIRATION_MS=86400000
+
+if [ -f "$(dirname "$0")/.env" ]; then
+  set -a
+  source "$(dirname "$0")/.env"
+  set +a
+else
+  echo "Error: .env file not found in $(dirname "$0")"
+  exit 1
+fi
 
 
 cleanup() {
