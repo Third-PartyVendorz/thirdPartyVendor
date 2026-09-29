@@ -1,26 +1,27 @@
 <div class="summary-card">
     <div class="summary-header">
         <h2>My Portfolio</h2>
-        
-        <button class="trade-button">
-            TRADE <span>↗</span>
-        </button>
 
         <div class="portfolio-value">
             <h2 class="balance-amount">$9,000.00</h2>
             <!-- {{ portfolioValue | currency }} -->
         </div>
-        
+    </div>
+    <div class="vertical-line"></div>
+    <div class="summary-body">
+        <button class="trade-button">
+            TRADE <span>↗</span>
+        </button>
+            
         <div class="gain">
             <div class="gain-dollar">
                 <!-- +{{ dailyGain | number:'1.2-2' }} -->
                 +$42.56
             </div>
-        </div>
-        <div class="gain-percentage">
-            <div class="gain-percentage-value">
+
+            <div class="gain-percentage">
                 <!-- +{{ dailyGainPercentage | number:'1.2-2' }}% -->
-                 +0.16%
+                +0.16%
             </div>
         </div>
     </div>
