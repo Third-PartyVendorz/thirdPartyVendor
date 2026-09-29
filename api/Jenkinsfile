@@ -32,7 +32,9 @@ pipeline {
         }
         stage('Integration Tests') {
             steps {
-                sh 'bash api/integration-test.sh'
+                dir('api') {
+                    sh 'bash integration-test.sh'
+                }
             }
         }
     }
