@@ -38,11 +38,6 @@ pipeline {
             }
         }
     }
-    post {
-        always {
-            junit 'api/target/surefire-reports/*.xml'
-        }
-    }
 }
 
 //Testing my push
