@@ -1,7 +1,6 @@
 package com.thirdpartyvendor.api.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -9,33 +8,20 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.Optional;
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
-
-
+import com.thirdpartyvendor.api.dto.CreateOrderRequest;
+import com.thirdpartyvendor.api.dto.OrderResponse;
+import com.thirdpartyvendor.api.error.OrderExceptions.BadOrderException;
 import com.thirdpartyvendor.api.entity.Order;
 import com.thirdpartyvendor.api.repository.OrderRepository;
-import static org.mockito.Mockito.mock;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import com.thirdpartyvendor.api.dto.OrderResponse;
-import com.thirdpartyvendor.api.dto.CreateOrderRequest;
-
-
-import org.springframework.web.server.ResponseStatusException;
+import com.thirdpartyvendor.api.validator.OrderValidator;
 
 
 class OrderServiceTest {
@@ -46,7 +32,7 @@ class OrderServiceTest {
     @BeforeEach
     void setUp() {
         orderRepository = mock(OrderRepository.class);
-        orderService = new OrderService(orderRepository);
+        orderService = new OrderService(orderRepository, new OrderValidator());
     }
 
     //Get Orders Tests
@@ -141,10 +127,10 @@ class OrderServiceTest {
 
         Long userId = 1L;
         
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
+        BadOrderException exception = assertThrows(BadOrderException.class, () -> {
             orderService.createOrder(createOrderRequest, userId);
         });
-        assertEquals("Order currency is required", exception.getReason());
+        assertEquals("Order currency is required", exception.getMessage());
         verify(orderRepository, never()).save(any(Order.class));
     }
 
