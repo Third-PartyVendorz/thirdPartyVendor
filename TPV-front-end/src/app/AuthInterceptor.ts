@@ -32,6 +32,7 @@ export function authInterceptor(
         if (error.status === 401) {
           authService.clearAuthToken();
           router.navigateByUrl('/login');
+          errorService.setErrorMessage('Your session has expired. Please log in again.');
         }
 
         if (error.status === 403) {

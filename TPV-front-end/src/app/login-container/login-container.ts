@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { AuthenticationRequest } from '../dto/AuthenticationRequest';
 import { AuthenticationResponse } from '../dto/AuthenticationResponse';
 import { Router } from '@angular/router';
+import { ErrorService } from '../services/error.service';
 
 @Component({
   standalone: true,
@@ -17,6 +18,7 @@ import { Router } from '@angular/router';
 export class LoginContainer {
   constructor(
     private authService: AuthService,
+    private errorService: ErrorService,
     private router: Router,
   ) {}
 
@@ -73,6 +75,7 @@ export class LoginContainer {
   authenticate (request: AuthenticationRequest) {
     this.authService.authenticate(request).subscribe({
       next: (response: AuthenticationResponse) => {
+        this.errorService.clearErrorMessage();
         this.authService.setAuthToken(response.jwtToken);
         this.router.navigateByUrl('/');
         console.log('Login Successful');
