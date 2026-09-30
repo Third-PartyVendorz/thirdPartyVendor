@@ -28,6 +28,17 @@
     letter-spacing: 1px;
 }
 
+.brand h1 a {
+    color: #ffffff;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.brand h1 a:hover {
+    color: #ffffff;
+    text-decoration: none;
+}
+
 .navbar nav ul {
     list-style: none;
     display: flex;
