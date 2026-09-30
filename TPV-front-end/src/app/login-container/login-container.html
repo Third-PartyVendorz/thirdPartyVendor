@@ -1,7 +1,7 @@
 <h2 *ngIf="activeTab === 'register'">Register</h2>
 <h2 *ngIf="activeTab === 'login'">Login</h2>
 
-<div class="auth-card">
+<div class="switch-card">
     <div class="tabs">
         <button [class.active]="activeTab === 'login'"
         (click)="showLogin()">Login</button>
