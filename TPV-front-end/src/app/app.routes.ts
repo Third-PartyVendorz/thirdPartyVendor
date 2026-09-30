@@ -1,12 +1,12 @@
 import { Routes } from '@angular/router';
 import { HomePage } from './home-page/home-page';
-import { LoginContainer } from './login-container/login-container';
+import { AuthPage } from './auth-page/auth-page';
 import { authGuard } from './auth.guard';
 
 export const routes: Routes = [
 	{
 		path: 'login',
-		component: LoginContainer,
+		component: AuthPage,
 	},
 	{
 		path: '',
