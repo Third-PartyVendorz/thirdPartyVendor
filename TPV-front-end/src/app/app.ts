@@ -1,6 +1,6 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { AuthService } from './services/auth.service';
+import { ErrorService } from './services/error.service';
 
 @Component({
   standalone: true,
@@ -10,7 +10,7 @@ import { AuthService } from './services/auth.service';
   templateUrl: './app.html',
 })
 export class App {
-  constructor(public authService: AuthService) {}
+  constructor(public errorService: ErrorService) {}
 
   protected readonly title = signal('TPV-front-end');
 }

@@ -1,7 +1,7 @@
-@if (authService.errorMessage(); as errorMessage) {
+@if (errorService.errorMessage(); as errorMessage) {
 	<div class="error-banner" role="alert">
 		<span>{{ errorMessage }}</span>
-		<button type="button" (click)="authService.clearErrorMessage()">Dismiss</button>
+		<button type="button" (click)="errorService.clearErrorMessage()">Dismiss</button>
 	</div>
 }
 

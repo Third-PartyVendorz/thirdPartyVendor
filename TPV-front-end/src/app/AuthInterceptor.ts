@@ -8,12 +8,14 @@ import {
 import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 import { AuthService } from './services/auth.service';
+import { ErrorService } from './services/error.service';
 
 export function authInterceptor(
   req: HttpRequest<unknown>,
   next: HttpHandlerFn,
 ): import('rxjs').Observable<HttpEvent<unknown>> {
   const authService = inject(AuthService);
+  const errorService = inject(ErrorService);
   const router = inject(Router);
   const authToken = authService.getAuthToken();
   const isAuthEndpoint = req.url.includes('/auth/authenticate') || req.url.includes('/auth/register');
@@ -33,7 +35,7 @@ export function authInterceptor(
         }
 
         if (error.status === 403) {
-          authService.setErrorMessage('You do not have permission to access this resource.');
+          errorService.setErrorMessage('You do not have permission to access this resource.');
         }
       }
 
