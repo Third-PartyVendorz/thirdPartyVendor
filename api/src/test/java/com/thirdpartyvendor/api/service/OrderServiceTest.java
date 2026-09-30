@@ -16,22 +16,13 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
 import com.thirdpartyvendor.api.dto.CreateOrderRequest;
 import com.thirdpartyvendor.api.dto.OrderResponse;
-import com.thirdpartyvendor.api.error.OrderExceptions.BadOrderException;
 import com.thirdpartyvendor.api.entity.Order;
+import com.thirdpartyvendor.api.error.OrderExceptions.BadOrderException;
 import com.thirdpartyvendor.api.repository.OrderRepository;
 import com.thirdpartyvendor.api.validator.OrderValidator;
-
-import static org.mockito.Mockito.mock;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import com.thirdpartyvendor.api.dto.OrderResponse;
-import com.thirdpartyvendor.api.dto.CreateOrderRequest;
-
-
-import org.springframework.web.server.ResponseStatusException;
-
 
 class OrderServiceTest {
 
@@ -42,11 +33,8 @@ class OrderServiceTest {
     void setUp() {
         orderRepository = mock(OrderRepository.class);
         OrderValidator orderValidator = mock(OrderValidator.class);
-        orderService = new OrderService(orderRepository, orderValidator);    }
-
-    //Get Orders Tests
-
-    //Need to add tests in getOrders for quantity and price
+        orderService = new OrderService(orderRepository, orderValidator);
+    }
 
     @Test
     @DisplayName("Test getOrders by userId returns correct orders")
@@ -56,20 +44,22 @@ class OrderServiceTest {
         order1.setId(1L);
         order1.setUserId(userId);
         order1.setAssetId(100L);
+        order1.setTicker("AAPL");
         order1.setOrderIntent(Order.OrderIntent.BUY);
         order1.setStatus(Order.OrderStatus.PENDING);
-        
+
         Order order2 = new Order();
         order2.setId(2L);
         order2.setUserId(userId);
         order2.setAssetId(101L);
+        order2.setTicker("TSLA");
         order2.setOrderIntent(Order.OrderIntent.SELL);
         order2.setStatus(Order.OrderStatus.EXECUTED);
 
         when(orderRepository.findByUserId(userId)).thenReturn(Arrays.asList(order1, order2));
-        
+
         List<OrderResponse> result = orderService.getOrders(userId);
-        
+
         assertEquals(2, result.size());
         assertEquals(order1.getId(), result.get(0).orderId());
         assertEquals(order2.getId(), result.get(1).orderId());
@@ -78,27 +68,22 @@ class OrderServiceTest {
 
     @Test
     @DisplayName("Test that getOrders returns empty list for a user with no orders")
-    void testgetOrdersReturnsEmptyWhenUserNoOrders(){
+    void testGetOrdersReturnsEmptyWhenUserNoOrders() {
         Long userId = 1L;
         when(orderRepository.findByUserId(userId)).thenReturn(Arrays.asList());
 
         List<OrderResponse> result = orderService.getOrders(userId);
 
         assertTrue(result.isEmpty(), "List should be empty");
-
         verify(orderRepository).findByUserId(userId);
     }
 
-    //Creat order tests
-
-    //Validate succesful test --> Intended behavior
-    //Either quantity or order price must be null --> Include test for each
     @Test
     @DisplayName("Test createOrder successfully creates an order")
     void testCreateOrderSuccessfully() {
-
         CreateOrderRequest createOrderRequest = new CreateOrderRequest(
             100L,
+            "AAPL",
             Order.OrderIntent.BUY,
             null,
             BigDecimal.valueOf(500.0),
@@ -110,14 +95,16 @@ class OrderServiceTest {
         newOrder.setId(1L);
         newOrder.setUserId(userId);
         newOrder.setAssetId(createOrderRequest.assetId());
+        newOrder.setTicker(createOrderRequest.ticker());
         newOrder.setOrderIntent(createOrderRequest.orderIntent());
         newOrder.setQuantity(createOrderRequest.quantity());
         newOrder.setOrderPrice(createOrderRequest.orderPrice());
         newOrder.setOrderCurrency(createOrderRequest.orderCurrency());
 
         when(orderRepository.save(any(Order.class))).thenReturn(newOrder);
+
         OrderResponse result = orderService.createOrder(createOrderRequest, userId);
-        
+
         assertEquals(newOrder.getId(), result.orderId());
         verify(orderRepository).save(any(Order.class));
     }
@@ -125,9 +112,9 @@ class OrderServiceTest {
     @Test
     @DisplayName("Test createOrder with missing fields")
     void testCreateOrderWithMissingFields() {
-        
         CreateOrderRequest createOrderRequest = new CreateOrderRequest(
             100L,
+            "AAPL",
             Order.OrderIntent.BUY,
             null,
             BigDecimal.valueOf(500.0),
@@ -135,23 +122,12 @@ class OrderServiceTest {
         );
 
         Long userId = 1L;
-        
+
         BadOrderException exception = assertThrows(BadOrderException.class, () -> {
             orderService.createOrder(createOrderRequest, userId);
         });
+
         assertEquals("Order currency is required", exception.getMessage());
         verify(orderRepository, never()).save(any(Order.class));
     }
-
-    //Tests order creation with invalid fields
-    // @Test
-    // @DisplayName("Test createOrder with invalid fields")
-    // void testCreateOrderWithInvalidFields() {
-        
-    // }
-
-
-
-
-
 }

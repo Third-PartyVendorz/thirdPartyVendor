@@ -45,6 +45,9 @@ public class Order {
     @Column(name = "asset_id", nullable = false)
     private Long assetId;
 
+    @Column(name = "ticker", nullable = false)
+    private String ticker;
+
     @Column(name = "order_intent", nullable = false)
     @Enumerated(EnumType.STRING)
     private OrderIntent orderIntent;

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import com.thirdpartyvendor.api.dto.OrderResponse;
 import com.thirdpartyvendor.api.dto.CreateOrderRequest;
 import com.thirdpartyvendor.api.entity.AppUser;
+import com.thirdpartyvendor.api.service.OrderExecutionService;
 import com.thirdpartyvendor.api.service.OrderService;
 
 import java.util.List;
@@ -24,9 +25,11 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 public class OrderController {
 
     private final OrderService orderService;
+    private final OrderExecutionService orderExecutionService;
 
-    public OrderController(OrderService orderService) {
+    public OrderController(OrderService orderService, OrderExecutionService orderExecutionService) {
         this.orderService = orderService;
+        this.orderExecutionService = orderExecutionService;
     }
 
     @PostMapping()
@@ -48,6 +51,14 @@ public class OrderController {
         @AuthenticationPrincipal AppUser currentUser
     ) {
         return ResponseEntity.ok(orderService.cancelOrder(id, currentUser.getId()));
+    }
+
+    @PostMapping("/{id}/execute")
+    public ResponseEntity<OrderResponse> executeOrder(
+        @PathVariable Long id,
+        @AuthenticationPrincipal AppUser currentUser
+    ) {
+        return ResponseEntity.ok(orderExecutionService.executeOrder(id, currentUser.getId()));
     }
     
 

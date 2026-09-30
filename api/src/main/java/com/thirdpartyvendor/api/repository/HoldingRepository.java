@@ -9,7 +9,7 @@ import com.thirdpartyvendor.api.entity.Holding;
 import com.thirdpartyvendor.api.entity.HoldingId;
 
 public interface HoldingRepository extends JpaRepository<Holding, HoldingId> {
-    Optional<Holding> findByAssetIdAndUserId(Long assetId, Long userId);
-    Optional<Holding> findFirstByAssetId(Long assetId);
+    Optional<Holding> findByTickerAndUserId(String ticker, Long userId);
+    Optional<Holding> findFirstByTicker(String ticker);
     List<Holding> findByUserId(Long userId);
 }

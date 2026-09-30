@@ -5,6 +5,7 @@ import com.thirdpartyvendor.api.entity.Order.OrderIntent;
 
 public record CreateOrderRequest(
     Long assetId,
+    String ticker,
     OrderIntent orderIntent,
     BigDecimal quantity,
     BigDecimal orderPrice,

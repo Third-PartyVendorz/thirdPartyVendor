@@ -28,6 +28,7 @@ CREATE TABLE orders (
     order_id BIGINT PRIMARY KEY,
     user_id INT NOT NULL,
     asset_id BIGINT NOT NULL,
+    ticker VARCHAR(10) NOT NULL,
     order_intent VARCHAR(10) NOT NULL,
     quantity NUMERIC(15, 4),
     order_price NUMERIC(15, 4),
@@ -68,7 +69,3 @@ CREATE TABLE exchange_log (
     exchange_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
-
-
-
-

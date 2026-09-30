@@ -31,6 +31,7 @@ public class OrderService {
         Order newOrder = new Order();
         newOrder.setUserId(userId);
         newOrder.setAssetId(createOrderRequest.assetId());
+        newOrder.setTicker(normalizeTicker(createOrderRequest.ticker()));
         newOrder.setOrderIntent(createOrderRequest.orderIntent());
         newOrder.setQuantity(createOrderRequest.quantity());
         newOrder.setOrderPrice(createOrderRequest.orderPrice());
@@ -43,6 +44,7 @@ public class OrderService {
             savedOrder.getId(),
             savedOrder.getUserId(),
             savedOrder.getAssetId(),
+            savedOrder.getTicker(),
             savedOrder.getOrderIntent(),
             savedOrder.getQuantity(),
             savedOrder.getOrderPrice(),
@@ -56,12 +58,17 @@ public class OrderService {
         return orderCurrency.trim().toUpperCase(Locale.ROOT);
     }
 
+    private String normalizeTicker(String ticker) {
+        return ticker.trim().toUpperCase(Locale.ROOT);
+    }
+
     public List<OrderResponse> getOrders(Long userId) {
         return orderRepository.findByUserId(userId).stream()
             .map(order -> new OrderResponse(
                 order.getId(),
                 order.getUserId(),
                 order.getAssetId(),
+                order.getTicker(),
                 order.getOrderIntent(),
                 order.getQuantity(),
                 order.getOrderPrice(),
@@ -83,6 +90,7 @@ public class OrderService {
             order.getId(),
             order.getUserId(),
             order.getAssetId(),
+            order.getTicker(),
             order.getOrderIntent(),
             order.getQuantity(),
             order.getOrderPrice(),
