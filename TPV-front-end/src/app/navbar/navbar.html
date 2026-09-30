@@ -1,22 +1,30 @@
-<header class="navbar">
-    <div class="navbar-content">
-        <div class="brand">
-            <h1>Third Party Vendor</h1>
-        </div>
-
-        <nav>
-            <ul>
-                <li><a href="#">Portfolio</a></li>
-                <li><a href="#">Portfolio History</a></li>
-                <li><a href="#">Trade</a></li>
-                <li><a href="#">Trade Options</a></li>
-            </ul>
-        </nav>
-
-        <div class="user-menu">
-            <button class="profile-button">
-                <img src='../../../profile-icon.jpg' alt="Profile Icon">
-            </button>
-        </div>
+<div class="navbar-content">
+    <div class="brand-name">
+        <h1>Third Party Vendor</h1>
     </div>
-</header>
+
+    <nav class="desktop-nav">
+        <ul>
+            <li><a href="/">Portfolio</a></li>
+            <li><a href="/portfolio-history">Portfolio History</a></li>
+            <li><a href="/trade">Execute Trade</a></li>
+            <li><a href="/trade-options">Trade Options</a></li>
+        </ul>
+    </nav>
+
+    <button class="profile-button">
+        <img src='../../../profile-icon.jpg' alt="Profile Icon">
+    </button>
+
+    <button class="mobile-menu-button" (click)="isMenuOpen = !isMenuOpen">
+        ☰
+    </button>
+</div>
+
+<div class="mobile-nav" *ngIf="isMenuOpen">
+    <a href="/">Portfolio</a>
+    <a href="/portfolio-history">Portfolio History</a>
+    <a href="/trade">Execute Trade</a>
+    <a href="/trade-options">Trade Options</a>
+    <a href="/profile">Profile</a>
+</div>
