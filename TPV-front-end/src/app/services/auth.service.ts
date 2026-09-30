@@ -5,11 +5,14 @@ import { RegisterResponse } from '../dto/RegisterResponse';
 import { AuthenticationRequest } from '../dto/AuthenticationRequest';
 import { AuthenticationResponse } from '../dto/AuthenticationResponse';
 import { environment } from '../../environments/environment';
+import { signal } from '@angular/core';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+  readonly errorMessage = signal<string | null>(null);
+
   constructor(private http: HttpClient) { }
 
   register(registerRequest: RegisterRequest) {
@@ -30,6 +33,14 @@ export class AuthService {
 
   clearAuthToken() {
     localStorage.removeItem('authToken');
+  }
+
+  setErrorMessage(message: string) {
+    this.errorMessage.set(message);
+  }
+
+  clearErrorMessage() {
+    this.errorMessage.set(null);
   }
 
 }

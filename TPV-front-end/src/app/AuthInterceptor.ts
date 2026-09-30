@@ -1,12 +1,43 @@
 import { inject } from '@angular/core';
+import {
+  HttpErrorResponse,
+  HttpEvent,
+  HttpHandlerFn,
+  HttpRequest,
+} from '@angular/common/http';
+import { Router } from '@angular/router';
+import { catchError, throwError } from 'rxjs';
 import { AuthService } from './services/auth.service';
 
-export function authInterceptor(req: any, next: any) {
-  const authToken = inject(AuthService).getAuthToken();
-  if (authToken) {
-    req = req.clone({
-      headers: req.headers.append('Authorization', `Bearer ${authToken}`)
-    })
-  }
-  return next(req);
+export function authInterceptor(
+  req: HttpRequest<unknown>,
+  next: HttpHandlerFn,
+): import('rxjs').Observable<HttpEvent<unknown>> {
+  const authService = inject(AuthService);
+  const router = inject(Router);
+  const authToken = authService.getAuthToken();
+  const isAuthEndpoint = req.url.includes('/auth/authenticate') || req.url.includes('/auth/register');
+  const shouldAttachAuthHeader = Boolean(authToken) && !isAuthEndpoint;
+  const interceptedRequest = shouldAttachAuthHeader
+    ? req.clone({
+        headers: req.headers.append('Authorization', `Bearer ${authToken}`),
+      })
+    : req;
+
+  return next(interceptedRequest).pipe(
+    catchError((error: unknown) => {
+      if (error instanceof HttpErrorResponse && shouldAttachAuthHeader) {
+        if (error.status === 401) {
+          authService.clearAuthToken();
+          router.navigateByUrl('/login');
+        }
+
+        if (error.status === 403) {
+          authService.setErrorMessage('You do not have permission to access this resource.');
+        }
+      }
+
+      return throwError(() => error);
+    }),
+  );
 }
