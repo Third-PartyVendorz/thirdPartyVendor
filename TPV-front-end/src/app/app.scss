@@ -11,26 +11,37 @@
 }
 
 .error-banner {
-    position: sticky;
+    position: fixed;
     top: 0;
+    left: 0;
+    right: 0;
     z-index: 1000;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 1rem 1.25rem 0;
+    pointer-events: none;
+}
+
+.error-banner__panel {
+    position: relative;
+    pointer-events: auto;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    padding: 1rem 1.25rem;
-    margin: 0.75rem auto 0;
-    width: min(100% - 1.5rem, 1100px);
+    width: min(100%, 720px);
+    padding: 1.25rem 1.4rem;
     border: 1px solid rgba(3, 61, 108, 0.22);
-    border-radius: 16px;
+    border-radius: 18px;
     background: linear-gradient(135deg, rgba(3, 61, 108, 0.98), rgba(2, 43, 74, 0.96));
     color: #eff6ff;
-    box-shadow: 0 16px 40px rgba(3, 61, 108, 0.26);
-    backdrop-filter: blur(10px);
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.32);
     animation: banner-drop 180ms ease-out;
 }
 
 .error-banner__content {
+    position: relative;
     display: grid;
     gap: 0.25rem;
 }
@@ -48,6 +59,7 @@
 }
 
 .error-banner__dismiss {
+    position: relative;
     flex: 0 0 auto;
     border: 0;
     border-radius: 999px;
@@ -71,7 +83,7 @@
 @keyframes banner-drop {
     from {
         opacity: 0;
-        transform: translateY(-8px);
+        transform: translateY(-10px);
     }
 
     to {

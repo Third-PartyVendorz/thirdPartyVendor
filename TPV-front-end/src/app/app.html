@@ -1,12 +1,14 @@
 @if (errorService.errorMessage(); as errorMessage) {
 	<div class="error-banner" role="alert" aria-live="polite">
-		<div class="error-banner__content">
-			<strong>Error</strong>
-			<span>{{ errorMessage }}</span>
+		<div class="error-banner__panel">
+			<div class="error-banner__content">
+				<strong>Error</strong>
+				<span>{{ errorMessage }}</span>
+			</div>
+			<button type="button" class="error-banner__dismiss" (click)="errorService.clearErrorMessage()">
+				Dismiss
+			</button>
 		</div>
-		<button type="button" class="error-banner__dismiss" (click)="errorService.clearErrorMessage()">
-			Dismiss
-		</button>
 	</div>
 }
 
