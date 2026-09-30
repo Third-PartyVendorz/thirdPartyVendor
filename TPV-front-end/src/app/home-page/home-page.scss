@@ -5,31 +5,22 @@
     font-family: 'Inter', sans-serif;
 }
 
-.registration-page {
+.home-page {
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background-image: url('../../assets/login-page-background.jpg');
-    background-size: cover;
-    background-position: center;
+    padding: 2rem;
+    background: linear-gradient(135deg, #f6f9fc 0%, #e8eef6 100%);
 }
 
-.login-container {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    width: 100%;
-    padding: 20px;
-}
-
-.hero-section {
-    flex: 1.2;
-    color: #ffffff;
-}
-
-.right-column {
-    flex: 1;
+.home-page__card {
+    width: min(100%, 720px);
+    padding: 3rem 2.5rem;
+    border-radius: 20px;
+    background: #ffffff;
+    box-shadow: 0 18px 45px rgba(3, 61, 108, 0.1);
+    text-align: center;
 }
 
 nav {
@@ -43,11 +34,23 @@ nav {
     padding: 1rem 2rem;
 }
 
-.hero-section h1 {
-    font-size: 3rem;
-    margin-bottom: 1rem;
+.home-page__eyebrow {
+    margin-bottom: 0.75rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #033d6c;
 }
 
-.hero-section p {
-    font-size: 16px;
+.home-page__card h1 {
+    font-size: clamp(2.25rem, 4vw, 3.25rem);
+    color: #022b4a;
+    margin-bottom: 0.85rem;
+}
+
+.home-page__copy {
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: #4b5563;
 }

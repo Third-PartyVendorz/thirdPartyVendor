@@ -10,6 +10,7 @@ import com.thirdpartyvendor.api.dto.ForexRequest;
 import com.thirdpartyvendor.api.dto.ForexResponse;
 import com.thirdpartyvendor.api.dto.MarketQuoteAPIResponse;
 import com.thirdpartyvendor.api.entity.ForexLog;
+import com.thirdpartyvendor.api.error.ForexExceptions.ExchangeAmountExcpetion;
 import com.thirdpartyvendor.api.repository.ForexLogRepository;
 
 import jakarta.transaction.Transactional;
@@ -97,17 +98,5 @@ public class ForexService {
                 log.getExchangeTimestamp()
             ))
             .toList();
-    }
-
-    public static class InsufficientCashException extends RuntimeException {
-		public InsufficientCashException(String message) {
-			super(message);
-		}
-	}
-
-    public static class ExchangeAmountExcpetion extends RuntimeException {
-        public ExchangeAmountExcpetion(String message) {
-			super(message);
-		}
     }
 }
