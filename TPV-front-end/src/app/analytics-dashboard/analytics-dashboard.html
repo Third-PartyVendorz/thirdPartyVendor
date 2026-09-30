@@ -1,9 +1,15 @@
 <div class="analytics-container">
   <h2>Analytics Dashboard</h2>
-  <button (click)="performAnalytics()">Perform Analytics</button>
+  <button (click)="performAnalytics()" class="analytics-button">Perform Analytics</button>
   
   <div *ngIf="analyticsResult" class="result-display">
-    <h3>Analytics Result:</h3>
-    <pre>{{ analyticsResult | json }}</pre>
+    <div class="chart-container">
+      <canvas #chartCanvas></canvas>
+    </div>
+    <div class="raw-data">
+      <h4>Raw Data:</h4>
+      <p><strong>Buy Orders:</strong> {{ analyticsResult.buy_count }}</p>
+      <p><strong>Sell Orders:</strong> {{ analyticsResult.sell_count }}</p>
+    </div>
   </div>
 </div>
