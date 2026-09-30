@@ -37,7 +37,7 @@ public class Trade {
     @Column(name = "trade_timestamp", nullable = false)
     private LocalDateTime tradeTimestamp;
 
-    @Column(name = "trade_currecny")
+    @Column(name = "trade_currency")
     private String tradeCurrency;
 
     @PrePersist
