@@ -1,0 +1,9 @@
+<div class="analytics-container">
+  <h2>Analytics Dashboard</h2>
+  <button (click)="performAnalytics()">Perform Analytics</button>
+  
+  <div *ngIf="analyticsResult" class="result-display">
+    <h3>Analytics Result:</h3>
+    <pre>{{ analyticsResult | json }}</pre>
+  </div>
+</div>
