@@ -74,7 +74,7 @@ Use the authentication endpoint to get a JWT after registering:
 curl -X POST http://localhost:8081/auth/authenticate \
   -H 'Content-Type: application/json' \
   -d '{
-    "email": "jane.doe@example.com",
+    "email": "frobs@hoppond.com",
     "password": "secret123"
   }'
 ```
