@@ -1,8 +1,6 @@
 rm -rf /home/ec2-user/thirdPartyVendor/analytics/visuals/* /home/ec2-user/thirdPartyVendor/analytics/raw-data/*
 
-curl -X POST http://127.0.0.1:5000/analytics \
-  -H "Content-Type: application/json" \
-  -d '{}'
+curl -H "Content-Type: application/json" http://127.0.0.1:8089/analytics
 
 
 Analytics we are going to capture:
@@ -10,6 +8,6 @@ Analytics we are going to capture:
  - Buy/sell count
  - Buy/sell volume
  - Trade volume by day of the month (Bar chart that only accounts for total volume, but bar will be made of buy(greea) and sell(red))
- - Trade volume by open market hour (Bar chart that only accounts for total volume, but bar will be made of buy(greea) and sell(red))
+ - Trade volume by open market hour () (Bar chart that only accounts for total volume, but bar will be made of buy(greea) and sell(red))
  - Open market vs After hours/pre-market trading volume
- - 10 most traded stocks
+ - k most traded assets
