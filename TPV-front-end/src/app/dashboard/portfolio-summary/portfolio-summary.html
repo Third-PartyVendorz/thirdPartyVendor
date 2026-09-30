@@ -1,27 +1,53 @@
-<div class="summary-card">
-    <div class="summary-header">
-        <h2>My Portfolio</h2>
-
-        <div class="portfolio-value">
-            <h2 class="balance-amount">$9,000.00</h2>
-            <!-- {{ portfolioValue | currency }} -->
+<div class="portfolio-card">
+    <div class="portfolio-header">
+        <div class="summary-title">
+            <h2>Portfolio</h2>
+            <p>Your investments at a glance</p>
         </div>
-    </div>
-    <div class="vertical-line"></div>
-    <div class="summary-body">
         <button class="trade-button">
             TRADE <span>↗</span>
         </button>
-            
-        <div class="gain">
-            <div class="gain-dollar">
-                <!-- +{{ dailyGain | number:'1.2-2' }} -->
-                +$42.56
+    </div>
+
+    <div class="portfolio-metrics">
+        <div class="metric-primary">
+            <div class="label">Total Value</div>
+
+            <div class="value">
+                {{ portfolioValue | currency:'USD':'symbol': '1.2-2' }}
             </div>
 
-            <div class="gain-percentage">
-                <!-- +{{ dailyGainPercentage | number:'1.2-2' }}% -->
-                +0.16%
+            <div class="portfolio-daily-change" [class.positive]="dailyGainLoss > 0" [class.negative]="dailyGainLoss < 0">
+                {{ dailyGainLoss | currency: 'USD' :'symbol': '1.2-2' }}
+                ({{ dailyGainLossPercentage > 0 ? '+' : '' }}{{ dailyGainLossPercentage | number:'1.2-2' }}%)
+                <span class="period">Today</span>
+            </div>
+        </div>
+
+        <div class="metric">
+            <div class="label">Buying Power</div>
+            <div class="small-value">
+                {{ buyingPower | currency:'USD':'symbol': '1.2-2' }}
+            </div>
+        </div>
+
+        <div class="metric">
+            <div class="label">Cash Balance</div>
+            <div class="small-value">
+                {{ cashBalance | currency:'USD':'symbol': '1.2-2' }}
+            </div>
+        </div>
+
+        <div class="metric">
+            <div class="label">Total Gain/Loss</div>
+            <div class="small-value"
+                [class.positive]="totalGainLoss > 0" [class.negative]="totalGainLoss < 0">
+                {{ totalGainLoss | currency:'USD':'symbol': '1.2-2' }}
+                ({{ totalGainLossPercent > 0 ? '+' : '' }}{{ totalGainLossPercent | number:'1.2-2' }}%)
+            </div>
+
+            <div class="period">
+                All Time
             </div>
         </div>
     </div>

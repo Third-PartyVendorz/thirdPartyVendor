@@ -20,7 +20,7 @@
     </button>
 </div>
 
-<div class="mobile-nav" *ngIf="isMenuOpen">
+<div class="mobile-nav" *ngIf="isMenuOpen" (click)="$event.stopPropagation()">
     <a href="/">Portfolio</a>
     <a href="/portfolio-history">Portfolio History</a>
     <a href="/trade">Execute Trade</a>

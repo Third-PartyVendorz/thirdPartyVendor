@@ -1,42 +1,170 @@
-.summary-card {
-    min-width: 250px;
-    padding: 1rem;
+.portfolio-card {
+    background: #ffffff;
+    padding: 0.5rem;
+}
+
+.portfolio-header {
     display: flex;
-    gap: 1.5rem;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
 }
 
-.vertical-line {
-    border-left: 2px solid #000000;
-    height: 80px;
-    margin: 0 2px;
-    display: inline-block;
-}
-
-.summary-body {
-    gap: 1.5rem;
-}
-
-h2 {
+.balance-amount {
     margin: 0;
-    font-weight: 400;
+    color: #123f74;
+    font-size: 1.75rem;
+    font-weight: 600;
+}
+
+.summary-title h2 {
+    margin: 0;
+    font-size: 2rem;
+}
+
+.summary-title p {
+    margin: 0.25rem;
 }
 
 .trade-button {
     background-color: #033D6C;
     color: #F8B776;
     border: none;
-    border-radius: 6px;
-    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background 0.2s;
 }
 
-.portfolio-value {
-    font-size: 1.5rem;
-    font-weight: 300;
-    margin: 0.5rem 0;
+.trade-button:hover {
+    background-color: #022b4a;
 }
 
-.gain {
-    color: #198754;
-    font-size: 1.25rem;
+.portfolio-metrics {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.04);
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1.25fr;
+    gap: 0;
+}
+
+.metric {
+    padding: 0 1.5rem;
+    &:not(:first-child) {
+        border-left: 1px solid #e5e7eb;
+    }
+}
+
+.label {
+    color: #64748b;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.value {
+    color: #123f74;
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.small-value {
+    color: #123f74;
+    font-size: 1.65rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.change {
+    margin-top: 0.75rem;
+    font-weight: 600;
+}
+
+.positive {
+    color: #139141;
+}
+
+.negative {
+    color: #dc2626;
+}
+
+.period {
+    margin-left: 0.5rem;
+    font-size: 0.9rem;
+    color: #64748b;
+    font-weight: 400;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .portfolio-header {
+        gap: 1rem;
+    }
+
+    .summary-title h2 {
+        font-size: 1.5rem;
+    }
+
+    .trade-button {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .portfolio-metrics {
+        padding: 1rem;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .metric {
+        padding: 0;
+        border-left: none !important;
+        border-bottom: 1px solid #e5e7eb;
+        padding-bottom: 1rem;
+    }
+
+    .metric:last-child {
+        border-bottom: none;
+    }
+
+    .value {
+        font-size: 1.75rem;
+    }
+
+    .small-value {
+        font-size: 1.25rem;
+        white-space: normal;
+    }
+
+    .metric-primary {
+        border-bottom: 1px solid #e5e7eb;
+        padding-bottom: 1rem;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .portfolio-metrics {
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .metric {
+        padding: 0;
+        border-left: none !important;
+    }
+
+    .small-value {
+        white-space: normal;
+    }
+
+    .value {
+        font-size: 1.75rem;
+    }
 }

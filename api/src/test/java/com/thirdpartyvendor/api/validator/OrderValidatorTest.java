@@ -6,10 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.math.BigDecimal;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.thirdpartyvendor.api.dto.CreateOrderRequest;
+import com.thirdpartyvendor.api.error.OrderExceptions.BadOrderException;
 import com.thirdpartyvendor.api.entity.Order.OrderIntent;
 
 class OrderValidatorTest {
@@ -18,15 +17,15 @@ class OrderValidatorTest {
 
     @Test
     void rejectsMissingOrderRequestWith422() {
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+        BadOrderException exception = assertThrows(BadOrderException.class,
             () -> orderValidator.validateCreateOrder(null, 1L));
 
-        assertEquals(HttpStatusCode.valueOf(422), exception.getStatusCode());
+        assertEquals("Order request is required", exception.getMessage());
     }
 
     @Test
     void rejectsMissingAssetIdWith422() {
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+        BadOrderException exception = assertThrows(BadOrderException.class,
             () -> orderValidator.validateCreateOrder(new CreateOrderRequest(
                 null,
                 OrderIntent.BUY,
@@ -35,12 +34,12 @@ class OrderValidatorTest {
                 "USD"
             ), 1L));
 
-        assertEquals(HttpStatusCode.valueOf(422), exception.getStatusCode());
+        assertEquals("Asset id is required", exception.getMessage());
     }
 
     @Test
     void rejectsMissingOrderIntentWith422() {
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+        BadOrderException exception = assertThrows(BadOrderException.class,
             () -> orderValidator.validateCreateOrder(new CreateOrderRequest(
                 1L,
                 null,
@@ -49,12 +48,12 @@ class OrderValidatorTest {
                 "USD"
             ), 1L));
 
-        assertEquals(HttpStatusCode.valueOf(422), exception.getStatusCode());
+        assertEquals("Order intent is required", exception.getMessage());
     }
 
     @Test
     void rejectsProvidingBothQuantityAndOrderPriceWith422() {
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+        BadOrderException exception = assertThrows(BadOrderException.class,
             () -> orderValidator.validateCreateOrder(new CreateOrderRequest(
                 1L,
                 OrderIntent.BUY,
@@ -63,12 +62,12 @@ class OrderValidatorTest {
                 "USD"
             ), 1L));
 
-        assertEquals(HttpStatusCode.valueOf(422), exception.getStatusCode());
+        assertEquals("Exactly one of quantity or order price must be provided", exception.getMessage());
     }
 
     @Test
     void rejectsNonPositiveQuantityWith422() {
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+        BadOrderException exception = assertThrows(BadOrderException.class,
             () -> orderValidator.validateCreateOrder(new CreateOrderRequest(
                 1L,
                 OrderIntent.BUY,
@@ -77,12 +76,12 @@ class OrderValidatorTest {
                 "USD"
             ), 1L));
 
-        assertEquals(HttpStatusCode.valueOf(422), exception.getStatusCode());
+        assertEquals("Quantity must be greater than zero", exception.getMessage());
     }
 
     @Test
     void rejectsNonPositiveOrderPriceWith422() {
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+        BadOrderException exception = assertThrows(BadOrderException.class,
             () -> orderValidator.validateCreateOrder(new CreateOrderRequest(
                 1L,
                 OrderIntent.BUY,
@@ -91,12 +90,12 @@ class OrderValidatorTest {
                 "USD"
             ), 1L));
 
-        assertEquals(HttpStatusCode.valueOf(422), exception.getStatusCode());
+        assertEquals("Order price must be greater than zero", exception.getMessage());
     }
 
     @Test
     void rejectsMissingCurrencyWith422() {
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+        BadOrderException exception = assertThrows(BadOrderException.class,
             () -> orderValidator.validateCreateOrder(new CreateOrderRequest(
                 1L,
                 OrderIntent.BUY,
@@ -105,6 +104,6 @@ class OrderValidatorTest {
                 ""
             ), 1L));
 
-        assertEquals(HttpStatusCode.valueOf(422), exception.getStatusCode());
+        assertEquals("Order currency is required", exception.getMessage());
     }
 }
