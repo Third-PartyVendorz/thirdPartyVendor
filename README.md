@@ -57,11 +57,11 @@ Once the api is running, create a user with:
 curl -X POST http://localhost:8081/auth/register \
   -H 'Content-Type: application/json' \
   -d '{
-    "firstName": "Jane",
-    "lastName": "Doe",
+    "firstName": "Frobert",
+    "lastName": "Hops",
     "phoneNumber": "555-0102",
     "dateOfBirth": "1992-08-22",
-    "email": "jane.doe@example.com",
+    "email": "frobs@hoppond.com",
     "password": "secret123"
   }'
 ```
@@ -74,7 +74,7 @@ Use the authentication endpoint to get a JWT after registering:
 curl -X POST http://localhost:8081/auth/authenticate \
   -H 'Content-Type: application/json' \
   -d '{
-    "email": "jane.doe@example.com",
+    "email": "frobs@hoppond.com",
     "password": "secret123"
   }'
 ```

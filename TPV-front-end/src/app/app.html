@@ -1,11 +1,15 @@
-<!DOCTYPE html>
-<main>
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3rd Party Vendors</title>
-  </head>
-  <body>
-    <app-home-page/>
-  </body>
-</main>
+@if (errorService.errorMessage(); as errorMessage) {
+	<div class="error-banner" role="alert" aria-live="polite">
+		<div class="error-banner__panel">
+			<div class="error-banner__content">
+				<strong>Error</strong>
+				<span>{{ errorMessage }}</span>
+			</div>
+			<button type="button" class="error-banner__dismiss" (click)="errorService.clearErrorMessage()">
+				Dismiss
+			</button>
+		</div>
+	</div>
+}
+
+<router-outlet />

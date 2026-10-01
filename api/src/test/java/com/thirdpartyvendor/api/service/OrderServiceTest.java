@@ -12,6 +12,7 @@ import static org.mockito.Mockito.when;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -31,6 +32,7 @@ import com.thirdpartyvendor.api.validator.OrderValidator;
 class OrderServiceTest {
 
     private OrderRepository orderRepository;
+    private OrderValidator orderValidator;
     private OrderService orderService;
     private HoldingRepository holdingRepository;
     private CashHoldingsService cashHoldingsService;
@@ -47,7 +49,7 @@ class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("Test getOrders by userId returns correct orders")
+    @DisplayName("Test getOrders returns all orders for a user")
     void testGetOrdersByUserId() {
         Long userId = 1L;
         Order order1 = new Order();
@@ -56,6 +58,7 @@ class OrderServiceTest {
         order1.setAssetId(100L);
         order1.setTicker("AAPL");
         order1.setOrderIntent(Order.OrderIntent.BUY);
+        order1.setQuantity(BigDecimal.valueOf(10.0));
         order1.setStatus(Order.OrderStatus.PENDING);
 
         Order order2 = new Order();
@@ -64,7 +67,9 @@ class OrderServiceTest {
         order2.setAssetId(101L);
         order2.setTicker("TSLA");
         order2.setOrderIntent(Order.OrderIntent.SELL);
+        order2.setOrderPrice(BigDecimal.valueOf(500.0));
         order2.setStatus(Order.OrderStatus.EXECUTED);
+        order2.setOrderCurrency("USD");
 
         when(orderRepository.findByUserId(userId)).thenReturn(Arrays.asList(order1, order2));
 
@@ -110,7 +115,10 @@ class OrderServiceTest {
             )
         );
 
-        CreateOrderRequest createOrderRequest = new CreateOrderRequest(
+    @Test
+    @DisplayName("Test createOrder successfully with orderPrice")
+    void testCreateOrderSuccessfullyWithOrderPrice() {
+        CreateOrderRequest request = new CreateOrderRequest(
             100L,
             "AAPL",
             Order.OrderIntent.BUY,
@@ -145,9 +153,9 @@ class OrderServiceTest {
             100L,
             "AAPL",
             Order.OrderIntent.BUY,
+            BigDecimal.valueOf(10.0),
             null,
-            BigDecimal.valueOf(500.0),
-            null
+            "usd"
         );
 
         Long userId = 1L;
