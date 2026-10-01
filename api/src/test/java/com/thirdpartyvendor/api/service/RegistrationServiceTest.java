@@ -118,7 +118,18 @@ class RegistrationServiceTest {
 	}
 
 	@ParameterizedTest
-	@ValueSource(strings = {"jane.doeexample.com", "jane.doe@.com", "jane.doe@com", "jane.doe@example"})
+	@ValueSource(strings = {
+		"jane.doeexample.com",
+		"jane.doe@.com",
+		"jane.doe@com",
+		"jane.doe@example",
+		// "user+alias@example.com",
+		"user.name+tag@://example.com",
+		"\"very.common\"@example.com",
+		// "user-name@example.co.uk",
+		"pelé@example.com",
+		"ñññ@example.com"
+	})
 	void attemptsToRegisterWithInvalidEmail(String email){
 
 		when(appUserRepository.save(org.mockito.ArgumentMatchers.any(AppUser.class))).thenAnswer(invocation -> {

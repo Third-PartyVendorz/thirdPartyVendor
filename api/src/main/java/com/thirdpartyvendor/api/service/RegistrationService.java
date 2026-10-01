@@ -39,14 +39,21 @@ public class RegistrationService {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Date of birth is required");
 		}
 
+		validateEmail(email);
+
 		if (appUserRepository.findByEmail(email).isPresent()) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already registered");
+		}
+
+		String phoneNumber = StringUtils.hasText(request.phoneNumber()) ? request.phoneNumber().trim() : null;
+		if (phoneNumber != null) {
+			validatePhoneNumber(phoneNumber);
 		}
 
 		AppUser user = new AppUser();
 		user.setFirstName(firstName);
 		user.setLastName(lastName);
-		user.setPhoneNumber(StringUtils.hasText(request.phoneNumber()) ? request.phoneNumber().trim() : null);
+		user.setPhoneNumber(phoneNumber);
 		user.setDateOfBirth(request.dateOfBirth());
 		user.setEmail(email);
 		user.setPasswordHash(passwordEncoder.encode(password));
@@ -62,5 +69,18 @@ public class RegistrationService {
 		}
 
 		return value.trim();
+	}
+
+	private void validateEmail(String email) {
+		String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
+		if (!email.matches(emailRegex)) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid email format");
+		}
+	}
+
+	private void validatePhoneNumber(String phoneNumber) {
+		if (!phoneNumber.matches("^[0-9\\-\\s()]+$")) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid phone number format");
+		}
 	}
 }
