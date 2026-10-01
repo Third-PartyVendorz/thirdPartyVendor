@@ -1,1 +1,81 @@
-<p>holdings-table works!</p>
+<div class="holdings-card">
+    <div class="card-header">
+        <h2>Holdings</h2>
+    </div>
+
+    <!-- Desktop Table View -->
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th class="numeric">Shares</th>
+                    <th class="numeric">Avg. Cost</th>
+                    <th class="numeric">Last Price</th>
+                    <th class="numeric">Market Value</th>
+                    <th class="numeric">Total Gain/Loss</th>
+                    <th class="numeric">Day Change</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let holding of holdings">
+                    <td data-label="Name">{{ holding.companyName }}</td>
+                    <td class="numeric" data-label="Shares">{{ holding.shares }}</td>
+                    <td class="numeric" data-label="Avg. Cost">{{ holding.averageCost | currency }}</td>
+                    <td class="numeric" data-label="Last Price">{{ holding.lastPrice | currency }}</td>
+                    <td class="numeric" data-label="Market Value">{{ holding.marketValue | currency }}</td>
+                    <td class="numeric change" data-label="Total Gain/Loss" [class.positive]="holding.gainLoss > 0" [class.negative]="holding.gainLoss < 0">
+                        <div>{{ holding.gainLoss | currency }}</div>
+                        <small>({{ holding.gainLossPercent | number:'1.2-2' }}%)</small>
+                    </td>
+                    <td class="numeric" data-label="Day Change" [class.positive]="holding.dailyChangePercent > 0" [class.negative]="holding.dailyChangePercent < 0">
+                        {{ holding.dailyChangePercent }}%
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Mobile Card View -->
+    <div class="mobile-holdings">
+        <div class="mobile-holdings-item" *ngFor="let holding of holdings">
+            <div class="mobile-holdings-row">
+                <span class="mobile-holdings-label">Name</span>
+                <span class="mobile-holdings-value company-name">{{ holding.companyName }}</span>
+            </div>
+            <div class="mobile-holdings-row">
+                <span class="mobile-holdings-label">Shares</span>
+                <span class="mobile-holdings-value">{{ holding.shares }}</span>
+            </div>
+            <div class="mobile-holdings-row">
+                <span class="mobile-holdings-label">Avg. Cost</span>
+                <span class="mobile-holdings-value">{{ holding.averageCost | currency }}</span>
+            </div>
+            <div class="mobile-holdings-row">
+                <span class="mobile-holdings-label">Last Price</span>
+                <span class="mobile-holdings-value">{{ holding.lastPrice | currency }}</span>
+            </div>
+            <div class="mobile-holdings-row">
+                <span class="mobile-holdings-label">Market Value</span>
+                <span class="mobile-holdings-value">{{ holding.marketValue | currency }}</span>
+            </div>
+            <div class="mobile-holdings-row">
+                <span class="mobile-holdings-label">Total Gain/Loss</span>
+                <span class="mobile-holdings-value" [class.positive]="holding.gainLoss > 0" [class.negative]="holding.gainLoss < 0">
+                    {{ holding.gainLoss | currency }}<br/>
+                    <small>({{ holding.gainLossPercent | number:'1.2-2' }}%)</small>
+                </span>
+            </div>
+            <div class="mobile-holdings-row">
+                <span class="mobile-holdings-label">Day Change</span>
+                <span class="mobile-holdings-value" [class.positive]="holding.dailyChangePercent > 0" [class.negative]="holding.dailyChangePercent < 0">
+                    {{ holding.dailyChangePercent }}%
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-footer">
+        <!-- <span>Total Market Value: {{ totalMarketValue | currency }}</span> -->
+    </div>
+</div>

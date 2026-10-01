@@ -1,0 +1,137 @@
+.holdings-card{
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    margin: 0.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.card-header {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.card-header h2 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #111827;
+}
+
+.table-wrapper {
+    display: none;
+
+    @media (min-width: 768px) {
+        display: block;
+    }
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead {
+    background: #fafbfd;
+}
+
+th {
+    text-align: left;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #111827;
+    white-space: nowrap;
+}
+
+tbody tr {
+    border-top: 1px solid #edf1f7;
+    transition: background 0.2s ease;
+}
+
+tbody tr:hover {
+    background: #f8fafc;
+}
+
+td {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    color: #111827;
+    vertical-align: middle;
+}
+
+.change {
+    font-weight: 600;
+}
+
+.percentage {
+    font-weight: 600;
+}
+
+.positive {
+    color: #139141;
+}
+
+.negative {
+    color: #dc2626;
+}
+
+// Mobile holdings card layout
+.mobile-holdings {
+    display: block;
+
+    @media (min-width: 768px) {
+        display: none;
+    }
+}
+
+.mobile-holdings-item {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background: #ffffff;
+    transition: box-shadow 0.2s ease;
+
+    &:hover {
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+.mobile-holdings-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f0f2f5;
+
+    &:last-child {
+        border-bottom: none;
+    }
+}
+
+.mobile-holdings-label {
+    font-weight: 600;
+    color: #6b7280;
+    font-size: 0.85rem;
+    min-width: 100px;
+    flex-shrink: 0;
+}
+
+.mobile-holdings-value {
+    text-align: right;
+    font-size: 0.95rem;
+    color: #111827;
+    font-weight: 500;
+}
+
+.mobile-holdings-value.company-name {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #111827;
+}
