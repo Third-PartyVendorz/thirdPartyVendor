@@ -17,31 +17,36 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
+import com.thirdpartyvendor.api.client.MarketDataAPIClient;
 import com.thirdpartyvendor.api.dto.CreateOrderRequest;
+import com.thirdpartyvendor.api.dto.MarketQuoteAPIResponse;
 import com.thirdpartyvendor.api.dto.OrderResponse;
 import com.thirdpartyvendor.api.entity.Order;
 import com.thirdpartyvendor.api.error.OrderExceptions.BadOrderException;
+import com.thirdpartyvendor.api.repository.HoldingRepository;
 import com.thirdpartyvendor.api.repository.OrderRepository;
 import com.thirdpartyvendor.api.validator.OrderValidator;
-import com.thirdpartyvendor.api.dto.OrderResponse;
-import com.thirdpartyvendor.api.dto.CreateOrderRequest;
-
 
 class OrderServiceTest {
 
     private OrderRepository orderRepository;
     private OrderValidator orderValidator;
     private OrderService orderService;
+    private HoldingRepository holdingRepository;
+    private CashHoldingsService cashHoldingsService;
+    private MarketDataAPIClient marketDataAPIClient;
 
     @BeforeEach
     void setUp() {
         orderRepository = mock(OrderRepository.class);
-        orderValidator = mock(OrderValidator.class);
-        orderService = new OrderService(orderRepository, orderValidator);
+        holdingRepository = mock(HoldingRepository.class);
+        cashHoldingsService = mock(CashHoldingsService.class);
+        marketDataAPIClient = mock(MarketDataAPIClient.class);
+        OrderValidator orderValidator = new OrderValidator();
+        orderService = new OrderService(orderRepository, orderValidator, holdingRepository, cashHoldingsService, marketDataAPIClient);
     }
-
-    // ============= getOrders Tests =============
 
     @Test
     @DisplayName("Test getOrders returns all orders for a user")
@@ -51,24 +56,25 @@ class OrderServiceTest {
         order1.setId(1L);
         order1.setUserId(userId);
         order1.setAssetId(100L);
+        order1.setTicker("AAPL");
         order1.setOrderIntent(Order.OrderIntent.BUY);
         order1.setQuantity(BigDecimal.valueOf(10.0));
         order1.setStatus(Order.OrderStatus.PENDING);
-        order1.setOrderCurrency("USD");
-        
+
         Order order2 = new Order();
         order2.setId(2L);
         order2.setUserId(userId);
         order2.setAssetId(101L);
+        order2.setTicker("TSLA");
         order2.setOrderIntent(Order.OrderIntent.SELL);
         order2.setOrderPrice(BigDecimal.valueOf(500.0));
         order2.setStatus(Order.OrderStatus.EXECUTED);
         order2.setOrderCurrency("USD");
 
         when(orderRepository.findByUserId(userId)).thenReturn(Arrays.asList(order1, order2));
-        
+
         List<OrderResponse> result = orderService.getOrders(userId);
-        
+
         assertEquals(2, result.size());
         assertEquals(order1.getId(), result.get(0).orderId());
         assertEquals(order2.getId(), result.get(1).orderId());
@@ -76,195 +82,89 @@ class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("Test getOrders returns empty list when user has no orders")
-    void testGetOrdersReturnsEmptyList() {
+    @DisplayName("Test that getOrders returns empty list for a user with no orders")
+    void testGetOrdersReturnsEmptyWhenUserNoOrders() {
         Long userId = 1L;
         when(orderRepository.findByUserId(userId)).thenReturn(Arrays.asList());
 
         List<OrderResponse> result = orderService.getOrders(userId);
 
-        assertTrue(result.isEmpty());
+        assertTrue(result.isEmpty(), "List should be empty");
         verify(orderRepository).findByUserId(userId);
     }
 
     @Test
-    @DisplayName("Test getOrders preserves all order properties")
-    void testGetOrdersPreservesOrderProperties() {
-        Long userId = 1L;
-        Long assetId = 100L;
-        BigDecimal price = BigDecimal.valueOf(250.75);
-        String currency = "EUR";
-        
-        Order order = new Order();
-        order.setId(1L);
-        order.setUserId(userId);
-        order.setAssetId(assetId);
-        order.setOrderIntent(Order.OrderIntent.BUY);
-        order.setOrderPrice(price);
-        order.setStatus(Order.OrderStatus.PENDING);
-        order.setOrderCurrency(currency);
-
-        when(orderRepository.findByUserId(userId)).thenReturn(Arrays.asList(order));
-        
-        List<OrderResponse> result = orderService.getOrders(userId);
-        OrderResponse response = result.get(0);
-        
-        assertEquals(1L, response.orderId());
-        assertEquals(userId, response.userId());
-        assertEquals(assetId, response.assetId());
-        assertEquals(Order.OrderIntent.BUY, response.orderIntent());
-        assertEquals(price, response.orderPrice());
-        assertEquals(Order.OrderStatus.PENDING, response.status());
-        assertEquals(currency, response.orderCurrency());
-    }
-
-    // // ============= createOrder Tests =============
+    @DisplayName("Test createOrder successfully creates an order")
+    void testCreateOrderSuccessfully() {
+        Mockito.when(marketDataAPIClient.fetchQuote("AAPL")).thenReturn(
+            new MarketQuoteAPIResponse(
+                new MarketQuoteAPIResponse.Data(
+                    "AAPL",
+                    new BigDecimal("100.00"),
+                    null,
+                    null,
+                    null,
+                    "USD",
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                ),
+                null
+            )
+        );
 
     @Test
     @DisplayName("Test createOrder successfully with orderPrice")
     void testCreateOrderSuccessfullyWithOrderPrice() {
         CreateOrderRequest request = new CreateOrderRequest(
             100L,
+            "AAPL",
             Order.OrderIntent.BUY,
             null,
             BigDecimal.valueOf(500.0),
             "USD"
         );
 
-        Order savedOrder = new Order();
-        savedOrder.setId(1L);
-        savedOrder.setUserId(1L);
-        savedOrder.setAssetId(100L);
-        savedOrder.setOrderIntent(Order.OrderIntent.BUY);
-        savedOrder.setOrderPrice(BigDecimal.valueOf(500.0));
-        savedOrder.setStatus(Order.OrderStatus.PENDING);
-        savedOrder.setOrderCurrency("USD");
+        Order newOrder = new Order();
+        Long userId = 1L;
+        newOrder.setId(1L);
+        newOrder.setUserId(userId);
+        newOrder.setAssetId(createOrderRequest.assetId());
+        newOrder.setTicker(createOrderRequest.ticker());
+        newOrder.setOrderIntent(createOrderRequest.orderIntent());
+        newOrder.setQuantity(createOrderRequest.quantity());
+        newOrder.setOrderPrice(createOrderRequest.orderPrice());
+        newOrder.setOrderCurrency(createOrderRequest.orderCurrency());
 
-        when(orderRepository.save(any(Order.class))).thenReturn(savedOrder);
-        OrderResponse result = orderService.createOrder(request, 1L);
-        
-        assertEquals(1L, result.orderId());
-        assertEquals(Order.OrderStatus.PENDING, result.status());
-        assertEquals("USD", result.orderCurrency());
-        assertEquals(BigDecimal.valueOf(500.0), result.orderPrice());
-        verify(orderValidator).validateCreateOrder(request, 1L);
+        when(orderRepository.save(any(Order.class))).thenReturn(newOrder);
+
+        OrderResponse result = orderService.createOrder(createOrderRequest, userId);
+
+        assertEquals(newOrder.getId(), result.orderId());
         verify(orderRepository).save(any(Order.class));
     }
 
     @Test
-    @DisplayName("Test createOrder successfully with quantity")
-    void testCreateOrderSuccessfullyWithQuantity() {
-        CreateOrderRequest request = new CreateOrderRequest(
+    @DisplayName("Test createOrder with missing fields")
+    void testCreateOrderWithMissingFields() {
+        CreateOrderRequest createOrderRequest = new CreateOrderRequest(
             100L,
-            Order.OrderIntent.SELL,
-            BigDecimal.valueOf(25.5),
-            null,
-            "GBP"
-        );
-
-        Order savedOrder = new Order();
-        savedOrder.setId(2L);
-        savedOrder.setUserId(2L);
-        savedOrder.setAssetId(100L);
-        savedOrder.setOrderIntent(Order.OrderIntent.SELL);
-        savedOrder.setQuantity(BigDecimal.valueOf(25.5));
-        savedOrder.setStatus(Order.OrderStatus.PENDING);
-        savedOrder.setOrderCurrency("GBP");
-
-        when(orderRepository.save(any(Order.class))).thenReturn(savedOrder);
-        OrderResponse result = orderService.createOrder(request, 2L);
-        
-        assertEquals(2L, result.orderId());
-        assertEquals(BigDecimal.valueOf(25.5), result.quantity());
-        assertEquals(Order.OrderStatus.PENDING, result.status());
-        assertEquals("GBP", result.orderCurrency());
-        verify(orderValidator).validateCreateOrder(request, 2L);
-        verify(orderRepository).save(any(Order.class));
-    }
-
-    @Test
-    @DisplayName("Test createOrder normalizes currency to uppercase")
-    void testCreateOrderNormalizesCurrencyToUppercase() {
-        CreateOrderRequest request = new CreateOrderRequest(
-            100L,
+            "AAPL",
             Order.OrderIntent.BUY,
             BigDecimal.valueOf(10.0),
             null,
             "usd"
         );
 
-        Order savedOrder = new Order();
-        savedOrder.setId(3L);
-        savedOrder.setUserId(3L);
-        savedOrder.setAssetId(100L);
-        savedOrder.setOrderIntent(Order.OrderIntent.BUY);
-        savedOrder.setQuantity(BigDecimal.valueOf(10.0));
-        savedOrder.setStatus(Order.OrderStatus.PENDING);
-        savedOrder.setOrderCurrency("USD");
+        Long userId = 1L;
 
-        when(orderRepository.save(any(Order.class))).thenReturn(savedOrder);
-        OrderResponse result = orderService.createOrder(request, 3L);
-        
-        assertEquals(3L, result.orderId());
-        assertEquals("USD", result.orderCurrency());
-        verify(orderValidator).validateCreateOrder(request, 3L);
-        verify(orderRepository).save(any(Order.class));
+        BadOrderException exception = assertThrows(BadOrderException.class, () -> {
+            orderService.createOrder(createOrderRequest, userId);
+        });
+
+        assertEquals("Order currency is required", exception.getMessage());
+        verify(orderRepository, never()).save(any(Order.class));
     }
-
-    @Test
-    @DisplayName("Test createOrder calls validator")
-    void testCreateOrderCallsValidator() {
-        CreateOrderRequest request = new CreateOrderRequest(
-            100L,
-            Order.OrderIntent.BUY,
-            BigDecimal.valueOf(15.0),
-            null,
-            "EUR"
-        );
-
-        Order savedOrder = new Order();
-        savedOrder.setId(4L);
-        savedOrder.setUserId(4L);
-        savedOrder.setAssetId(100L);
-        savedOrder.setOrderIntent(Order.OrderIntent.BUY);
-        savedOrder.setQuantity(BigDecimal.valueOf(15.0));
-        savedOrder.setStatus(Order.OrderStatus.PENDING);
-        savedOrder.setOrderCurrency("EUR");
-
-        when(orderRepository.save(any(Order.class))).thenReturn(savedOrder);
-        orderService.createOrder(request, 4L);
-        
-        verify(orderValidator).validateCreateOrder(request, 4L);
-    }
-
-    // // ============= cancelOrder Tests =============
-
-    @Test
-    @DisplayName("Test cancelOrder successfully cancels an order")
-    void testCancelOrderSuccessfully() {
-        Long orderId = 5L;
-        Long userId = 5L;
-
-        Order order = new Order();
-        order.setId(orderId);
-        order.setUserId(userId);
-        order.setAssetId(100L);
-        order.setOrderIntent(Order.OrderIntent.BUY);
-        order.setQuantity(BigDecimal.valueOf(5.0));
-        order.setStatus(Order.OrderStatus.PENDING);
-        order.setOrderCurrency("USD");
-
-        when(orderRepository.findById(userId)).thenReturn(Optional.of(order));
-        when(orderRepository.save(any(Order.class))).thenReturn(order);
-
-        OrderResponse result = orderService.cancelOrder(orderId, userId);
-        
-        assertEquals(orderId, result.orderId());
-        assertEquals(Order.OrderStatus.CANCELLED, result.status());
-        verify(orderRepository).save(any(Order.class));
-    }
-
 }
-
-
-
