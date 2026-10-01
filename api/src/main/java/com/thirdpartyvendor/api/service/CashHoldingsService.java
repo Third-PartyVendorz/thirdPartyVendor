@@ -56,6 +56,15 @@ public class CashHoldingsService {
         }
     }
 
+    public void ensureSufficientCash(String currencyCode, BigDecimal amount, Long userId) {
+        CashHolding cashHolding = cashHoldingsRepository.findByUserIdAndCurrencyCode(userId, currencyCode)
+            .orElseThrow(() -> new InsufficientCashException("User holds no cash in " + currencyCode));
+
+        if (cashHolding.getBalance().compareTo(amount) < 0) {
+            throw new InsufficientCashException("Insufficient cash in " + currencyCode);
+        }
+    }
+
     public void ensureCashHoldingExists(String currencyCode, Long userId) {
         cashHoldingsRepository.findByUserIdAndCurrencyCode(userId, currencyCode)
             .orElseGet(() -> {
