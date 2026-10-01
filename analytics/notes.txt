@@ -5,9 +5,14 @@ curl -H "Content-Type: application/json" http://127.0.0.1:8089/analytics
 
 Analytics we are going to capture:
 
- - Buy/sell count
- - Buy/sell volume
+ - Buy/sell count --> toggle between bar and pie charts
+ - Buy/sell volume --> toggle between bar and pie charts
  - Trade volume by day of the month (Bar chart that only accounts for total volume, but bar will be made of buy(greea) and sell(red))
  - Trade volume by open market hour () (Bar chart that only accounts for total volume, but bar will be made of buy(greea) and sell(red))
  - Open market vs After hours/pre-market trading volume
  - k most traded assets
+
+
+
+
+Using a view? --> Like this idea
