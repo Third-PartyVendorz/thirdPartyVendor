@@ -8,8 +8,8 @@ import java.math.BigDecimal;
 import org.junit.jupiter.api.Test;
 
 import com.thirdpartyvendor.api.dto.CreateOrderRequest;
-import com.thirdpartyvendor.api.error.OrderExceptions.BadOrderException;
 import com.thirdpartyvendor.api.entity.Order.OrderIntent;
+import com.thirdpartyvendor.api.error.OrderExceptions.BadOrderException;
 
 class OrderValidatorTest {
 
@@ -28,6 +28,7 @@ class OrderValidatorTest {
         BadOrderException exception = assertThrows(BadOrderException.class,
             () -> orderValidator.validateCreateOrder(new CreateOrderRequest(
                 null,
+                "AAPL",
                 OrderIntent.BUY,
                 new BigDecimal("10"),
                 null,
@@ -38,10 +39,26 @@ class OrderValidatorTest {
     }
 
     @Test
+    void rejectsMissingTickerWith422() {
+        BadOrderException exception = assertThrows(BadOrderException.class,
+            () -> orderValidator.validateCreateOrder(new CreateOrderRequest(
+                1L,
+                null,
+                OrderIntent.BUY,
+                new BigDecimal("10"),
+                null,
+                "USD"
+            ), 1L));
+
+        assertEquals("Ticker is required", exception.getMessage());
+    }
+
+    @Test
     void rejectsMissingOrderIntentWith422() {
         BadOrderException exception = assertThrows(BadOrderException.class,
             () -> orderValidator.validateCreateOrder(new CreateOrderRequest(
                 1L,
+                "AAPL",
                 null,
                 new BigDecimal("10"),
                 null,
@@ -56,6 +73,7 @@ class OrderValidatorTest {
         BadOrderException exception = assertThrows(BadOrderException.class,
             () -> orderValidator.validateCreateOrder(new CreateOrderRequest(
                 1L,
+                "AAPL",
                 OrderIntent.BUY,
                 new BigDecimal("10"),
                 new BigDecimal("100"),
@@ -70,6 +88,7 @@ class OrderValidatorTest {
         BadOrderException exception = assertThrows(BadOrderException.class,
             () -> orderValidator.validateCreateOrder(new CreateOrderRequest(
                 1L,
+                "AAPL",
                 OrderIntent.BUY,
                 BigDecimal.ZERO,
                 null,
@@ -84,6 +103,7 @@ class OrderValidatorTest {
         BadOrderException exception = assertThrows(BadOrderException.class,
             () -> orderValidator.validateCreateOrder(new CreateOrderRequest(
                 1L,
+                "AAPL",
                 OrderIntent.BUY,
                 null,
                 BigDecimal.ZERO,
@@ -98,6 +118,7 @@ class OrderValidatorTest {
         BadOrderException exception = assertThrows(BadOrderException.class,
             () -> orderValidator.validateCreateOrder(new CreateOrderRequest(
                 1L,
+                "AAPL",
                 OrderIntent.BUY,
                 new BigDecimal("10"),
                 null,
