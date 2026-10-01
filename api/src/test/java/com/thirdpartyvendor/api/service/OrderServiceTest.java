@@ -16,11 +16,15 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
+import com.thirdpartyvendor.api.client.MarketDataAPIClient;
 import com.thirdpartyvendor.api.dto.CreateOrderRequest;
+import com.thirdpartyvendor.api.dto.MarketQuoteAPIResponse;
 import com.thirdpartyvendor.api.dto.OrderResponse;
 import com.thirdpartyvendor.api.entity.Order;
 import com.thirdpartyvendor.api.error.OrderExceptions.BadOrderException;
+import com.thirdpartyvendor.api.repository.HoldingRepository;
 import com.thirdpartyvendor.api.repository.OrderRepository;
 import com.thirdpartyvendor.api.validator.OrderValidator;
 
@@ -28,12 +32,18 @@ class OrderServiceTest {
 
     private OrderRepository orderRepository;
     private OrderService orderService;
+    private HoldingRepository holdingRepository;
+    private CashHoldingsService cashHoldingsService;
+    private MarketDataAPIClient marketDataAPIClient;
 
     @BeforeEach
     void setUp() {
         orderRepository = mock(OrderRepository.class);
-        OrderValidator orderValidator = mock(OrderValidator.class);
-        orderService = new OrderService(orderRepository, orderValidator);
+        holdingRepository = mock(HoldingRepository.class);
+        cashHoldingsService = mock(CashHoldingsService.class);
+        marketDataAPIClient = mock(MarketDataAPIClient.class);
+        OrderValidator orderValidator = new OrderValidator();
+        orderService = new OrderService(orderRepository, orderValidator, holdingRepository, cashHoldingsService, marketDataAPIClient);
     }
 
     @Test
@@ -81,6 +91,25 @@ class OrderServiceTest {
     @Test
     @DisplayName("Test createOrder successfully creates an order")
     void testCreateOrderSuccessfully() {
+        Mockito.when(marketDataAPIClient.fetchQuote("AAPL")).thenReturn(
+            new MarketQuoteAPIResponse(
+                new MarketQuoteAPIResponse.Data(
+                    "AAPL",
+                    new BigDecimal("100.00"),
+                    null,
+                    null,
+                    null,
+                    "USD",
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                ),
+                null
+            )
+        );
+
         CreateOrderRequest createOrderRequest = new CreateOrderRequest(
             100L,
             "AAPL",
