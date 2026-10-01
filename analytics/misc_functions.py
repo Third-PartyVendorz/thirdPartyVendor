@@ -1,8 +1,8 @@
 from datetime import datetime
 
 def get_date_tag():
-#     now = datetime.now()
-#     return now.month, now.year, f"{now.year}_{now.month:02d}"
+    # now = datetime.now()
+    # return now.month, now.year, f"{now.year}_{now.month:02d}"
     a = "09"
     b = "2026"
     return a, b, f"{b}_{a}"

@@ -2,6 +2,8 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
+# ===== Importing and Validation =====
+
 def json_to_dataframe(json_data):
     return pd.DataFrame(json_data)
 
@@ -14,8 +16,11 @@ def validate_dataframe(df):
     if missing_columns:
         raise ValueError(f"Missing required columns: {missing_columns}")
     return True
+# ==========
 
-# ----- Buy/Sell counts -----
+
+# ========== Buy/Sell Analysis - Count and Volume ==========
+
 def buy_sell_count(df):
     """Calculate buy and sell counts with error handling."""
     try:
@@ -31,26 +36,7 @@ def buy_sell_count(df):
         raise KeyError(f"Column not found: {e}")
     except Exception as e:
         raise Exception(f"Error calculating buy/sell count: {str(e)}")
-    
-def visualize_buy_sell_count(buy_count, sell_count, date_tag):
-    """Visualize buy vs sell count with error handling."""
-    try:
-        if buy_count < 0 or sell_count < 0:
-            raise ValueError("Counts cannot be negative")
-        
-        labels = ['BUY', 'SELL']
-        counts = [buy_count, sell_count]
-        plt.bar(labels, counts)
-        plt.title('Buy vs Sell Count')
-        plt.savefig(f'visuals/buy_sell_count_{date_tag}.png')
-        plt.close()
-    except Exception as e:
-        print(f"Error visualizing buy/sell count: {str(e)}")
-        plt.close()
 
-# --------------------    
-
-# ----- Buy/Sell volume -----
 def buy_sell_volume(df):
     """Calculate buy and sell volumes with error handling."""
     try:
@@ -73,6 +59,47 @@ def buy_sell_volume(df):
         raise KeyError(f"Column not found: {e}")
     except Exception as e:
         raise Exception(f"Error calculating buy/sell volume: {str(e)}")
+    
+# ============================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# ----- Buy/Sell counts -----
+    
+def visualize_buy_sell_count(buy_count, sell_count, date_tag):
+    """Visualize buy vs sell count with error handling."""
+    try:
+        if buy_count < 0 or sell_count < 0:
+            raise ValueError("Counts cannot be negative")
+        
+        labels = ['BUY', 'SELL']
+        counts = [buy_count, sell_count]
+        plt.bar(labels, counts)
+        plt.title('Buy vs Sell Count')
+        plt.savefig(f'visuals/buy_sell_count_{date_tag}.png')
+        plt.close()
+    except Exception as e:
+        print(f"Error visualizing buy/sell count: {str(e)}")
+        plt.close()
+
+# --------------------    
+
+# ----- Buy/Sell volume -----
 
 def visualize_buy_sell_volume(buy_volume, sell_volume, date_tag):
     """Visualize buy vs sell volume with error handling."""

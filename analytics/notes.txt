@@ -15,4 +15,10 @@ Analytics we are going to capture:
 
 
 
-Using a view? --> Like this idea
+
+Plan: 
+
+ - Finalize basic analytics
+ - API send basic payload to frontend
+ - Implement non-blocking scheduling of some variety
+ - Implement non-blocking strategy with frontend
