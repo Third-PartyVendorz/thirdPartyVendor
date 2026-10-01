@@ -1,0 +1,53 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+}
+
+.registration-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-image: url('../../assets/login-page-background.jpg');
+    background-size: cover;
+    background-position: center;
+}
+
+.login-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
+    padding: 20px;
+}
+
+.hero-section {
+    flex: 1.2;
+    color: #ffffff;
+}
+
+.right-column {
+    flex: 1;
+}
+
+nav {
+    display: flex;
+    gap: 1.5rem;
+    background-color: #033D6C;
+    color: #ffffff;
+    font-size: 30px;
+    font-weight: 600;
+    height: 60px;
+    padding: 1rem 2rem;
+}
+
+.hero-section h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.hero-section p {
+    font-size: 16px;
+}
