@@ -1,0 +1,155 @@
+<section class="asset-page">
+	<article *ngIf="loading()" class="asset-card asset-status-card">Loading quote data...</article>
+
+	<div *ngIf="!loading()">
+		<ng-container *ngIf="quote() as currentQuote">
+			<ng-container *ngIf="asset() as currentAsset">
+				<header class="asset-hero">
+					<div class="asset-hero__identity">
+						<div class="asset-badge">{{ currentAsset.symbol }}</div>
+						<div>
+							<p class="asset-kicker">{{ currentAsset.exchange }} • {{ currentAsset.currency }}</p>
+							<h1>{{ currentAsset.name }}</h1>
+						</div>
+					</div>
+
+					<div class="asset-price-panel">
+						<div class="asset-price">{{ currentQuote.price | currency:currentQuote.currency:'symbol':'1.2-2' }}</div>
+						<div class="asset-change" [class.positive]="currentQuote.change > 0" [class.negative]="currentQuote.change < 0">
+							{{ currentQuote.change > 0 ? '+' : '' }}{{ currentQuote.change | currency:currentQuote.currency:'symbol':'1.2-2' }}
+							<span>({{ currentQuote.changePercent > 0 ? '+' : '' }}{{ currentQuote.changePercent | number:'1.2-2' }}%)</span>
+						</div>
+						<p class="asset-updated">Updated {{ currentQuote.asOf | date:'medium' }}</p>
+					</div>
+				</header>
+
+				<article *ngIf="errorMessage()" class="asset-card asset-status-card error">{{ errorMessage() }}</article>
+
+				<div class="asset-layout">
+					<article class="asset-card asset-chart-card">
+						<div class="card-heading">
+							<div>
+								<p class="card-eyebrow">History</p>
+								<h2>Daily candles</h2>
+							</div>
+							<div class="chart-range chart-controls">
+								<div class="interval-picker" role="group" aria-label="Historical range">
+									<button
+										type="button"
+										*ngFor="let option of rangeOptions"
+										[class.active]="selectedRange() === option.value"
+										(click)="setRange(option.value)">
+										{{ option.label }}
+									</button>
+								</div>
+								<span>{{ historicalRangeLabel }}</span>
+							</div>
+						</div>
+
+					<div class="chart-shell">
+						<ng-container *ngIf="historicalLoading(); else historicalContent">
+							<p class="chart-placeholder">Loading historical candles...</p>
+						</ng-container>
+
+						<ng-template #historicalContent>
+							<ng-container *ngIf="hasHistoricalData; else noHistory">
+								<div class="chart-frame">
+									<div class="chart-y-axis">
+										<span *ngFor="let value of chartYAxisValues">
+											{{ value | currency:currentQuote.currency:'symbol':'1.2-2' }}
+										</span>
+									</div>
+
+									<div class="chart-plot">
+										<svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+											<defs>
+												<linearGradient id="asset-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+													<stop offset="0%" stop-color="#033D6C" stop-opacity="0.35" />
+													<stop offset="100%" stop-color="#033D6C" stop-opacity="0.02" />
+												</linearGradient>
+											</defs>
+
+											<polyline class="chart-area" [attr.points]="chartAreaPoints"></polyline>
+											<polyline class="chart-line" [attr.points]="chartLinePoints"></polyline>
+										</svg>
+
+										<div class="chart-axis" [style.--chart-axis-columns]="chartAxisGridColumns">
+											<span *ngFor="let label of chartAxisLabels">{{ label }}</span>
+										</div>
+									</div>
+								</div>
+
+								<div class="summary-grid compact-summary">
+									<div>
+										<dt>Latest adj close</dt>
+										<dd>{{ latestCandle?.adjclose | currency:currentQuote.currency:'symbol':'1.2-2' }}</dd>
+									</div>
+									<div>
+										<dt>Latest volume</dt>
+										<dd>{{ latestCandle?.volume | number:'1.0-0' }}</dd>
+									</div>
+								</div>
+
+								<div class="historical-table-wrapper">
+									<table class="historical-table">
+										<thead>
+											<tr>
+												<th>Date</th>
+												<th>Open</th>
+												<th>High</th>
+												<th>Low</th>
+												<th>Close</th>
+												<th>Adj Close</th>
+												<th>Volume</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr *ngFor="let candle of recentCandles">
+												<td>{{ candle.date }}</td>
+												<td>{{ candle.open | currency:currentQuote.currency:'symbol':'1.2-2' }}</td>
+												<td>{{ candle.high | currency:currentQuote.currency:'symbol':'1.2-2' }}</td>
+												<td>{{ candle.low | currency:currentQuote.currency:'symbol':'1.2-2' }}</td>
+												<td>{{ candle.close | currency:currentQuote.currency:'symbol':'1.2-2' }}</td>
+												<td>{{ candle.adjclose | currency:currentQuote.currency:'symbol':'1.2-2' }}</td>
+												<td>{{ candle.volume | number:'1.0-0' }}</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</ng-container>
+
+							<ng-template #noHistory>
+								<p class="chart-placeholder">{{ historicalError() || 'Historical candles are not available yet.' }}</p>
+							</ng-template>
+						</ng-template>
+					</div>
+				</article>
+
+				<aside class="asset-card asset-summary-card">
+					<div class="card-heading compact">
+						<div>
+							<p class="card-eyebrow">Asset</p>
+							<h2>About this stock</h2>
+						</div>
+					</div>
+
+					<dl class="summary-grid">
+						<div>
+							<dt>Name</dt>
+							<dd>{{ currentAsset.name }}</dd>
+						</div>
+						<div>
+							<dt>Exchange</dt>
+							<dd>{{ currentAsset.exchange }}</dd>
+						</div>
+						<div>
+							<dt>Currency</dt>
+							<dd>{{ currentAsset.currency }}</dd>
+						</div>
+					</dl>
+				</aside>
+			</div>
+			</ng-container>
+		</ng-container>
+	</div>
+</section>
