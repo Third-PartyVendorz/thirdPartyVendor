@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 
 import com.thirdpartyvendor.api.client.MarketDataAPIClient;
 import com.thirdpartyvendor.api.dto.MarketQuoteAPIResponse;
-import com.thirdpartyvendor.api.dto.OrderResponse;
 import com.thirdpartyvendor.api.entity.Holding;
 import com.thirdpartyvendor.api.entity.Order;
 import com.thirdpartyvendor.api.entity.Trade;
@@ -41,7 +40,7 @@ public class OrderExecutionService {
     }
 
     @Transactional
-    public OrderResponse executeOrder(Long orderId, Long userId) {
+    public void executeOrder(Long orderId, Long userId) {
         Order order = orderRepository.findById(orderId)
             .orElseThrow(() -> new OrderExecutionException("Order not found"));
 
@@ -53,13 +52,17 @@ public class OrderExecutionService {
             throw new OrderExecutionException("Cancelled orders cannot be executed");
         }
 
-        Holding holding = loadExecutionHolding(order, userId);
-
         MarketQuoteAPIResponse quoteResponse = marketDataAPIClient.fetchQuote(order.getTicker());
         BigDecimal executionPrice = quoteResponse.data().price().setScale(4, RoundingMode.HALF_UP);
 
         BigDecimal executionQuantity = resolveExecutionQuantity(order, executionPrice);
         BigDecimal tradeAmount = resolveTradeAmount(order, executionQuantity, executionPrice);
+
+        if (order.getOrderIntent() == Order.OrderIntent.BUY) {
+            cashHoldingsService.ensureSufficientCash(order.getOrderCurrency(), tradeAmount, userId);
+        }
+
+        Holding holding = loadExecutionHolding(order, userId);
 
         applyHoldingChange(order, holding, executionQuantity);
 
@@ -75,19 +78,6 @@ public class OrderExecutionService {
 
         order.setStatus(Order.OrderStatus.EXECUTED);
         orderRepository.save(order);
-
-        return new OrderResponse(
-            order.getId(),
-            order.getUserId(),
-            order.getAssetId(),
-            order.getTicker(),
-            order.getOrderIntent(),
-            order.getQuantity(),
-            order.getOrderPrice(),
-            order.getStatus(),
-            order.getCreatedAt(),
-            order.getOrderCurrency()
-        );
     }
 
     private Holding loadExecutionHolding(Order order, Long userId) {
