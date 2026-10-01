@@ -1,0 +1,51 @@
+%%{init: {'sequence': {'mirrorActors': false}}}%%
+sequenceDiagram
+    autonumber
+    actor U as User
+    participant FE as Frontend
+    participant API as Order API
+    participant ODB as Order DB
+    participant OUT as Outbox
+    participant K as Kafka
+    participant EX as Execution Consumer
+    participant Q as Market Data API
+    participant ID as Idempotency Ledger
+    participant TDB as Trade / Holdings / Cash DB
+    participant N as Portfolio / Notification Consumer
+    participant DLQ as Dead Letter Topic
+
+    U->>FE: Submit order
+    FE->>API: POST /orders
+    API->>ODB: validate + persist Order(PENDING)
+    API->>OUT: store OrderAccepted event
+    API-->>FE: 202 Accepted + orderId
+
+    OUT->>K: publish OrderAccepted{eventId, orderId, userId, ticker, side, qty, limitPrice}
+    Note over K,EX: Kafka can redeliver the same message more than once.
+    K-->>EX: OrderAccepted
+    EX->>ID: check eventId / orderId
+
+    alt already processed
+        ID-->>EX: duplicate
+        EX-->>K: ack without side effects
+    else first delivery
+        ID-->>EX: not processed
+        EX->>Q: fetch current quote
+
+        alt quote unavailable or retry limit hit
+            EX->>DLQ: park message after retries
+            EX-->>K: nack / retry
+        else quote available
+            EX->>TDB: begin transaction
+            EX->>TDB: write Trade
+            EX->>TDB: update Holding
+            EX->>TDB: update CashHolding
+            EX->>TDB: update Order status = EXECUTED
+            EX->>ID: mark eventId processed
+            EX-->>K: commit offset / ack
+            EX->>K: publish OrderExecuted{orderId, tradeId, executionPrice}
+            K-->>N: OrderExecuted
+        end
+    end
+
+   
