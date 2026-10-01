@@ -22,7 +22,7 @@
 .table-wrapper {
     display: none;
 
-    @media (min-width: 768px) {
+    @media (min-width: 900px) {
         display: block;
     }
 }
@@ -81,7 +81,7 @@ td {
 .mobile-holdings {
     display: block;
 
-    @media (min-width: 768px) {
+    @media (min-width: 900px) {
         display: none;
     }
 }
@@ -108,10 +108,14 @@ td {
     justify-content: space-between;
     align-items: center;
     padding: 0.5rem 0;
-    border-bottom: 1px solid #f0f2f5;
+    border-bottom: 1px solid #edf1f7;
 
     &:last-child {
         border-bottom: none;
+    }
+
+    &:hover {
+        background: #f8fafc;
     }
 }
 
@@ -128,6 +132,14 @@ td {
     font-size: 0.95rem;
     color: #111827;
     font-weight: 500;
+
+    &.positive {
+        color: #139141;
+    }
+
+    &.negative {
+        color: #dc2626;
+    }
 }
 
 .mobile-holdings-value.company-name {
