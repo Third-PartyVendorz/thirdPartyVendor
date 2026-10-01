@@ -25,7 +25,7 @@ export const routes: Routes = [
     ],
   },
   {
-    path: 'history',
+    path: 'portfolio-history',
     component: MainLayoutComponent,
     children: [
       { path: '', component: HistoryPage },
