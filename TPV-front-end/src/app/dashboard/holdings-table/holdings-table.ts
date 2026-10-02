@@ -3,7 +3,7 @@ import { CommonModule, CurrencyPipe, DecimalPipe } from '@angular/common';
 import { Holding } from './holding.model';
 import { MOCK_HOLDINGS } from './mock-holdings';
 
-type SortColumn = 'ticker' | 'gainLoss' | null;
+type SortColumn = 'ticker' | 'companyName' | 'shares' | 'averageCost' | 'lastPrice' | 'marketValue' | 'gainLoss' | 'dailyChangePercent' | null;
 type SortDirection = 'asc' | 'desc' | null;
 
 @Component({
@@ -18,6 +18,7 @@ export class HoldingsTable {
   sortDirection: SortDirection = null;
   displayCount: number = 10;
   readonly incrementCount: number = 10;
+  expandedHoldings: Set<string> = new Set();
 
   get sortedHoldings(): Holding[] {
     if (!this.sortColumn || !this.sortDirection) {
@@ -28,14 +29,41 @@ export class HoldingsTable {
       let aValue: string | number;
       let bValue: string | number;
 
-      if (this.sortColumn === 'ticker') {
-        aValue = a.ticker;
-        bValue = b.ticker;
-      } else if (this.sortColumn === 'gainLoss') {
-        aValue = a.gainLoss;
-        bValue = b.gainLoss;
-      } else {
-        return 0;
+      switch (this.sortColumn) {
+        case 'ticker':
+          aValue = a.ticker;
+          bValue = b.ticker;
+          break;
+        case 'companyName':
+          aValue = a.companyName;
+          bValue = b.companyName;
+          break;
+        case 'shares':
+          aValue = a.shares;
+          bValue = b.shares;
+          break;
+        case 'averageCost':
+          aValue = a.averageCost;
+          bValue = b.averageCost;
+          break;
+        case 'lastPrice':
+          aValue = a.lastPrice;
+          bValue = b.lastPrice;
+          break;
+        case 'marketValue':
+          aValue = a.marketValue;
+          bValue = b.marketValue;
+          break;
+        case 'gainLoss':
+          aValue = a.gainLoss;
+          bValue = b.gainLoss;
+          break;
+        case 'dailyChangePercent':
+          aValue = a.dailyChangePercent;
+          bValue = b.dailyChangePercent;
+          break;
+        default:
+          return 0;
       }
 
       if (typeof aValue === 'string') {
@@ -80,6 +108,18 @@ export class HoldingsTable {
     return this.sortDirection === 'asc' ? '▲' : '▼';
   }
 
+  toggleExpand(ticker: string): void {
+    if (this.expandedHoldings.has(ticker)) {
+      this.expandedHoldings.delete(ticker);
+    } else {
+      this.expandedHoldings.add(ticker);
+    }
+  }
+
+  isExpanded(ticker: string): boolean {
+    return this.expandedHoldings.has(ticker);
+  }
+
   loadMore(): void {
     this.displayCount += this.incrementCount;
   }
@@ -90,5 +130,29 @@ export class HoldingsTable {
 
   getDayChangeClass(value: number): string {
     return value >= 0 ? 'positive' : 'negative';
+  }
+
+  getSortOptionLabel(column: SortColumn): string {
+    switch (column) {
+      case 'ticker': return 'Ticker';
+      case 'companyName': return 'Name';
+      case 'shares': return 'Shares';
+      case 'averageCost': return 'Avg. Cost';
+      case 'lastPrice': return 'Last Price';
+      case 'marketValue': return 'Market Value';
+      case 'gainLoss': return 'Total Gain/Loss';
+      case 'dailyChangePercent': return 'Day Change';
+      default: return 'Sort by';
+    }
+  }
+
+  onSortChange(value: string): void {
+    if (value === '') {
+      // Reset to original order
+      this.sortColumn = null;
+      this.sortDirection = null;
+    } else {
+      this.toggleSort(value as SortColumn);
+    }
   }
 }

@@ -1,6 +1,18 @@
 <div class="holdings-card">
     <div class="card-header">
         <h2>Holdings</h2>
+        <label for="mobile-sort" class="mobile-sort-label">Sort by:</label>
+        <select #sortSelect id="mobile-sort" class="mobile-sort-dropdown" (change)="onSortChange(sortSelect.value)">
+            <option value="">Default Order</option>
+            <option value="ticker">Ticker</option>
+            <option value="companyName">Name</option>
+            <option value="shares">Shares</option>
+            <option value="averageCost">Avg. Cost</option>
+            <option value="lastPrice">Last Price</option>
+            <option value="marketValue">Market Value</option>
+            <option value="gainLoss">Total Gain/Loss</option>
+            <option value="dailyChangePercent">Day Change</option>
+        </select>
     </div>
 
     <!-- Desktop Table View -->
@@ -11,15 +23,27 @@
                     <th class="sortable" (click)="toggleSort('ticker')">
                         Ticker {{ getSortIndicator('ticker') }}
                     </th>
-                    <th>Name</th>
-                    <th class="numeric">Shares</th>
-                    <th class="numeric">Avg. Cost</th>
-                    <th class="numeric">Last Price</th>
-                    <th class="numeric">Market Value</th>
+                    <th class="sortable" (click)="toggleSort('companyName')">
+                        Name {{ getSortIndicator('companyName') }}
+                    </th>
+                    <th class="numeric sortable" (click)="toggleSort('shares')">
+                        Shares {{ getSortIndicator('shares') }}
+                    </th>
+                    <th class="numeric sortable" (click)="toggleSort('averageCost')">
+                        Avg. Cost {{ getSortIndicator('averageCost') }}
+                    </th>
+                    <th class="numeric sortable" (click)="toggleSort('lastPrice')">
+                        Last Price {{ getSortIndicator('lastPrice') }}
+                    </th>
+                    <th class="numeric sortable" (click)="toggleSort('marketValue')">
+                        Market Value {{ getSortIndicator('marketValue') }}
+                    </th>
                     <th class="numeric sortable" (click)="toggleSort('gainLoss')">
                         Total Gain/Loss {{ getSortIndicator('gainLoss') }}
                     </th>
-                    <th class="numeric">Day Change</th>
+                    <th class="numeric sortable" (click)="toggleSort('dailyChangePercent')">
+                        Day Change {{ getSortIndicator('dailyChangePercent') }}
+                    </th>
                 </tr>
             </thead>
             <tbody>
@@ -44,43 +68,51 @@
 
     <!-- Mobile Card View -->
     <div class="mobile-holdings">
-        <div class="mobile-holdings-item" *ngFor="let holding of displayedHoldings">
-            <div class="mobile-holdings-row">
-                <span class="mobile-holdings-label">Ticker</span>
-                <span class="mobile-holdings-value company-name">{{ holding.ticker }}</span>
+        <div class="mobile-holdings-item" *ngFor="let holding of displayedHoldings" [class.expanded]="isExpanded(holding.ticker)">
+            <div class="mobile-holdings-header">
+                <button (click)="toggleExpand(holding.ticker)" class="expand-button">
+                    <span class="expand-icon">{{ isExpanded(holding.ticker) ? '▼' : '▶' }}</span>
+                    {{ holding.companyName }} ({{ holding.ticker }})
+                </button>
             </div>
-            <div class="mobile-holdings-row">
-                <span class="mobile-holdings-label">Name</span>
-                <span class="mobile-holdings-value company-name">{{ holding.companyName }}</span>
-            </div>
-            <div class="mobile-holdings-row">
-                <span class="mobile-holdings-label">Shares</span>
-                <span class="mobile-holdings-value">{{ holding.shares }}</span>
-            </div>
-            <div class="mobile-holdings-row">
-                <span class="mobile-holdings-label">Avg. Cost</span>
-                <span class="mobile-holdings-value">{{ holding.averageCost | currency }}</span>
-            </div>
-            <div class="mobile-holdings-row">
-                <span class="mobile-holdings-label">Last Price</span>
-                <span class="mobile-holdings-value">{{ holding.lastPrice | currency }}</span>
-            </div>
-            <div class="mobile-holdings-row">
-                <span class="mobile-holdings-label">Market Value</span>
-                <span class="mobile-holdings-value">{{ holding.marketValue | currency }}</span>
-            </div>
-            <div class="mobile-holdings-row">
-                <span class="mobile-holdings-label">Total Gain/Loss</span>
-                <span class="mobile-holdings-value" [class.positive]="holding.gainLoss > 0" [class.negative]="holding.gainLoss < 0">
-                    {{ holding.gainLoss > 0 ? '+' : '' }}{{ holding.gainLoss | currency }}<br/>
-                    <small>({{holding.gainLossPercent > 0 ? '+' : ''}}{{ holding.gainLossPercent | number:'1.2-2' }}%)</small>
-                </span>
-            </div>
-            <div class="mobile-holdings-row">
-                <span class="mobile-holdings-label">Day Change</span>
-                <span class="mobile-holdings-value" [class.positive]="holding.dailyChangePercent > 0" [class.negative]="holding.dailyChangePercent < 0">
-                    {{ holding.dailyChangePercent > 0 ? '▲' : '▼' }} {{ holding.dailyChangePercent }}%
-                </span>
+            <div class="mobile-summary-card" *ngIf="isExpanded(holding.ticker)">
+                <div class="mobile-holdings-row">
+                    <span class="mobile-holdings-label">Ticker</span>
+                    <span class="mobile-holdings-value company-name">{{ holding.ticker }}</span>
+                </div>
+                <div class="mobile-holdings-row">
+                    <span class="mobile-holdings-label">Name</span>
+                    <span class="mobile-holdings-value company-name">{{ holding.companyName }}</span>
+                </div>
+                <div class="mobile-holdings-row">
+                    <span class="mobile-holdings-label">Shares</span>
+                    <span class="mobile-holdings-value">{{ holding.shares }}</span>
+                </div>
+                <div class="mobile-holdings-row">
+                    <span class="mobile-holdings-label">Avg. Cost</span>
+                    <span class="mobile-holdings-value">{{ holding.averageCost | currency }}</span>
+                </div>
+                <div class="mobile-holdings-row">
+                    <span class="mobile-holdings-label">Last Price</span>
+                    <span class="mobile-holdings-value">{{ holding.lastPrice | currency }}</span>
+                </div>
+                <div class="mobile-holdings-row">
+                    <span class="mobile-holdings-label">Market Value</span>
+                    <span class="mobile-holdings-value">{{ holding.marketValue | currency }}</span>
+                </div>
+                <div class="mobile-holdings-row">
+                    <span class="mobile-holdings-label">Total Gain/Loss</span>
+                    <span class="mobile-holdings-value" [class.positive]="holding.gainLoss > 0" [class.negative]="holding.gainLoss < 0">
+                        {{ holding.gainLoss > 0 ? '+' : '' }}{{ holding.gainLoss | currency }}<br/>
+                        <small>({{holding.gainLossPercent > 0 ? '+' : ''}}{{ holding.gainLossPercent | number:'1.2-2' }}%)</small>
+                    </span>
+                </div>
+                <div class="mobile-holdings-row">
+                    <span class="mobile-holdings-label">Day Change</span>
+                    <span class="mobile-holdings-value" [class.positive]="holding.dailyChangePercent > 0" [class.negative]="holding.dailyChangePercent < 0">
+                        {{ holding.dailyChangePercent > 0 ? '▲' : '▼' }} {{ holding.dailyChangePercent }}%
+                    </span>
+                </div>
             </div>
         </div>
     </div>
