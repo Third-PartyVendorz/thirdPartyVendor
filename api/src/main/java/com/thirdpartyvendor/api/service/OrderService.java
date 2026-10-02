@@ -1,7 +1,7 @@
 package com.thirdpartyvendor.api.service;
 
+import java.math.BigDecimal;
 import java.util.List;
-import java.util.Locale;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -9,23 +9,38 @@ import org.springframework.stereotype.Service;
 import com.thirdpartyvendor.api.dto.CreateOrderRequest;
 import com.thirdpartyvendor.api.dto.OrderResponse;
 import com.thirdpartyvendor.api.entity.Order;
+import com.thirdpartyvendor.api.entity.Order.OrderIntent;
 import com.thirdpartyvendor.api.entity.Order.OrderStatus;
+import com.thirdpartyvendor.api.model.Currency;
 import com.thirdpartyvendor.api.repository.OrderRepository;
 import com.thirdpartyvendor.api.validator.OrderValidator;
 
 @Service
 public class OrderService {
 
+    private final CashHoldingsService cashHoldingsService;
     private final OrderRepository orderRepository;
     private final OrderValidator orderValidator;
 
-    public OrderService(OrderRepository orderRepository, OrderValidator orderValidator) {
+    public OrderService(OrderRepository orderRepository, OrderValidator orderValidator, CashHoldingsService cashHoldingsService) {
         this.orderRepository = orderRepository;
         this.orderValidator = orderValidator;
+        this.cashHoldingsService = cashHoldingsService;
     }
 
     public OrderResponse createOrder(CreateOrderRequest createOrderRequest, Long userId) {
         orderValidator.validateCreateOrder(createOrderRequest, userId);
+
+        Currency currency = Currency.of(createOrderRequest.orderCurrency());
+        BigDecimal totalRequired = createOrderRequest.orderPrice().multiply(createOrderRequest.quantity());
+        
+        if (createOrderRequest.orderIntent() == OrderIntent.BUY) {
+            cashHoldingsService.validateSufficientCash(
+                currency,
+                totalRequired,
+                userId
+            );
+        }
 
         Order newOrder = new Order();
         newOrder.setUserId(userId);
@@ -34,9 +49,11 @@ public class OrderService {
         newOrder.setQuantity(createOrderRequest.quantity());
         newOrder.setOrderPrice(createOrderRequest.orderPrice());
         newOrder.setStatus(OrderStatus.PENDING);
-        newOrder.setOrderCurrency(normalizeCurrency(createOrderRequest.orderCurrency()));
+        newOrder.setOrderCurrency(currency.getCode());
 
         Order savedOrder = orderRepository.save(newOrder);
+
+        
 
         return new OrderResponse(
             savedOrder.getId(),
@@ -49,10 +66,6 @@ public class OrderService {
             savedOrder.getCreatedAt(),
             savedOrder.getOrderCurrency()
         );
-    }
-
-    private String normalizeCurrency(String orderCurrency) {
-        return orderCurrency.trim().toUpperCase(Locale.ROOT);
     }
 
     public List<OrderResponse> getOrders(Long userId) {
