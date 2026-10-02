@@ -1,4 +1,5 @@
 import { CurrencyPipe, DatePipe, DecimalPipe, NgFor, NgIf } from '@angular/common';
+import { Navbar } from '../navbar/navbar';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MarketQuoteData } from '../dto/MarketQuoteAPIResponse';
@@ -26,7 +27,7 @@ type HistoricalRangeOption = {
 
 @Component({
   standalone: true,
-  imports: [CurrencyPipe, DatePipe, DecimalPipe, NgFor, NgIf],
+  imports: [CurrencyPipe, DatePipe, DecimalPipe, NgFor, NgIf, Navbar],
   selector: 'app-asset-page',
   styleUrl: './asset-page.scss',
   templateUrl: './asset-page.html',
@@ -161,6 +162,11 @@ export class AssetPage implements OnInit {
   get latestCandle(): HistoricalCandle | null {
     const candles = this.displayedCandles;
     return candles.length > 0 ? candles[candles.length - 1] : null;
+  }
+
+  get latestVolumeCandle(): HistoricalCandle | null {
+    const candles = [...this.displayedCandles].reverse();
+    return candles.find((candle) => candle.volume > 0) ?? this.latestCandle;
   }
 
   get historicalRangeLabel(): string {

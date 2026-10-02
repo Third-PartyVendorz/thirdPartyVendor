@@ -1,3 +1,4 @@
+
 <section class="asset-page">
 	<article *ngIf="loading()" class="asset-card asset-status-card">Loading quote data...</article>
 
@@ -30,7 +31,6 @@
 						<div class="card-heading">
 							<div>
 								<p class="card-eyebrow">History</p>
-								<h2>Daily candles</h2>
 							</div>
 							<div class="chart-range chart-controls">
 								<div class="interval-picker" role="group" aria-label="Historical range">
@@ -48,7 +48,7 @@
 
 					<div class="chart-shell">
 						<ng-container *ngIf="historicalLoading(); else historicalContent">
-							<p class="chart-placeholder">Loading historical candles...</p>
+							<p class="chart-placeholder">Loading historical data...</p>
 						</ng-container>
 
 						<ng-template #historicalContent>
@@ -86,7 +86,7 @@
 									</div>
 									<div>
 										<dt>Latest volume</dt>
-										<dd>{{ latestCandle?.volume | number:'1.0-0' }}</dd>
+										<dd>{{ latestVolumeCandle?.volume | number:'1.0-0' }}</dd>
 									</div>
 								</div>
 
@@ -129,7 +129,7 @@
 					<div class="card-heading compact">
 						<div>
 							<p class="card-eyebrow">Asset</p>
-							<h2>About this stock</h2>
+							<h2>About this {{ currentAsset.type }}</h2>
 						</div>
 					</div>
 
