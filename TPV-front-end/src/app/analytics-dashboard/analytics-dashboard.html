@@ -1,15 +1,89 @@
-<div class="analytics-container">
-  <h2>Analytics Dashboard</h2>
-  <button (click)="performAnalytics()" class="analytics-button">Perform Analytics</button>
-  
-  <div *ngIf="analyticsResult" class="result-display">
-    <div class="chart-container">
-      <canvas #chartCanvas></canvas>
+<app-navbar/>
+<button (click)="performAnalytics()">Perform Analytics</button>
+
+<div *ngIf="analyticsResult" class="analytics-container">
+  <section class="summary">
+    <h2>Order Summary</h2>
+    <p><strong>Buy Orders:</strong> {{ analyticsResult.buy_count }}</p>
+    <p><strong>Buy Volume:</strong> {{ analyticsResult.buy_volume }}</p>
+    <p><strong>Sell Orders:</strong> {{ analyticsResult.sell_count }}</p>
+    <p><strong>Sell Volume:</strong> {{ analyticsResult.sell_volume }}</p>
+  </section>
+
+  <section class="volume-summary">
+    <h2>Volume Summary</h2>
+    <p><strong>Total Market Volume:</strong> {{ analyticsResult.total_market_volume }}</p>
+    <p><strong>Total After Hours Volume:</strong> {{ analyticsResult.total_after_hours_volume }}</p>
+  </section>
+
+  <section class="top-assets">
+    <h2>Top 5 Most Traded Assets</h2>
+    <ul *ngIf="analyticsResult.top_5_most_traded_assets">
+      <li *ngFor="let asset of objectKeys(analyticsResult.top_5_most_traded_assets)">
+        {{ asset }}: {{ analyticsResult.top_5_most_traded_assets[asset] }}
+      </li>
+    </ul>
+  </section>
+
+  <section class="volume-by-date">
+    <h2>Trade Volume by Date</h2>
+    <ul *ngIf="analyticsResult.trade_volume_by_date">
+      <li *ngFor="let date of objectKeys(analyticsResult.trade_volume_by_date)">
+        {{ date }}: {{ analyticsResult.trade_volume_by_date[date] }}
+      </li>
+    </ul>
+  </section>
+
+  <section class="volume-by-interval">
+    <h2>Volume by Market Interval</h2>
+    <ul *ngIf="analyticsResult.volume_by_market_interval">
+      <li *ngFor="let interval of objectKeys(analyticsResult.volume_by_market_interval)">
+        Interval {{ interval }}: {{ analyticsResult.volume_by_market_interval[interval] }}
+      </li>
+    </ul>
+  </section>
+
+  <section class="volume-by-date-and-side">
+    <h2>Trade Volume by Date and Side</h2>
+    <div *ngIf="analyticsResult.trade_volume_by_date_and_side">
+      <div class="side-group">
+        <h3>BUY</h3>
+        <ul *ngIf="analyticsResult.trade_volume_by_date_and_side['BUY']">
+          <li *ngFor="let date of objectKeys(analyticsResult.trade_volume_by_date_and_side['BUY'])">
+            {{ date }}: {{ analyticsResult.trade_volume_by_date_and_side['BUY'][date] }}
+          </li>
+        </ul>
+      </div>
+      <div class="side-group">
+        <h3>SELL</h3>
+        <ul *ngIf="analyticsResult.trade_volume_by_date_and_side['SELL']">
+          <li *ngFor="let date of objectKeys(analyticsResult.trade_volume_by_date_and_side['SELL'])">
+            {{ date }}: {{ analyticsResult.trade_volume_by_date_and_side['SELL'][date] }}
+          </li>
+        </ul>
+      </div>
     </div>
-    <div class="raw-data">
-      <h4>Raw Data:</h4>
-      <p><strong>Buy Orders:</strong> {{ analyticsResult.buy_count }}</p>
-      <p><strong>Sell Orders:</strong> {{ analyticsResult.sell_count }}</p>
+  </section>
+
+  <section class="volume-by-interval-and-side">
+    <h2>Volume by Market Interval and Side</h2>
+    <div *ngIf="analyticsResult.volume_by_market_interval_and_side">
+      <div class="side-group">
+        <h3>BUY</h3>
+        <ul *ngIf="analyticsResult.volume_by_market_interval_and_side['BUY']">
+          <li *ngFor="let interval of objectKeys(analyticsResult.volume_by_market_interval_and_side['BUY'])">
+            Interval {{ interval }}: {{ analyticsResult.volume_by_market_interval_and_side['BUY'][interval] }}
+          </li>
+        </ul>
+      </div>
+      <div class="side-group">
+        <h3>SELL</h3>
+        <ul *ngIf="analyticsResult.volume_by_market_interval_and_side['SELL']">
+          <li *ngFor="let interval of objectKeys(analyticsResult.volume_by_market_interval_and_side['SELL'])">
+            Interval {{ interval }}: {{ analyticsResult.volume_by_market_interval_and_side['SELL'][interval] }}
+          </li>
+        </ul>
+      </div>
     </div>
-  </div>
+  </section>
 </div>

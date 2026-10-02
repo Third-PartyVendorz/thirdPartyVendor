@@ -22,13 +22,14 @@ export const routes: Routes = [
 		canActivate: [authGuard],
 	},
 	{
+		path: 'analytics',
+		component: AnalyticsDashboard,
+		canActivate: [authGuard],
+	},
+	{
 		path: '**',
 		redirectTo: '',
 		component: HomePage
-	},
-	{
-		path: 'analytics',
-		component: AnalyticsDashboard
 	}
 ];
 
