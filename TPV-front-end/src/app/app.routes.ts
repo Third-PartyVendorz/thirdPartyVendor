@@ -6,6 +6,7 @@ import { DashboardPage } from './dashboard/dashboard-page/dashboard-page';
 import { HistoryPage } from './history-page/history-page';
 import { TradePage } from './trade-page/trade-page';
 import { MainLayoutComponent } from './layouts/main-layout';
+import { AssetsPage } from './assets-page/assets-page';
 
 export const routes: Routes = [
   {
