@@ -9,29 +9,25 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
 
 import java.time.LocalDate;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.thirdpartyvendor.api.dto.ChangePasswordRequest;
 import com.thirdpartyvendor.api.dto.EditAccountRequest;
+import com.thirdpartyvendor.api.error.AuthExceptions.ForbiddenException;
+import com.thirdpartyvendor.api.error.UserExceptions.EmailAlreadyInUseException;
+import com.thirdpartyvendor.api.error.UserExceptions.PasswordException;
+import com.thirdpartyvendor.api.error.UserExceptions.UserNotFoundException;
 import com.thirdpartyvendor.api.entity.AppUser;
 import com.thirdpartyvendor.api.entity.AppUser.UserRole;
 import com.thirdpartyvendor.api.repository.AppUserRepository;
-import com.thirdpartyvendor.api.service.UserService.EmailAlreadyInUseException;
-import com.thirdpartyvendor.api.service.UserService.PasswordException;
-import com.thirdpartyvendor.api.service.UserService.UserNotFoundException;
-import com.thirdpartyvendor.api.util.AuthorizationUtil;
 
 class UserServiceTest {
 
@@ -362,7 +358,7 @@ class UserServiceTest {
 		AppUser nonAdmin = createUser(2L, "john", "doe", "555-0000", LocalDate.of(1990, 1, 1), "john@example.com", "defaultPassword123", UserRole.USER, false);
 
 		// AuthorizationUtil.requireAdmin will throw an exception for non-admin users
-		assertThrows(AuthorizationUtil.ForbiddenException.class, () -> userService.freezeAccount(userId, nonAdmin));
+		assertThrows(ForbiddenException.class, () -> userService.freezeAccount(userId, nonAdmin));
 	}
 
 
@@ -403,7 +399,7 @@ class UserServiceTest {
 		AppUser nonAdmin = createUser(2L, "john", "doe", "555-0000", LocalDate.of(1990, 1, 1), "john@example.com", "defaultPassword123", UserRole.USER, false);
 
 		// AuthorizationUtil.requireAdmin will throw an exception for non-admin users
-		assertThrows(AuthorizationUtil.ForbiddenException.class, () -> userService.unfreezeAccount(userId, nonAdmin));
+		assertThrows(ForbiddenException.class, () -> userService.unfreezeAccount(userId, nonAdmin));
 	}
 
     private AppUser createUser(Long id, String firstName, String lastName, String phoneNumber, LocalDate dateOfBirth, String email, String password, UserRole role, boolean frozen) {

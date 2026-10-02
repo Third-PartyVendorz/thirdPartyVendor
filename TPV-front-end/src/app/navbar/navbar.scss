@@ -1,0 +1,141 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+.navbar-content {
+    background-color: #033D6C;
+    border-bottom: 4px solid #F8B776;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0 24px;
+    position: relative;
+}
+
+.brand-name h1 {
+    color: #ffffff;
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 300;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: clamp(1.3rem, 3vw, 2.5rem);
+}
+
+.desktop-nav ul {
+    list-style: none;
+    display: flex;
+    gap: 30px;
+}
+
+.desktop-nav ul li a {
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.desktop-nav ul li a:hover {
+    color: #F8B776;
+}
+
+.profile-button {
+    border: none;
+    background: transparent;
+    color: #ffffff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-button:hover {
+    transform: scale(1.05);
+}
+
+.profile-button img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.mobile-nav {
+    display: none;
+    flex-direction: column;
+    gap: 0.5rem;
+    background-color: #033D6C;
+    padding: 1rem;
+    border: 1px solid #F8B776;
+    position: fixed;
+    top: 72px;
+    right: 0;
+    width: 200px;
+    z-index: 1000;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.mobile-nav a {
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 0.5rem 0;
+    display: block;
+}
+
+.mobile-nav a:hover {
+    color: #F8B776;
+}
+
+.mobile-menu-button {
+    border: none;
+    background: transparent;
+    color: #ffffff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    transition: color 0.3s ease;
+}
+
+.mobile-menu-button:hover {
+    color: #F8B776;
+}
+
+@media (max-width: 768px) {
+    .desktop-nav {
+        display: none;
+    }
+    .profile-button {
+        display: none;
+    }
+    .mobile-menu-button {
+        display: flex;
+    }
+    .mobile-nav {
+        display: flex;
+    }
+}
+
+@media (min-width: 769px) {
+    .mobile-menu-button {
+        display: none;
+    }
+}
+
+@media (min-width: 1024px) {
+    .desktop-nav ul {
+        gap: 60px;
+    }
+}
+
+@media (min-width: 1400px) {
+    .desktop-nav ul {
+        gap: 100px;
+    }
+}
