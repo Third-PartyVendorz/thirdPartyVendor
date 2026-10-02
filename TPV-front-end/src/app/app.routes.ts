@@ -22,7 +22,7 @@ export const routes: Routes = [
 		canActivate: [authGuard],
 	},
 	{
-		path: 'assets',
+		path: 'explore-assets',
 		component: AssetsPage,
 		canActivate: [authGuard],
 	},
