@@ -1,11 +1,14 @@
 import { CurrencyPipe, DatePipe, DecimalPipe, NgFor, NgIf } from '@angular/common';
 import { Navbar } from '../navbar/navbar';
-import { Component, OnInit, inject, signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MarketQuoteData } from '../dto/MarketQuoteAPIResponse';
 import { MarketSymbolData } from '../dto/MarketSymbolAPIResponse';
 import { MarketApiService } from '../services/marketApi.service';
 import { ErrorService } from '../services/error.service';
+import { forkJoin, of } from 'rxjs';
+import { catchError, distinctUntilChanged, filter, map, switchMap, tap } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 type HistoricalCandle = {
   date: string;
@@ -36,7 +39,8 @@ type HistoricalRangeOption = {
 export class AssetPage implements OnInit {
 
   private route = inject(ActivatedRoute);
-  readonly symbol: string = this.route.snapshot.paramMap.get('ticker')?.toUpperCase() ?? '';
+  private readonly destroyRef = inject(DestroyRef);
+  private symbol = '';
 
   readonly quote = signal<MarketQuoteData | null>(null);
   readonly asset = signal<MarketSymbolData | null>(null);
@@ -51,6 +55,7 @@ export class AssetPage implements OnInit {
 
   readonly loading = signal(true);
   readonly historicalLoading = signal(true);
+  readonly notFound = signal(false);
   readonly errorMessage = signal('');
   readonly historicalError = signal('');
 
@@ -60,64 +65,90 @@ export class AssetPage implements OnInit {
   constructor(
     private marketApiService: MarketApiService,
     private errorService: ErrorService,
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
     this.errorService.clearErrorMessage();
-    this.loadSymbol();
-    this.loadQuote();
-    this.loadHistoricalCandles();
+    this.route.paramMap
+      .pipe(
+        map((params) => params.get('ticker')?.trim().toUpperCase() ?? ''),
+        filter((ticker) => ticker.length > 0),
+        distinctUntilChanged(),
+        switchMap((ticker) => this.loadTicker(ticker)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe();
   }
 
-  loadQuote(): void {
-    this.marketApiService.fetchQuote(this.symbol).subscribe({
-      next: (response) => {
-        this.quote.set(response.data);
+  private loadTicker(ticker: string) {
+    this.symbol = ticker;
+    this.resetState();
 
-        if (this.asset()) {
-          this.loading.set(false);
+    return forkJoin({
+      quote: this.marketApiService.fetchQuote(ticker).pipe(
+        catchError((error) => {
+          if (error.status === 404) {
+            this.notFound.set(true);
+          }
+          this.errorMessage.set('Unable to load the latest quote data.');
+          this.errorService.setErrorMessage('Unable to load the latest quote data.');
+          return of(null);
+        }),
+      ),
+      asset: this.marketApiService.fetchAssetInfo(ticker).pipe(
+        catchError((error) => {
+          if (error.status === 404) {
+            this.notFound.set(true);
+          }
+          this.errorMessage.set('Unable to load the asset data.');
+          this.errorService.setErrorMessage('Unable to load the asset data.');
+          return of(null);
+        }),
+      ),
+      candles: this.marketApiService.fetchHistoricalCandles(ticker, this.historicalFrom, this.historicalTo).pipe(
+        catchError(() => {
+          this.historicalError.set('Historical data is unavailable right now.');
+          this.errorService.setErrorMessage('Historical data is unavailable right now.');
+          return of(null);
+        }),
+      ),
+    }).pipe(
+      tap(({ quote, asset, candles }) => {
+        if (quote) {
+          this.quote.set(quote.data);
         }
-      },
-      error: () => {
-        this.loading.set(false);
-        this.errorMessage.set('Unable to load the latest quote data.');
-        this.errorService.setErrorMessage('Unable to load the latest quote data.');
-      },
-    });
-  }
 
-  loadSymbol(): void {
-    this.marketApiService.fetchAssetInfo(this.symbol).subscribe({
-      next: (response) => {
-        this.asset.set(response.data);
-
-        if (this.quote()) {
-          this.loading.set(false);
+        if (asset) {
+          this.asset.set(asset.data);
         }
-      },
-      error: () => {
+
+        if (candles) {
+          this.candles.set(candles.data.candles);
+        }
+
         this.loading.set(false);
-        this.errorMessage.set('Unable to load the asset data.');
-        this.errorService.setErrorMessage('Unable to load the asset data.');
-      },
-    });
+        this.historicalLoading.set(false);
+      }),
+    );
   }
 
-  loadHistoricalCandles(): void {
+  private resetState(): void {
+    this.quote.set(null);
+    this.asset.set(null);
+    this.candles.set([]);
+    this.loading.set(true);
     this.historicalLoading.set(true);
+    this.notFound.set(false);
+    this.errorMessage.set('');
     this.historicalError.set('');
+  }
 
-    this.marketApiService.fetchHistoricalCandles(this.symbol, this.historicalFrom, this.historicalTo).subscribe({
-      next: (response) => {
-        this.candles.set(response.data.candles);
-        this.historicalLoading.set(false);
-      },
-      error: () => {
-        this.historicalLoading.set(false);
-        this.historicalError.set('Historical data is unavailable right now.');
-        this.errorService.setErrorMessage('Historical data is unavailable right now.');
-      },
-    });
+  onTickerResubmit(value: string): void {
+    const ticker = value.trim().toUpperCase();
+    if (ticker) {
+      this.router.navigate(['/assets', ticker]);
+    }
   }
 
   get chartLinePoints(): string {

@@ -1,6 +1,14 @@
-
+<app-navbar/>
 <section class="asset-page">
 	<article *ngIf="loading()" class="asset-card asset-status-card">Loading quote data...</article>
+
+	<div *ngIf="notFound() && !loading()" class="asset-not-found">
+		<article class="asset-card asset-status-card error">Asset not found. Please check the ticker symbol and try again.</article>
+		<div class="asset-search-row">
+			<input class="asset-search-input" type="text" placeholder="Enter ticker symbol" autocomplete="off" #resubmitInput />
+			<button class="asset-search-button" type="button" (click)="onTickerResubmit(resubmitInput.value)">Search</button>
+		</div>
+	</div>
 
 	<div *ngIf="!loading()">
 		<ng-container *ngIf="quote() as currentQuote">
