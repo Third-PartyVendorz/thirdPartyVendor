@@ -9,6 +9,7 @@ public record OrderResponse(
     Long orderId,
     Long userId,
     Long assetId,
+    String ticker,
     OrderIntent orderIntent,
     BigDecimal quantity,
     BigDecimal orderPrice,

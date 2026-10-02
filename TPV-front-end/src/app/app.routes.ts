@@ -39,6 +39,11 @@ export const routes: Routes = [
     ],
   },
   {
+		path: 'explore-assets',
+		component: AssetsPage,
+		canActivate: [authGuard],
+	},
+  {
     path: '**',
     redirectTo: '',
   },
