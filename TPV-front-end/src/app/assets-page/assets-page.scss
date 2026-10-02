@@ -1,0 +1,111 @@
+.assets-page {
+	display: grid;
+	gap: 1.5rem;
+	padding: 1.5rem;
+	background:
+		radial-gradient(circle at top left, rgba(248, 183, 118, 0.22), transparent 34%),
+		linear-gradient(180deg, #f7fbff 0%, #eef4f9 100%);
+}
+
+.assets-search-panel,
+.assets-empty-state {
+	border: 1px solid rgba(148, 163, 184, 0.2);
+	border-radius: 24px;
+	background: rgba(255, 255, 255, 0.94);
+	box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+}
+
+.assets-search-panel {
+	display: grid;
+	gap: 1rem;
+	padding: 1.5rem;
+}
+
+.assets-eyebrow {
+	margin: 0 0 0.35rem;
+	text-transform: uppercase;
+	letter-spacing: 0.14em;
+	font-size: 0.75rem;
+	font-weight: 700;
+	color: #64748b;
+}
+
+.assets-search-panel h1,
+.assets-empty-state h2 {
+	margin: 0;
+	color: #0f172a;
+}
+
+.assets-search-panel h1 {
+	font-size: clamp(1.8rem, 3vw, 2.8rem);
+}
+
+.assets-lead,
+.assets-empty-state p {
+	margin: 0;
+	color: #475569;
+	line-height: 1.6;
+}
+
+.assets-search-form {
+	display: flex;
+	flex-wrap: nowrap;
+	gap: 0.75rem;
+	align-items: center;
+	padding: 0.9rem;
+	border-radius: 20px;
+	background: rgba(248, 251, 255, 0.95);
+	border: 1px solid rgba(3, 61, 108, 0.12);
+}
+
+.assets-search-form input {
+	min-width: 0;
+	flex: 1 1 auto;
+	padding: 0.95rem 1rem;
+	border: 1px solid rgba(3, 61, 108, 0.18);
+	border-radius: 14px;
+	background: #fff;
+	color: #0f172a;
+	font-size: 1rem;
+	font-weight: 600;
+}
+
+.assets-search-form input:focus {
+	outline: none;
+	border-color: #0b5ca5;
+	box-shadow: 0 0 0 4px rgba(11, 92, 165, 0.12);
+}
+
+.assets-search-form button {
+	flex: 0 0 auto;
+	padding: 0.95rem 1.35rem;
+	border: 0;
+	border-radius: 14px;
+	background: linear-gradient(135deg, #033d6c, #0b5ca5);
+	color: #fff;
+	font-size: 0.95rem;
+	font-weight: 800;
+	letter-spacing: 0.04em;
+	cursor: pointer;
+	white-space: nowrap;
+	box-shadow: 0 14px 24px rgba(3, 61, 108, 0.18);
+}
+
+.assets-search-error {
+	margin: 0;
+	color: #b91c1c;
+	font-weight: 600;
+}
+
+.assets-empty-state {
+	padding: 1.5rem;
+}
+
+@media (max-width: 700px) {
+	.assets-page,
+	.assets-search-panel,
+	.assets-empty-state {
+		padding: 1.1rem;
+		border-radius: 20px;
+	}
+}

@@ -10,6 +10,22 @@ To start a local development server, run:
 ng serve
 ```
 
+## Local environment setup
+
+This project keeps the Angular environment file local to each machine. The file is ignored by git, so every developer must create their own `src/environments/environment.local.ts` before running the app.
+
+If the file does not exist yet, create it with values like this:
+
+```ts
+export const environment = {
+	apiBaseUrl: 'http://localhost:8081',
+	fauxnanceApiUrl: 'https://y4t9nq2bqf.execute-api.eu-west-2.amazonaws.com/v1',
+	fauxnanceApiKey: '',
+};
+```
+
+If you need a local API key or different local endpoints, update only your own copy of that file. Do not commit it.
+
 Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
 
 ## Code scaffolding

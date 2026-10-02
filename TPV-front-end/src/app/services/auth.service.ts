@@ -4,7 +4,7 @@ import { RegisterRequest } from '../dto/RegisterRequest';
 import { RegisterResponse } from '../dto/RegisterResponse';
 import { AuthenticationRequest } from '../dto/AuthenticationRequest';
 import { AuthenticationResponse } from '../dto/AuthenticationResponse';
-import { environment } from '../../environments/environment';
+import { environment } from '../../environments/environment.local';
 
 @Injectable({
   providedIn: 'root'

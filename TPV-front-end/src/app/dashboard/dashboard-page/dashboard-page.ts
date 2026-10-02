@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { Navbar } from '../../navbar/navbar';
 import { PortfolioSummary } from '../portfolio-summary/portfolio-summary';
 import { HoldingsTable } from '../holdings-table/holdings-table';
 import { PortfolioGraphics } from '../portfolio-graphics/portfolio-graphics';
