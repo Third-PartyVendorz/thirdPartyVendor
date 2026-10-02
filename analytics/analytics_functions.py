@@ -65,8 +65,8 @@ def trade_volume_by_date(df):
     if timestamps.isna().all():
         raise ValueError("Could not parse any timestamps")
         
-    # Extract day of the month
-    day_of_month = timestamps.dt.date
+    # Extract day of the month and convert to string for JSON serialization
+    day_of_month = timestamps.dt.date.astype(str)
         
     trade_volume_by_day = df.groupby(day_of_month)['execution_quantity'].sum()
 
@@ -74,8 +74,15 @@ def trade_volume_by_date(df):
         
     if trade_volume_by_day.empty or trade_volume_by_day.sum() == 0:
         raise ValueError("No volume data found by day of month")
+    
+    # Restructure trade_volume_by_day_and_side to have sides as top-level keys
+    trade_volume_by_day_and_side_dict = {}
+    for (date, side), volume in trade_volume_by_day_and_side.items():
+        if side not in trade_volume_by_day_and_side_dict:
+            trade_volume_by_day_and_side_dict[side] = {}
+        trade_volume_by_day_and_side_dict[side][date] = volume
         
-    return trade_volume_by_day.to_dict(), trade_volume_by_day_and_side.to_dict()
+    return trade_volume_by_day.to_dict(), trade_volume_by_day_and_side_dict
 # ============================================================
 
 
@@ -135,11 +142,18 @@ def trade_volume_by_market_hour(df):
         
     if volume_by_interval.sum() == 0:
         raise ValueError("No volume data found by market hour")
+    
+    # Restructure volume_by_interval_and_side to have sides as top-level keys
+    volume_by_interval_and_side_dict = {}
+    for (interval, side), volume in volume_by_interval_and_side.items():
+        if side not in volume_by_interval_and_side_dict:
+            volume_by_interval_and_side_dict[side] = {}
+        volume_by_interval_and_side_dict[side][interval] = volume
         
     total_market_volume = volume_by_interval.iloc[:13].sum()
     total_after_hours_volume = volume_by_interval.iloc[13]  # Index 13 is interval 14
         
-    return volume_by_interval.to_dict(), volume_by_interval_and_side.to_dict(), total_market_volume, total_after_hours_volume
+    return volume_by_interval.to_dict(), volume_by_interval_and_side_dict, total_market_volume, total_after_hours_volume
 # ================================================================   
 
 

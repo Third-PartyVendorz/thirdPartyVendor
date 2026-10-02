@@ -11,12 +11,8 @@ def run_analytics_job():
     month, year, date_tag = msc.get_date_tag()
     results = db.execute_fetch_query(query, conn)
 
-    #save raw data as csv file
     df = pd.DataFrame(results)
-    print(df.columns)
-    df.to_csv(f'../analytics/raw-data/raw_data_{date_tag}.csv', index=False)
 
-    #Pass results to analytics functions
     analytics_payload = af.perform_analytics(df, date_tag)
 
     db.close_db_connection(conn)
