@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { MarketQuoteData } from '../dto/MarketQuoteAPIResponse';
 import { MarketSymbolData } from '../dto/MarketSymbolAPIResponse';
 import { MarketApiService } from '../services/marketApi.service';
+import { ErrorService } from '../services/error.service';
 
 type HistoricalCandle = {
   date: string;
@@ -55,9 +56,13 @@ export class AssetPage implements OnInit {
   readonly historicalTo = this.toIsoDate(new Date());
   readonly historicalFrom = this.toIsoDate(this.shiftDate(new Date(), -365));
 
-  constructor(private marketApiService: MarketApiService) {}
+  constructor(
+    private marketApiService: MarketApiService,
+    private errorService: ErrorService,
+  ) {}
 
   ngOnInit(): void {
+    this.errorService.clearErrorMessage();
     this.loadSymbol();
     this.loadQuote();
     this.loadHistoricalCandles();
@@ -75,6 +80,7 @@ export class AssetPage implements OnInit {
       error: () => {
         this.loading.set(false);
         this.errorMessage.set('Unable to load the latest quote data.');
+        this.errorService.setErrorMessage('Unable to load the latest quote data.');
       },
     });
   }
@@ -91,6 +97,7 @@ export class AssetPage implements OnInit {
       error: () => {
         this.loading.set(false);
         this.errorMessage.set('Unable to load the asset data.');
+        this.errorService.setErrorMessage('Unable to load the asset data.');
       },
     });
   }
@@ -107,6 +114,7 @@ export class AssetPage implements OnInit {
       error: () => {
         this.historicalLoading.set(false);
         this.historicalError.set('Historical data is unavailable right now.');
+        this.errorService.setErrorMessage('Historical data is unavailable right now.');
       },
     });
   }

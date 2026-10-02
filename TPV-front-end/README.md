@@ -12,9 +12,9 @@ ng serve
 
 ## Local environment setup
 
-This project keeps the Angular environment file local to each machine. The file is ignored by git, so every developer should create their own `src/environments/environment.ts` before running the app.
+This project keeps the Angular environment file local to each machine. The file is ignored by git, so every developer must create their own `src/environments/environment.local.ts` before running the app.
 
-Create the file with values like this:
+If the file does not exist yet, create it with values like this:
 
 ```ts
 export const environment = {
@@ -24,7 +24,7 @@ export const environment = {
 };
 ```
 
-If you need a local API key, add it only in your own copy of that file. Do not commit it.
+If you need a local API key or different local endpoints, update only your own copy of that file. Do not commit it.
 
 Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
 

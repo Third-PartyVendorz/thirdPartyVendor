@@ -6,7 +6,7 @@ import { MarketQuoteAPIResponse } from '../dto/MarketQuoteAPIResponse';
 import { MarketSymbolAPIResponse } from '../dto/MarketSymbolAPIResponse';
 import { MarketHistoricalAPIResponse } from '../dto/MarketHistoricalAPIResponse';
 
-import { environment } from '../../environments/environment';
+import { environment } from '../../environments/environment.local';
 
 
 

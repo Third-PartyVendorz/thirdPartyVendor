@@ -39,7 +39,7 @@ testem.log
 /typings
 __screenshots__/
 .env
-src/environments/environment.ts
+src/environments/environment.local.ts
 
 # System files
 .DS_Store
