@@ -7,7 +7,6 @@ import org.springframework.web.server.ResponseStatusException;
 import com.thirdpartyvendor.api.dto.CashHoldingResponse;
 import com.thirdpartyvendor.api.entity.CashHolding;
 import com.thirdpartyvendor.api.error.CashExceptions.InsufficientCashException;
-import com.thirdpartyvendor.api.error.CashExceptions.InvalidCurrencyException;
 import com.thirdpartyvendor.api.model.Currency;
 import com.thirdpartyvendor.api.repository.CashHoldingsRepository;
 
@@ -84,15 +83,6 @@ public class CashHoldingsService {
         BigDecimal newBalance = cashHolding.getBalance().add(amount);
         cashHolding.setBalance(newBalance);
         cashHoldingsRepository.save(cashHolding);
-    }
-
-    public void ensureSufficientCash(String currencyCode, BigDecimal amount, Long userId) {
-        CashHolding cashHolding = cashHoldingsRepository.findByUserIdAndCurrencyCode(userId, currencyCode)
-            .orElseThrow(() -> new InsufficientCashException("User holds no cash in " + currencyCode));
-
-        if (cashHolding.getBalance().compareTo(amount) < 0) {
-            throw new InsufficientCashException("Insufficient cash in " + currencyCode);
-        }
     }
 
     public List<CashHoldingResponse> getCashHoldingsByUser(Long userId) {

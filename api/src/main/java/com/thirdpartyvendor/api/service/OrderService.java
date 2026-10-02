@@ -14,10 +14,9 @@ import com.thirdpartyvendor.api.dto.MarketQuoteAPIResponse;
 import com.thirdpartyvendor.api.dto.OrderResponse;
 import com.thirdpartyvendor.api.entity.Holding;
 import com.thirdpartyvendor.api.entity.Order;
-import com.thirdpartyvendor.api.entity.Order.OrderIntent;
 import com.thirdpartyvendor.api.entity.Order.OrderStatus;
-import com.thirdpartyvendor.api.error.CashExceptions.InsufficientCashException;
 import com.thirdpartyvendor.api.error.OrderExceptions.OrderNotFoundException;
+import com.thirdpartyvendor.api.error.OrderExceptions.InsufficientSharesException;
 import com.thirdpartyvendor.api.model.Currency;
 import com.thirdpartyvendor.api.repository.HoldingRepository;
 import com.thirdpartyvendor.api.repository.OrderRepository;
@@ -51,15 +50,6 @@ public class OrderService {
         validateOrderFunds(createOrderRequest, userId);
 
         Currency currency = Currency.of(createOrderRequest.orderCurrency());
-        BigDecimal totalRequired = createOrderRequest.orderPrice().multiply(createOrderRequest.quantity());
-        
-        if (createOrderRequest.orderIntent() == OrderIntent.BUY) {
-            cashHoldingsService.validateSufficientCash(
-                currency,
-                totalRequired,
-                userId
-            );
-        }
 
         Order newOrder = new Order();
         newOrder.setUserId(userId);
@@ -95,16 +85,28 @@ public class OrderService {
 
         if (request.orderIntent() == Order.OrderIntent.BUY) {
             BigDecimal tradeAmount = resolveTradeAmount(request.quantity(), request.orderPrice(), quotePrice);
-            cashHoldingsService.ensureSufficientCash(normalizeCurrency(request.orderCurrency()), tradeAmount, userId);
+            Currency currency = Currency.of(request.orderCurrency());
+            cashHoldingsService.validateSufficientCash(currency, tradeAmount, userId);
             return;
         }
 
         BigDecimal executionQuantity = resolveExecutionQuantity(request.quantity(), request.orderPrice(), quotePrice);
-        Holding holding = holdingRepository.findByTickerAndUserId(normalizeTicker(request.ticker()), userId)
-            .orElseThrow(() -> new InsufficientCashException("Insufficient shares to execute sell order"));
+        String normalizedTicker = normalizeTicker(request.ticker());
+        Holding holding = holdingRepository.findByTickerAndUserId(normalizedTicker, userId)
+            .orElseThrow(() -> new InsufficientSharesException(
+                "No holdings found for ticker " + normalizedTicker,
+                normalizedTicker,
+                executionQuantity,
+                BigDecimal.ZERO
+            ));
 
         if (holding.getNumShares().compareTo(executionQuantity) < 0) {
-            throw new InsufficientCashException("Insufficient shares to execute sell order");
+            throw new InsufficientSharesException(
+                "Insufficient shares to execute sell order for " + normalizedTicker,
+                normalizedTicker,
+                executionQuantity,
+                holding.getNumShares()
+            );
         }
     }
 
@@ -122,10 +124,6 @@ public class OrderService {
         }
 
         return orderPrice.setScale(6, RoundingMode.HALF_UP);
-    }
-
-    private String normalizeCurrency(String orderCurrency) {
-        return orderCurrency.trim().toUpperCase(Locale.ROOT);
     }
 
     private String normalizeTicker(String ticker) {
