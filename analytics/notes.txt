@@ -20,5 +20,44 @@ Plan:
 
  - Finalize basic analytics
  - API send basic payload to frontend
+ - Implement frontend
  - Implement non-blocking scheduling of some variety
  - Implement non-blocking strategy with frontend
+
+
+
+
+
+
+
+
+
+
+
+Buckets:
+
+1. 570 - 600
+
+2. 600 - 630
+
+3. 630 - 660
+
+4. 660 - 690
+
+5. 690 - 720
+
+6. 720 - 750
+
+7. 750 - 780
+
+8. 780 - 810
+
+9. 810 - 840
+
+10. 840 - 870
+
+11. 870 - 900
+
+12. 900 - 930
+
+13. 930 - 960
