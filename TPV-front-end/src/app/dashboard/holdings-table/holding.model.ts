@@ -1,4 +1,5 @@
 export interface Holding {
+    ticker: string;
     companyName: string;
     shares: number;
     averageCost: number;

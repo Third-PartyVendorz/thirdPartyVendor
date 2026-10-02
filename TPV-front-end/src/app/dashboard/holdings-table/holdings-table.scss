@@ -5,11 +5,23 @@
     border-radius: 12px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
     overflow: hidden;
+
+    @media (max-width: 900px) {
+        border: none;
+        box-shadow: none;
+    }
 }
 
 .card-header {
     padding: 1rem 1.5rem;
     border-bottom: 1px solid #e5e7eb;
+
+    @media (max-width: 900px) {
+        border-radius: 12px;
+        border: 1.1px solid #e5e7eb;
+        border-bottom: none;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+    }
 }
 
 .card-header h2 {
@@ -43,6 +55,25 @@ th {
     font-weight: 600;
     color: #111827;
     white-space: nowrap;
+    background: linear-gradient(180deg, #f8fbff, #eef5fb)
+}
+
+th.sortable {
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+        background-color: #f3f4f6;
+    }
+
+    &:active {
+        background-color: #e5e7eb;
+    }
+}
+
+.numeric {
+    text-align: right;
 }
 
 tbody tr {
@@ -146,4 +177,47 @@ td {
     font-size: 1.05rem;
     font-weight: 600;
     color: #111827;
+}
+
+// Footer and load more button
+.table-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #e5e7eb;
+    background: #f9fafb;
+    display: flex;
+    justify-content: center;
+
+    @media (max-width: 900px) {
+        padding: 0.75rem 1rem;
+    }
+}
+
+.load-more-btn {
+    padding: 0.75rem 1.5rem;
+    background: #033D6C;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+
+    &:hover {
+        background: #033661;
+        box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+        transform: translateY(-1px);
+    }
+
+    &:active {
+        transform: translateY(0);
+        box-shadow: 0 1px 2px rgba(59, 130, 246, 0.2);
+    }
+
+    @media (max-width: 900px) {
+        padding: 0.6rem 1rem;
+        font-size: 0.85rem;
+        width: 100%;
+    }
 }
