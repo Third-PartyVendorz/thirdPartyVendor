@@ -3,7 +3,7 @@ import { HomePage } from './home-page/home-page';
 import { AuthPage } from './auth-page/auth-page';
 import { authGuard } from './auth.guard';
 import { DashboardPage } from './dashboard/dashboard-page/dashboard-page';
-import { AssetPage } from './asset-page/asset-page';
+import { AssetsPage } from './assets-page/assets-page';
 
 export const routes: Routes = [
 	{
@@ -22,8 +22,8 @@ export const routes: Routes = [
 		canActivate: [authGuard],
 	},
 	{
-		path: 'assets/:ticker',
-		component: AssetPage,
+		path: 'assets',
+		component: AssetsPage,
 		canActivate: [authGuard],
 	},
 	{

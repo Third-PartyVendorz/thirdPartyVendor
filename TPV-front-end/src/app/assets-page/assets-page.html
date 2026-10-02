@@ -1,0 +1,29 @@
+<app-navbar />
+<section class="assets-page">
+	<header class="assets-search-panel">
+		<div>
+			<p class="assets-eyebrow">Assets</p>
+			<h1>Search for an asset</h1>
+			<p class="assets-lead">Look up a ticker and review the asset details inline.</p>
+		</div>
+
+		<form class="assets-search-form" (ngSubmit)="submitSearch()">
+			<label class="sr-only" for="asset-ticker-input">Ticker symbol</label>
+			<input id="asset-ticker-input" name="ticker" [(ngModel)]="searchTicker" type="text" placeholder="Enter ticker symbol" autocomplete="off" />
+			<button type="submit">Search</button>
+		</form>
+
+		<p *ngIf="searchError" class="assets-search-error">{{ searchError }}</p>
+	</header>
+
+	<ng-container *ngIf="activeTicker; else emptyState">
+		<app-asset-result [ticker]="activeTicker"></app-asset-result>
+	</ng-container>
+
+	<ng-template #emptyState>
+		<article class="asset-card assets-empty-state">
+			<h2>Ready when you are</h2>
+			<p>Search for a ticker above to load the asset details here.</p>
+		</article>
+	</ng-template>
+</section>
