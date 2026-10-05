@@ -1,0 +1,313 @@
+.analytics-container {
+    padding: 2rem;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+.analytics-card {
+    border: 1px solid rgba(3, 61, 108, 0.1);
+    border-radius: 14px;
+    background: #ffffff;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+}
+
+.analytics-status-card {
+    padding: 1.5rem;
+    color: #123f74;
+    font-weight: 600;
+}
+
+// Two-column layout for charts
+.charts-layout {
+    display: grid;
+    grid-template-columns: 1fr 1.6fr;
+    gap: 1.5rem;
+}
+
+.count-chart-card,
+.volume-histogram-card {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.card-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+
+    > div {
+        flex: 1;
+    }
+
+    h2 {
+        margin: 0 0 0.2rem 0;
+        color: #0f172a;
+        font-size: 1.1rem;
+        font-weight: 700;
+    }
+}
+
+.card-eyebrow {
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #64748b;
+}
+
+.toggle-button {
+    background-color: #033D6C;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    padding: 0.45rem 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: background 0.2s ease;
+    flex-shrink: 0;
+
+    &:hover {
+        background-color: #022b4a;
+    }
+}
+
+.chart-shell,
+.histogram-shell {
+    display: grid;
+    gap: 0.5rem;
+    flex: 1;
+    min-height: 0;
+}
+
+.chart-frame,
+.histogram-frame {
+    display: grid;
+    grid-template-columns: 50px 1fr;
+    gap: 0.75rem;
+    height: 180px;
+    overflow: hidden;
+}
+
+.chart-y-axis,
+.histogram-y-axis {
+    display: grid;
+    grid-template-rows: repeat(5, 1fr);
+    justify-items: end;
+    align-items: stretch;
+    padding-right: 0.3rem;
+    padding-top: 0.1rem;
+    padding-bottom: 0.1rem;
+    font-size: 0.65rem;
+    color: #64748b;
+    font-weight: 600;
+    line-height: 1.2;
+    overflow: hidden;
+}
+
+.chart-plot,
+.histogram-plot {
+    display: grid;
+    gap: 0.4rem;    min-height: 0;
+    overflow: hidden;}
+
+svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+.bar-rect,
+.histogram-bar {
+    vector-effect: non-scaling-stroke;
+    transition: opacity 0.2s ease;
+
+    &:hover {
+        opacity: 0.75;
+    }
+}
+
+.chart-labels {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.2rem;
+    font-size: 0.65rem;
+    color: #64748b;
+    font-weight: 600;
+    text-align: center;
+    margin-top: 0.15rem;
+    padding: 0 0.25rem;
+}
+
+.histogram-labels {
+    display: grid;
+    grid-template-columns: repeat(13, 1fr);
+    gap: 0.1rem;
+    font-size: 0.6rem;
+    color: #64748b;
+    font-weight: 600;
+    text-align: center;
+    margin-top: 0.15rem;
+    padding: 0 0.25rem;
+    min-width: 0;
+}
+
+.histogram-labels span {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    min-width: 0;
+}
+
+.histogram-legend {
+    display: flex;
+    gap: 1.25rem;
+    justify-content: center;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(3, 61, 108, 0.06);
+}
+
+// Pie chart
+.pie-chart-container {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    min-width: 0;
+}
+
+.pie-svg {
+    width: 150px;
+    height: 150px;
+    flex-shrink: 0;
+}
+
+.pie-slice {
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+
+    &:hover {
+        opacity: 0.75;
+    }
+}
+
+.pie-legend {
+    display: grid;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: #123f74;
+    font-size: 0.85rem;
+    white-space: nowrap;
+}
+
+.legend-color {
+    width: 18px;
+    height: 18px;
+    border-radius: 3px;
+    flex-shrink: 0;
+}
+
+// Summary grid
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.6rem;
+    margin: 0;
+}
+
+.summary-grid div {
+    padding: 0.65rem;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #f8fbff 0%, #eef5fb 100%);
+    border: 1px solid rgba(3, 61, 108, 0.05);
+}
+
+.summary-grid dt {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #64748b;
+    margin: 0;
+}
+
+.summary-grid dd {
+    margin: 0.25rem 0 0 0;
+    color: #123f74;
+    font-size: 1rem;
+    font-weight: 800;
+}
+
+.compact-summary {
+    margin: 0;
+}
+
+// Responsive
+@media (max-width: 1200px) {
+    .charts-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .chart-frame,
+    .histogram-frame {
+        height: 220px;
+    }
+}
+
+@media (max-width: 700px) {
+    .analytics-container {
+        padding: 1rem;
+    }
+
+    .analytics-card {
+        border-radius: 12px;
+        padding: 1rem;
+    }
+
+    .count-chart-card,
+    .volume-histogram-card {
+        padding: 1rem;
+    }
+
+    .card-heading {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    .toggle-button {
+        width: 100%;
+    }
+
+    .chart-frame,
+    .histogram-frame {
+        height: 200px;
+        grid-template-columns: 50px 1fr;
+        gap: 0.5rem;
+    }
+
+    .summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .histogram-labels {
+        font-size: 0.6rem;
+    }
+
+    .pie-svg {
+        width: 120px;
+        height: 120px;
+    }
+}

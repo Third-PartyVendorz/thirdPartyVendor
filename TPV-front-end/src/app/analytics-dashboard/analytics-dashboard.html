@@ -1,89 +1,146 @@
 <app-navbar/>
-<button (click)="performAnalytics()">Perform Analytics</button>
 
-<div *ngIf="analyticsResult" class="analytics-container">
-  <section class="summary">
-    <h2>Order Summary</h2>
-    <p><strong>Buy Orders:</strong> {{ analyticsResult.buy_count }}</p>
-    <p><strong>Buy Volume:</strong> {{ analyticsResult.buy_volume }}</p>
-    <p><strong>Sell Orders:</strong> {{ analyticsResult.sell_count }}</p>
-    <p><strong>Sell Volume:</strong> {{ analyticsResult.sell_volume }}</p>
-  </section>
+<article *ngIf="loading()" class="analytics-card analytics-status-card">Loading analytics data...</article>
 
-  <section class="volume-summary">
-    <h2>Volume Summary</h2>
-    <p><strong>Total Market Volume:</strong> {{ analyticsResult.total_market_volume }}</p>
-    <p><strong>Total After Hours Volume:</strong> {{ analyticsResult.total_after_hours_volume }}</p>
-  </section>
-
-  <section class="top-assets">
-    <h2>Top 5 Most Traded Assets</h2>
-    <ul *ngIf="analyticsResult.top_5_most_traded_assets">
-      <li *ngFor="let asset of objectKeys(analyticsResult.top_5_most_traded_assets)">
-        {{ asset }}: {{ analyticsResult.top_5_most_traded_assets[asset] }}
-      </li>
-    </ul>
-  </section>
-
-  <section class="volume-by-date">
-    <h2>Trade Volume by Date</h2>
-    <ul *ngIf="analyticsResult.trade_volume_by_date">
-      <li *ngFor="let date of objectKeys(analyticsResult.trade_volume_by_date)">
-        {{ date }}: {{ analyticsResult.trade_volume_by_date[date] }}
-      </li>
-    </ul>
-  </section>
-
-  <section class="volume-by-interval">
-    <h2>Volume by Market Interval</h2>
-    <ul *ngIf="analyticsResult.volume_by_market_interval">
-      <li *ngFor="let interval of objectKeys(analyticsResult.volume_by_market_interval)">
-        Interval {{ interval }}: {{ analyticsResult.volume_by_market_interval[interval] }}
-      </li>
-    </ul>
-  </section>
-
-  <section class="volume-by-date-and-side">
-    <h2>Trade Volume by Date and Side</h2>
-    <div *ngIf="analyticsResult.trade_volume_by_date_and_side">
-      <div class="side-group">
-        <h3>BUY</h3>
-        <ul *ngIf="analyticsResult.trade_volume_by_date_and_side['BUY']">
-          <li *ngFor="let date of objectKeys(analyticsResult.trade_volume_by_date_and_side['BUY'])">
-            {{ date }}: {{ analyticsResult.trade_volume_by_date_and_side['BUY'][date] }}
-          </li>
-        </ul>
+<div *ngIf="analyticsResult() && !loading()" class="analytics-container">
+  
+  <!-- Charts Layout -->
+  <div class="charts-layout">
+    <!-- Buy/Sell Count Chart (Square) -->
+    <article class="analytics-card count-chart-card">
+      <div class="card-heading">
+        <div>
+          <p class="card-eyebrow">Metrics</p>
+          <h2>{{ chartTitle }}</h2>
+        </div>
+        <button class="toggle-button" (click)="toggleChartType()">
+          {{ isBarChart() ? 'Show Pie Chart' : 'Show Bar Chart' }}
+        </button>
       </div>
-      <div class="side-group">
-        <h3>SELL</h3>
-        <ul *ngIf="analyticsResult.trade_volume_by_date_and_side['SELL']">
-          <li *ngFor="let date of objectKeys(analyticsResult.trade_volume_by_date_and_side['SELL'])">
-            {{ date }}: {{ analyticsResult.trade_volume_by_date_and_side['SELL'][date] }}
-          </li>
-        </ul>
-      </div>
-    </div>
-  </section>
 
-  <section class="volume-by-interval-and-side">
-    <h2>Volume by Market Interval and Side</h2>
-    <div *ngIf="analyticsResult.volume_by_market_interval_and_side">
-      <div class="side-group">
-        <h3>BUY</h3>
-        <ul *ngIf="analyticsResult.volume_by_market_interval_and_side['BUY']">
-          <li *ngFor="let interval of objectKeys(analyticsResult.volume_by_market_interval_and_side['BUY'])">
-            Interval {{ interval }}: {{ analyticsResult.volume_by_market_interval_and_side['BUY'][interval] }}
-          </li>
-        </ul>
+      <div class="chart-shell">
+        <!-- Bar Chart -->
+        <ng-container *ngIf="isBarChart()">
+          <div class="chart-frame">
+            <div class="chart-y-axis">
+              <span *ngFor="let value of chartYAxisValues">{{ value | number:'1.0-0' }}</span>
+            </div>
+
+            <div class="chart-plot">
+              <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+                <rect
+                  *ngFor="let bar of barChartBars"
+                  [attr.x]="bar.x"
+                  [attr.y]="bar.y"
+                  [attr.width]="bar.width"
+                  [attr.height]="bar.height"
+                  [attr.fill]="bar.color"
+                  class="bar-rect">
+                </rect>
+              </svg>
+
+              <div class="chart-labels">
+                <span *ngFor="let data of buySellData">{{ data.label }}</span>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+
+        <!-- Pie Chart -->
+        <ng-container *ngIf="!isBarChart()">
+          <div class="pie-chart-container">
+            <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" aria-hidden="true" class="pie-svg">
+              <path
+                *ngFor="let slice of pieSlices"
+                [attr.d]="slice.path"
+                [attr.fill]="slice.color"
+                [attr.stroke]="slice.darkColor"
+                stroke-width="1"
+                class="pie-slice">
+              </path>
+            </svg>
+
+            <div class="pie-legend">
+              <div *ngFor="let slice of pieSlices" class="legend-item">
+                <div class="legend-color" [style.background-color]="slice.color"></div>
+                <span>{{ slice.label }}: {{ slice.value | number:'1.0-0' }}</span>
+              </div>
+            </div>
+          </div>
+        </ng-container>
       </div>
-      <div class="side-group">
-        <h3>SELL</h3>
-        <ul *ngIf="analyticsResult.volume_by_market_interval_and_side['SELL']">
-          <li *ngFor="let interval of objectKeys(analyticsResult.volume_by_market_interval_and_side['SELL'])">
-            Interval {{ interval }}: {{ analyticsResult.volume_by_market_interval_and_side['SELL'][interval] }}
-          </li>
-        </ul>
+
+      <div class="summary-grid compact-summary">
+        <div>
+          <dt>Buy Orders</dt>
+          <dd>{{ analyticsResult()?.buy_count | number:'1.0-0' }}</dd>
+        </div>
+        <div>
+          <dt>Sell Orders</dt>
+          <dd>{{ analyticsResult()?.sell_count | number:'1.0-0' }}</dd>
+        </div>
       </div>
-    </div>
-  </section>
+    </article>
+
+    <!-- Volume by Market Interval Histogram (Rectangular) -->
+    <article class="analytics-card volume-histogram-card">
+      <div class="card-heading">
+        <div>
+          <p class="card-eyebrow">Activity</p>
+          <h2>Trade Volume by Market Hour</h2>
+        </div>
+      </div>
+
+      <div class="histogram-shell">
+        <div class="histogram-frame">
+          <div class="histogram-y-axis">
+            <span *ngFor="let value of histogramYAxisValues">{{ value | number:'1.0-0' }}</span>
+          </div>
+
+          <div class="histogram-plot">
+            <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+              <g *ngFor="let bar of volumeHistogramData; let i = index">
+                <!-- Sell volume (red) - bottom -->
+                <rect
+                  *ngIf="bar.sellHeight > 0"
+                  [attr.x]="5 + (i * 7.3)"
+                  [attr.y]="bar.sellY"
+                  [attr.width]="6"
+                  [attr.height]="bar.sellHeight"
+                  fill="#EF4444"
+                  class="histogram-bar sell-bar">
+                </rect>
+                <!-- Buy volume (green) - top -->
+                <rect
+                  *ngIf="bar.buyHeight > 0"
+                  [attr.x]="5 + (i * 7.3)"
+                  [attr.y]="bar.buyY"
+                  [attr.width]="6"
+                  [attr.height]="bar.buyHeight"
+                  fill="#10B981"
+                  class="histogram-bar buy-bar">
+                </rect>
+              </g>
+            </svg>
+
+            <div class="histogram-labels">
+              <span *ngFor="let bar of volumeHistogramData">{{ getIntervalTimeLabel(bar.interval) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="histogram-legend">
+        <div class="legend-item">
+          <div class="legend-color" style="background-color: #10B981;"></div>
+          <span>Buy Volume</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background-color: #EF4444;"></div>
+          <span>Sell Volume</span>
+        </div>
+      </div>
+    </article>
+  </div>
+
 </div>
