@@ -7,6 +7,7 @@ import { HistoryPage } from './history-page/history-page';
 import { TradePage } from './trade-page/trade-page';
 import { MainLayoutComponent } from './layouts/main-layout';
 import { AssetsPage } from './assets-page/assets-page';
+import { ProfilePage } from './profile-page/profile-page';
 
 export const routes: Routes = [
   {
@@ -38,6 +39,13 @@ export const routes: Routes = [
     children: [
       { path: '', component: TradePage },
     ],
+  },
+  {
+	path: 'profile',
+	component: MainLayoutComponent,
+	children: [
+	  { path: '', component: ProfilePage },
+	],
   },
   {
 		path: 'explore-assets',
