@@ -114,6 +114,7 @@ class OrderServiceTest {
                 null
             )
         );
+    }
 
     @Test
     @DisplayName("Test createOrder successfully with orderPrice")
@@ -131,16 +132,16 @@ class OrderServiceTest {
         Long userId = 1L;
         newOrder.setId(1L);
         newOrder.setUserId(userId);
-        newOrder.setAssetId(createOrderRequest.assetId());
-        newOrder.setTicker(createOrderRequest.ticker());
-        newOrder.setOrderIntent(createOrderRequest.orderIntent());
-        newOrder.setQuantity(createOrderRequest.quantity());
-        newOrder.setOrderPrice(createOrderRequest.orderPrice());
-        newOrder.setOrderCurrency(createOrderRequest.orderCurrency());
+        newOrder.setAssetId(request.assetId());
+        newOrder.setTicker(request.ticker());
+        newOrder.setOrderIntent(request.orderIntent());
+        newOrder.setQuantity(request.quantity());
+        newOrder.setOrderPrice(request.orderPrice());
+        newOrder.setOrderCurrency(request.orderCurrency());
 
         when(orderRepository.save(any(Order.class))).thenReturn(newOrder);
 
-        OrderResponse result = orderService.createOrder(createOrderRequest, userId);
+        OrderResponse result = orderService.createOrder(request, userId);
 
         assertEquals(newOrder.getId(), result.orderId());
         verify(orderRepository).save(any(Order.class));
