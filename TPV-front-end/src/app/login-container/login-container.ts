@@ -46,6 +46,8 @@ export class LoginContainer {
       dateOfBirth: new Date(String(formData.get('dateOfBirth') ?? '')),
     };
 
+    form.reset();
+
     this.register(request);
   }
 
@@ -58,17 +60,19 @@ export class LoginContainer {
       email: String(formData.get('email') ?? ''),
       password: String(formData.get('password') ?? ''),
     };
+
+    form.reset();
+
     this.authenticate(request);
   }
 
   register(request: RegisterRequest) {
     this.authService.register(request).subscribe({
       next: (response: RegisterResponse) => {
-        console.log('Registration successful: ', response);
         this.messageService.setSuccessMessage('Registration successful. You can now log in.');
       },
       error: (error) => {
-        this.messageService.setErrorMessage('Registration failed: ' + error.message);
+        this.messageService.setErrorMessage('Registration failed: ' + error.error.message);
       },
     });
   }
@@ -79,10 +83,9 @@ export class LoginContainer {
         this.messageService.setSuccessMessage('Login successful.');
         this.authService.setAuthToken(response.jwtToken);
         this.router.navigateByUrl('/');
-        console.log('Login Successful');
       },
       error: (error) => {
-        this.messageService.setErrorMessage('Login failed: ' + error.message);
+        this.messageService.setErrorMessage('Login failed: ' + error.error.message);
       }
     })
   }
