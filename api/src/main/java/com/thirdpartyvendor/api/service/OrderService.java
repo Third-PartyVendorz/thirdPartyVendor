@@ -135,7 +135,7 @@ public class OrderService {
     }
 
     public OrderResponse cancelOrder(Long orderId, Long userId) {
-        Order order = orderRepository.findById(userId)
+        Order order = orderRepository.findById(orderId)
             .orElseThrow(() -> new OrderNotFoundException("Order not found"));
 
         order.setStatus(OrderStatus.CANCELLED);
