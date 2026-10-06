@@ -1,146 +1,186 @@
 <app-navbar/>
 
-<article *ngIf="loading()" class="analytics-card analytics-status-card">Loading analytics data...</article>
+<div *ngIf="loading()" class="loading-state">Loading analytics...</div>
 
-<div *ngIf="analyticsResult() && !loading()" class="analytics-container">
-  
-  <!-- Charts Layout -->
-  <div class="charts-layout">
-    <!-- Buy/Sell Count Chart (Square) -->
-    <article class="analytics-card count-chart-card">
-      <div class="card-heading">
+<div *ngIf="analyticsResult() && !loading()" class="dashboard-container">
+  <!-- Header -->
+  <header class="dashboard-header">
+    <h1>Analytics Dashboard</h1>
+  </header>
+
+  <!-- Summary Cards -->
+  <section class="summary-section">
+    <div *ngFor="let card of summaryCards" class="summary-card">
+      <div class="card-icon" [style.background]="card.color"></div>
+      <div class="card-content">
+        <p class="card-label">{{ card.label }}</p>
+        <p class="card-value">{{ card.value | number:'1.0-0' }}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Order Distribution Section -->
+  <section class="order-distribution-section">
+    <article class="chart-card order-distribution-card">
+      <div class="card-header-with-toggle">
         <div>
-          <p class="card-eyebrow">Metrics</p>
-          <h2>{{ chartTitle }}</h2>
+          <h3>Order Distribution</h3>
         </div>
-        <button class="toggle-button" (click)="toggleChartType()">
-          {{ isBarChart() ? 'Show Pie Chart' : 'Show Bar Chart' }}
-        </button>
+        <div class="toggle-buttons">
+          <button 
+            [class.active]="orderDistributionMode() === 'count'"
+            (click)="toggleOrderDistributionMode()"
+            class="toggle-btn">
+            Count
+          </button>
+          <button 
+            [class.active]="orderDistributionMode() === 'volume'"
+            (click)="toggleOrderDistributionMode()"
+            class="toggle-btn">
+            Volume
+          </button>
+        </div>
       </div>
 
-      <div class="chart-shell">
+      <!-- Bar Chart and Pie Chart -->
+      <div class="distribution-content">
         <!-- Bar Chart -->
-        <ng-container *ngIf="isBarChart()">
-          <div class="chart-frame">
-            <div class="chart-y-axis">
-              <span *ngFor="let value of chartYAxisValues">{{ value | number:'1.0-0' }}</span>
+        <div class="distribution-chart bar-chart">
+          <div class="chart-wrapper">
+            <div class="chart-axis-y">
+              <div *ngFor="let val of buySellAxisValues" class="axis-label">{{ val | number:'1.0-0' }}</div>
             </div>
-
-            <div class="chart-plot">
-              <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-                <rect
-                  *ngFor="let bar of barChartBars"
-                  [attr.x]="bar.x"
-                  [attr.y]="bar.y"
-                  [attr.width]="bar.width"
-                  [attr.height]="bar.height"
-                  [attr.fill]="bar.color"
-                  class="bar-rect">
-                </rect>
-              </svg>
-
-              <div class="chart-labels">
-                <span *ngFor="let data of buySellData">{{ data.label }}</span>
-              </div>
-            </div>
+            <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="chart-svg">
+              <rect *ngFor="let bar of buySellChart" [attr.x]="bar.x" [attr.y]="bar.y" [attr.width]="bar.width" [attr.height]="bar.height" [attr.fill]="bar.color" rx="2" class="bar"></rect>
+              <line x1="0" y1="90" x2="100" y2="90" stroke="#e5e7eb" stroke-width="0.5"/>
+            </svg>
           </div>
-        </ng-container>
+          <div class="chart-labels">
+            <span>Buy</span>
+            <span>Sell</span>
+          </div>
+        </div>
 
         <!-- Pie Chart -->
-        <ng-container *ngIf="!isBarChart()">
-          <div class="pie-chart-container">
-            <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" aria-hidden="true" class="pie-svg">
-              <path
-                *ngFor="let slice of pieSlices"
-                [attr.d]="slice.path"
-                [attr.fill]="slice.color"
-                [attr.stroke]="slice.darkColor"
-                stroke-width="1"
-                class="pie-slice">
-              </path>
-            </svg>
-
-            <div class="pie-legend">
-              <div *ngFor="let slice of pieSlices" class="legend-item">
-                <div class="legend-color" [style.background-color]="slice.color"></div>
-                <span>{{ slice.label }}: {{ slice.value | number:'1.0-0' }}</span>
-              </div>
-            </div>
-          </div>
-        </ng-container>
-      </div>
-
-      <div class="summary-grid compact-summary">
-        <div>
-          <dt>Buy Orders</dt>
-          <dd>{{ analyticsResult()?.buy_count | number:'1.0-0' }}</dd>
-        </div>
-        <div>
-          <dt>Sell Orders</dt>
-          <dd>{{ analyticsResult()?.sell_count | number:'1.0-0' }}</dd>
-        </div>
-      </div>
-    </article>
-
-    <!-- Volume by Market Interval Histogram (Rectangular) -->
-    <article class="analytics-card volume-histogram-card">
-      <div class="card-heading">
-        <div>
-          <p class="card-eyebrow">Activity</p>
-          <h2>Trade Volume by Market Hour</h2>
-        </div>
-      </div>
-
-      <div class="histogram-shell">
-        <div class="histogram-frame">
-          <div class="histogram-y-axis">
-            <span *ngFor="let value of histogramYAxisValues">{{ value | number:'1.0-0' }}</span>
-          </div>
-
-          <div class="histogram-plot">
-            <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-              <g *ngFor="let bar of volumeHistogramData; let i = index">
-                <!-- Sell volume (red) - bottom -->
-                <rect
-                  *ngIf="bar.sellHeight > 0"
-                  [attr.x]="5 + (i * 7.3)"
-                  [attr.y]="bar.sellY"
-                  [attr.width]="6"
-                  [attr.height]="bar.sellHeight"
-                  fill="#EF4444"
-                  class="histogram-bar sell-bar">
-                </rect>
-                <!-- Buy volume (green) - top -->
-                <rect
-                  *ngIf="bar.buyHeight > 0"
-                  [attr.x]="5 + (i * 7.3)"
-                  [attr.y]="bar.buyY"
-                  [attr.width]="6"
-                  [attr.height]="bar.buyHeight"
-                  fill="#10B981"
-                  class="histogram-bar buy-bar">
-                </rect>
-              </g>
-            </svg>
-
-            <div class="histogram-labels">
-              <span *ngFor="let bar of volumeHistogramData">{{ getIntervalTimeLabel(bar.interval) }}</span>
+        <div class="distribution-chart pie-chart">
+          <svg viewBox="0 0 100 100" class="pie-svg">
+            <path *ngFor="let slice of buySellPie" 
+              [attr.d]="slice.path" 
+              [attr.fill]="slice.color" 
+              class="pie-slice">
+            </path>
+          </svg>
+          <div class="pie-legend">
+            <div *ngFor="let slice of buySellPie" class="legend-item">
+              <div class="legend-dot" [style.background]="slice.color"></div>
+              <span>{{ slice.label }}</span>
             </div>
           </div>
         </div>
       </div>
+    </article>
+  </section>
 
-      <div class="histogram-legend">
+  <!-- Order Volume by 30 Minute Market Interval -->
+  <section class="market-interval-section">
+    <article class="chart-card">
+      <div class="card-header-with-toggle">
+        <div>
+          <h3>Order Volume by 30 Minute Market Interval</h3>
+        </div>
+        <div class="toggle-buttons">
+          <button 
+            [class.active]="volumeByMarketMode() === 'volume'"
+            (click)="toggleVolumeByMarketMode()"
+            class="toggle-btn">
+            Volume
+          </button>
+          <button 
+            [class.active]="volumeByMarketMode() === 'slide'"
+            (click)="toggleVolumeByMarketMode()"
+            class="toggle-btn">
+            Slide
+          </button>
+        </div>
+      </div>
+
+      <div class="chart-wrapper">
+        <div class="chart-axis-y">
+          <div *ngFor="let val of marketHoursAxisValues" class="axis-label">{{ val | number:'1.0-0' }}</div>
+        </div>
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="chart-svg">
+          <g *ngFor="let bar of marketHoursChart">
+            <rect *ngIf="bar.sellHeight > 0" [attr.x]="bar.x" [attr.y]="bar.sellY" [attr.width]="bar.barWidth" [attr.height]="bar.sellHeight" fill="#EF4444" class="bar"></rect>
+            <rect *ngIf="bar.buyHeight > 0" [attr.x]="bar.x" [attr.y]="bar.buyY" [attr.width]="bar.barWidth" [attr.height]="bar.buyHeight" fill="#10B981" class="bar"></rect>
+          </g>
+          <line x1="0" y1="90" x2="100" y2="90" stroke="#e5e7eb" stroke-width="0.5"/>
+        </svg>
+      </div>
+      <div class="chart-labels-row time-labels">
+        <span *ngFor="let bar of marketHoursChart" class="time-label">{{ bar.time }}</span>
+      </div>
+      <div class="chart-legend">
         <div class="legend-item">
-          <div class="legend-color" style="background-color: #10B981;"></div>
-          <span>Buy Volume</span>
+          <div class="legend-box buy"></div>
+          <span>Buy</span>
         </div>
         <div class="legend-item">
-          <div class="legend-color" style="background-color: #EF4444;"></div>
-          <span>Sell Volume</span>
+          <div class="legend-box sell"></div>
+          <span>Sell</span>
         </div>
       </div>
     </article>
-  </div>
+  </section>
 
+  <!-- Order Volume by Date - Scrollable -->
+  <section class="volume-by-date-section">
+    <article class="chart-card">
+      <div class="card-header-with-toggle">
+        <div>
+          <h3>Order Volume by Date</h3>
+        </div>
+        <div class="toggle-buttons">
+          <button 
+            [class.active]="volumeByDateMode() === 'volume'"
+            (click)="toggleVolumeByDateMode()"
+            class="toggle-btn">
+            Volume
+          </button>
+          <button 
+            [class.active]="volumeByDateMode() === 'slide'"
+            (click)="toggleVolumeByDateMode()"
+            class="toggle-btn">
+            Slide
+          </button>
+        </div>
+      </div>
+
+      <div class="volume-by-date-scroll">
+        <div *ngFor="let item of volumeByDateList" class="date-item">
+          <div class="date-label">{{ item.date }}</div>
+          <div class="bar-container">
+            <div class="bar" [style.width.%]="item.percentage"></div>
+            <div class="bar-value">{{ item.value | number:'1.0-0' }} units</div>
+          </div>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <!-- Top K Most Traded Assets - Scrollable -->
+  <section class="top-assets-section">
+    <article class="chart-card">
+      <div class="card-header">
+        <h3>Top K Most Traded Assets</h3>
+      </div>
+
+      <div class="top-assets-scroll">
+        <div *ngFor="let asset of topAssetsList" class="asset-item">
+          <div class="asset-rank">{{ asset.rank }}.</div>
+          <div class="asset-name">{{ asset.symbol }}</div>
+          <div class="asset-value">{{ asset.value | number:'1.0-0' }} Shares</div>
+        </div>
+      </div>
+    </article>
+  </section>
 </div>
