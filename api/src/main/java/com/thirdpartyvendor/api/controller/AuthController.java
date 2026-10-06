@@ -2,6 +2,7 @@ package com.thirdpartyvendor.api.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,6 +14,8 @@ import com.thirdpartyvendor.api.dto.AuthenticationRequest;
 import com.thirdpartyvendor.api.dto.AuthenticationResponse;
 import com.thirdpartyvendor.api.service.AuthenticationService;
 import com.thirdpartyvendor.api.service.RegistrationService;
+
+import jakarta.servlet.http.Cookie;
 
 @RestController
 @RequestMapping("/auth")
@@ -32,7 +35,15 @@ public class AuthController {
 	}
 
 	@PostMapping("/authenticate")
-	public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request) {
-		return ResponseEntity.status(HttpStatus.OK).body(authenticationService.authenticate(request));
+	public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request, HttpServletResponse response) {
+		AuthenticationResponse authResponse = authenticationService.authenticate(request);
+		Cookie authCookie = new Cookie("authToken", authResponse.jwtToken());
+		authCookie.setHttpOnly(true);
+		authCookie.setSecure(true);
+		authCookie.setPath("/");
+		authCookie.setMaxAge(900);
+		authCookie.setAttribute("SameSite", "Strict");
+		response.addCookie(authCookie);
+		return ResponseEntity.status(HttpStatus.OK).body(authResponse);
 	}
 }
