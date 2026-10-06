@@ -1,7 +1,9 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule, CurrencyPipe, DecimalPipe } from '@angular/common';
 import { Holding } from './holding.model';
 import { MOCK_HOLDINGS } from './mock-holdings';
+import { HoldingService } from '../../services/holding.service';
+import { AuthService } from '../../services/auth.service';
 
 type SortColumn = 'ticker' | 'companyName' | 'shares' | 'averageCost' | 'lastPrice' | 'marketValue' | 'gainLoss' | 'dailyChangePercent' | null;
 type SortDirection = 'asc' | 'desc' | null;
@@ -12,13 +14,46 @@ type SortDirection = 'asc' | 'desc' | null;
   styleUrl: './holdings-table.scss',
   templateUrl: './holdings-table.html',
 })
-export class HoldingsTable {
-  @Input() holdings: Holding[] = MOCK_HOLDINGS;
+export class HoldingsTable implements OnInit {
+  constructor(
+    private holdingService: HoldingService,
+    private authService: AuthService
+  ) {}
+  
+  ngOnInit(): void {
+    this.loadHoldings();
+  }
+
+  @Input() holdings: Holding[] = [];
+  isLoading: boolean = false;
+  errorMessage: string | null = null;
   sortColumn: SortColumn = null;
   sortDirection: SortDirection = null;
   displayCount: number = 10;
   readonly incrementCount: number = 10;
   expandedHoldings: Set<string> = new Set();
+
+  // Fetch holdings from API
+  loadHoldings(): void {
+    this.isLoading = true;
+    this.errorMessage = null;
+
+    // TODO: Get actual userId from your auth/user service
+    const userId = 'user123'; // Replace with actual user ID
+
+    this.holdingService.fetchHoldings(userId).subscribe({
+      next: (data: Holding[]) => {
+        this.holdings = data;
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error fetching holdings:', error);
+        this.errorMessage = 'Failed to load holdings. Using mock data.';
+        this.holdings = MOCK_HOLDINGS; // Fallback to mock data on error
+        this.isLoading = false;
+      }
+    });
+  }
 
   get sortedHoldings(): Holding[] {
     if (!this.sortColumn || !this.sortDirection) {
