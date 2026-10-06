@@ -112,8 +112,6 @@ class OrderServiceTest {
                 null
             )
         );
-    }
-
         CreateOrderRequest request = new CreateOrderRequest(
             100L,
             "AAPL",
@@ -195,4 +193,4 @@ class OrderServiceTest {
         assertEquals("Order currency is required", exception.getMessage());
         verify(orderRepository, never()).save(any(Order.class));
     }
-}
+}       
