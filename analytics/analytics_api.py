@@ -7,7 +7,15 @@ CORS(app)
 
 @app.route('/analytics', methods=['GET'])
 def analytics():
-    data = request.get_json(silent=True)
+    
+    start_date = request.args.get('startDate', None)
+    end_date = request.args.get('endDate', None)
+    
+    if start_date and end_date:
+        print(f"Start date received: {start_date}")
+        print(f"End date received: {end_date}")
+    else:
+        print("Start date or end date not received")
     
     #Basic for now just want to get structure so that skeleton for further analytics is all there
 

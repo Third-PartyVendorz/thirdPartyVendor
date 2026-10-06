@@ -14,15 +14,25 @@ Analytics we are going to capture:
 
 
 
+MAY NEED TO REVISIT VOLUME BY 30 MINUTE INTERVAL
+- Is it useful to highlight this over a month --> More useful to show day per day
 
 
 Plan: 
 
- - Finalize basic analytics
- - API send basic payload to frontend
- - Implement frontend
+ - Finalize basic analytics - done
+ - API send basic payload to frontend - done
+ - Implement basic frontend - done
+ - Implement custom job
+ - Major clean-up
+    - rounding errors
+    - Total orders and volume instead of split
+    - 
+    - 
  - Implement non-blocking scheduling of some variety
  - Implement non-blocking strategy with frontend
+ - Verify Valid Auth flow
+ - Dockerize analytics service
 
 
 
