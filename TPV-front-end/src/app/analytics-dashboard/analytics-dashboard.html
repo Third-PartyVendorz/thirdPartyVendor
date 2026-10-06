@@ -24,7 +24,7 @@
                   class="bar-segment"
                   [style.height.%]="seg.pct"
                   [style.background]="seg.color"
-                  [attr.title]="seg.name + ': ' + (seg.value | number:'1.0-2')"></div>
+                  [attr.title]="seg.name + ': ' + (seg.value | number:'1.0-20')"></div>
               </div>
             </div>
           </div>
@@ -55,15 +55,15 @@
   </header>
 
   <!-- Summary Cards -->
-  <!-- <section class="summary-section">
+  <section class="summary-section">
     <div *ngFor="let card of summaryCards()" class="summary-card">
       <div class="card-icon" [style.background]="card.color"></div>
       <div class="card-content">
         <p class="card-label">{{ card.label }}</p>
-        <p class="card-value">{{ card.value | number:'1.0-0' }}</p>
+          <p class="card-value">{{ card.value | number:'1.0-20' }}</p>
       </div>
     </div>
-  </section> -->
+  </section>
 
   <!-- Order Distribution Section -->
   <section class="order-distribution-section">
@@ -182,10 +182,10 @@
                 class="date-segment"
                 [style.width.%]="seg.pct"
                 [style.background]="seg.color"
-                [attr.title]="seg.name + ': ' + (seg.value | number:'1.0-2')"></div>
+                [attr.title]="seg.name + ': ' + (seg.value | number:'1.0-20')"></div>
             </div>
           </div>
-          <div class="bar-value">{{ row.total | number:'1.0-0' }} units</div>
+          <div class="bar-value">{{ row.total | number:'1.0-20' }} units</div>
         </div>
       </div>
 
@@ -204,7 +204,7 @@
         <div *ngFor="let asset of topAssetsList()" class="asset-item">
           <div class="asset-rank">{{ asset.rank }}.</div>
           <div class="asset-name">{{ asset.symbol }}</div>
-          <div class="asset-value">{{ asset.value | number:'1.0-0' }} Shares</div>
+          <div class="asset-value">{{ asset.value | number:'1.0-20' }} Shares</div>
         </div>
       </div>
     </article>

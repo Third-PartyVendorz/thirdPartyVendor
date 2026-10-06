@@ -93,10 +93,12 @@ export class AnalyticsDashboard implements OnInit {
     const data = this.analyticsResult();
     if (!data) return [];
     return [
-      { label: 'Buy Orders', value: data.buy_count, color: BUY_COLOR },
-      { label: 'Sell Orders', value: data.sell_count, color: SELL_COLOR },
-      { label: 'Buy Volume', value: data.buy_volume, color: '#3B82F6' },
-      { label: 'Sell Volume', value: data.sell_volume, color: '#8B5CF6' },
+      // { label: 'Buy Orders', value: data.buy_count, color: BUY_COLOR },
+      // { label: 'Sell Orders', value: data.sell_count, color: SELL_COLOR },
+      // { label: 'Buy Volume', value: data.buy_volume, color: '#3B82F6' },
+      // { label: 'Sell Volume', value: data.sell_volume, color: '#8B5CF6' },
+      { label: 'Total Orders', value: (data.buy_count || 0) + (data.sell_count || 0), color: TOTAL_COLOR },
+      { label: 'Total Volume', value: (data.buy_volume || 0) + (data.sell_volume || 0), color: TOTAL_COLOR },
     ];
   });
 
@@ -282,7 +284,6 @@ export class AnalyticsDashboard implements OnInit {
   private formatAxisValue(value: number): string {
     return new Intl.NumberFormat('en-US', {
       notation: 'compact',
-      maximumFractionDigits: 1,
     }).format(value);
   }
 
