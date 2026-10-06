@@ -98,6 +98,18 @@ export class AnalyticsDashboard implements OnInit {
       startDate: this.customStartDate(),
       endDate: this.customEndDate(),
     });
+    this.analyticsService.performAnalytics({
+      startDate: this.customStartDate(),
+      endDate: this.customEndDate()
+    }).subscribe({
+      next: (response) => {
+        this.analyticsResult.set(response);
+        console.log('Custom date range analytics response:', response);
+      },
+      error: (err) => {
+        console.error('Analytics error:', err);
+      },
+    });
   }
 
   // ---------------------------------------------------------------------------

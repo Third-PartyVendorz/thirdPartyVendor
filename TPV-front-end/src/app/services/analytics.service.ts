@@ -9,8 +9,15 @@ import { AnalyticsResponse } from '../dto/AnalyticsResponse';
 export class AnalyticsService {
   constructor(private http: HttpClient) { }
 
-  performAnalytics() {
-    return this.http.get<AnalyticsResponse>(`${environment.analyticsBaseUrl}/analytics`);
+  performAnalytics(options?: { startDate?: string; endDate?: string }) {
+    const params: any = {};
+    if (options?.startDate) {
+      params.startDate = options.startDate;
+    }
+    if (options?.endDate) {
+      params.endDate = options.endDate;
+    }
+    return this.http.get<AnalyticsResponse>(`${environment.analyticsBaseUrl}/analytics`, { params });
   }
 
 }
