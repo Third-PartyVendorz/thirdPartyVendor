@@ -117,6 +117,12 @@
     }
 }
 
+.timeline-toggle-section {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
 .toggle-buttons {
     display: flex;
     flex-shrink: 0;
@@ -128,8 +134,8 @@
 
 .toggle-btn {
     // Fixed width so the toggle never changes size when the active button changes
-    min-width: 5rem;
-    padding: 0.5rem 1rem;
+    min-width: 7rem;
+    padding: 0.5rem 1.5rem;
     border: none;
     background: transparent;
     color: #64748b;
@@ -144,8 +150,8 @@
     }
 
     &.active {
-        background: white;
-        color: #0f172a;
+        background: #033D6C;
+        color: white;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
 }

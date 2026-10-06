@@ -29,6 +29,7 @@ type PieSlice = {
   color: string;
   label: string;
   value: number;
+  percentage: number;
 };
 
 type LegendItem = { label: string; color: string };
@@ -59,6 +60,7 @@ export class AnalyticsDashboard implements OnInit {
   orderDistributionMode = signal<'count' | 'volume'>('count');
   volumeByMarketMode = signal<'volume' | 'side'>('side');
   volumeByDateMode = signal<'volume' | 'side'>('volume');
+  timelineMode = signal<'monthly' | 'custom'>('monthly');
 
   readonly sideLegend: LegendItem[] = [
     { label: 'Buy', color: BUY_COLOR },
@@ -144,12 +146,14 @@ export class AnalyticsDashboard implements OnInit {
         color: BUY_COLOR,
         label: 'Buy',
         value: v.buy,
+        percentage: total > 0 ? (v.buy / total) * 100 : 0,
       },
       {
         path: this.slicePath(start + buyAngle, start + (total > 0 ? 2 * Math.PI : 0)),
         color: SELL_COLOR,
         label: 'Sell',
         value: v.sell,
+        percentage: total > 0 ? (v.sell / total) * 100 : 0,
       },
     ];
   });

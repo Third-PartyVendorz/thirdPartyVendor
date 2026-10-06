@@ -54,8 +54,28 @@
     <h1>Analytics Dashboard</h1>
   </header>
 
+  <!-- Timeline Toggle -->
+  <div class="timeline-toggle-section">
+    <div class="toggle-buttons">
+      <button
+        type="button"
+        class="toggle-btn"
+        [class.active]="timelineMode() === 'monthly'"
+        (click)="timelineMode.set('monthly')">
+        Monthly
+      </button>
+      <button
+        type="button"
+        class="toggle-btn"
+        [class.active]="timelineMode() === 'custom'"
+        (click)="timelineMode.set('custom')">
+        Custom
+      </button>
+    </div>
+  </div>
+
   <!-- Summary Cards -->
-  <section class="summary-section">
+  <section class="summary-section" *ngIf="timelineMode() === 'monthly'">
     <div *ngFor="let card of summaryCards()" class="summary-card">
       <div class="card-icon" [style.background]="card.color"></div>
       <div class="card-content">
@@ -66,7 +86,7 @@
   </section>
 
   <!-- Order Distribution Section -->
-  <section class="order-distribution-section">
+  <section class="order-distribution-section" *ngIf="timelineMode() === 'monthly'">
     <article class="chart-card order-distribution-card">
       <div class="card-header-with-toggle">
         <h3>Order Distribution by {{ orderDistributionMode() === 'count' ? 'Count' : 'Volume' }}</h3>
@@ -110,7 +130,7 @@
           <div class="pie-legend">
             <div *ngFor="let slice of buySellPie()" class="legend-item">
               <div class="legend-dot" [style.background]="slice.color"></div>
-              <span>{{ slice.label }}</span>
+              <span>{{ slice.label }}: {{ slice.percentage | number:'1.1-1' }}%</span>
             </div>
           </div>
         </div>
@@ -119,7 +139,7 @@
   </section>
 
   <!-- Order Volume by 30 Minute Market Interval -->
-  <section class="market-interval-section">
+  <section class="market-interval-section" *ngIf="timelineMode() === 'monthly'">
     <article class="chart-card">
       <div class="card-header-with-toggle">
         <h3>Order Volume by 30 Minute Market Interval</h3>
@@ -150,7 +170,7 @@
   </section>
 
   <!-- Order Volume by Date - Scrollable -->
-  <section class="volume-by-date-section">
+  <section class="volume-by-date-section" *ngIf="timelineMode() === 'monthly'">
     <article class="chart-card">
       <div class="card-header-with-toggle">
         <h3>Order Volume by Date</h3>
@@ -194,7 +214,7 @@
   </section>
 
   <!-- Top K Most Traded Assets - Scrollable -->
-  <section class="top-assets-section">
+  <section class="top-assets-section" *ngIf="timelineMode() === 'monthly'">
     <article class="chart-card">
       <div class="card-header">
         <h3>Top K Most Traded Assets</h3>
