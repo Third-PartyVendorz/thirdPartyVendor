@@ -35,6 +35,7 @@ class OrderServiceTest {
     private HoldingRepository holdingRepository;
     private CashHoldingsService cashHoldingsService;
     private MarketDataAPIClient marketDataAPIClient;
+    private OrderExecutionService orderExecutionService;
 
     @BeforeEach
     void setUp() {
@@ -42,8 +43,9 @@ class OrderServiceTest {
         holdingRepository = mock(HoldingRepository.class);
         cashHoldingsService = mock(CashHoldingsService.class);
         marketDataAPIClient = mock(MarketDataAPIClient.class);
+        orderExecutionService = mock(OrderExecutionService.class);
         OrderValidator orderValidator = new OrderValidator();
-        orderService = new OrderService(orderRepository, orderValidator, holdingRepository, cashHoldingsService, marketDataAPIClient);
+        orderService = new OrderService(orderRepository, orderValidator, holdingRepository, cashHoldingsService, marketDataAPIClient, orderExecutionService);
     }
 
     @Test
