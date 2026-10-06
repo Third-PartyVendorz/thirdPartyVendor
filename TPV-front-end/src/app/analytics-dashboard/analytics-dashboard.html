@@ -74,6 +74,27 @@
     </div>
   </div>
 
+  <!-- Custom Date Range Form -->
+  <form *ngIf="timelineMode() === 'custom'" (ngSubmit)="onCustomDateSubmit()">
+    <div>
+      <label for="startDate">Start Date:</label>
+      <input
+        id="startDate"
+        type="date"
+        [value]="customStartDate()"
+        (change)="customStartDate.set($any($event.target).value)" />
+    </div>
+    <div>
+      <label for="endDate">End Date:</label>
+      <input
+        id="endDate"
+        type="date"
+        [value]="customEndDate()"
+        (change)="customEndDate.set($any($event.target).value)" />
+    </div>
+    <button type="submit">Submit</button>
+  </form>
+
   <!-- Summary Cards -->
   <section class="summary-section" *ngIf="timelineMode() === 'monthly'">
     <div *ngFor="let card of summaryCards()" class="summary-card">

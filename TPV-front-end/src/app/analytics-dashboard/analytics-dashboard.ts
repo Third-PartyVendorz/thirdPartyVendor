@@ -1,5 +1,6 @@
 import { DecimalPipe, NgFor, NgIf, NgTemplateOutlet } from '@angular/common';
 import { Component, OnInit, computed, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 
 import { Navbar } from './../navbar/navbar';
 import { AnalyticsResponse } from '../dto/AnalyticsResponse';
@@ -47,7 +48,7 @@ const EMPTY_CHART: BarChartModel = { ticks: [], columns: [] };
 
 @Component({
   standalone: true,
-  imports: [Navbar, NgFor, NgIf, NgTemplateOutlet, DecimalPipe],
+  imports: [Navbar, NgFor, NgIf, NgTemplateOutlet, DecimalPipe, FormsModule],
   selector: 'app-analytics-dashboard',
   styleUrl: './analytics-dashboard.scss',
   templateUrl: './analytics-dashboard.html',
@@ -61,6 +62,10 @@ export class AnalyticsDashboard implements OnInit {
   volumeByMarketMode = signal<'volume' | 'side'>('side');
   volumeByDateMode = signal<'volume' | 'side'>('volume');
   timelineMode = signal<'monthly' | 'custom'>('monthly');
+
+  // Custom date range form
+  customStartDate = signal<string>('');
+  customEndDate = signal<string>('');
 
   readonly sideLegend: LegendItem[] = [
     { label: 'Buy', color: BUY_COLOR },
@@ -85,6 +90,13 @@ export class AnalyticsDashboard implements OnInit {
         console.error('Analytics error:', err);
         this.loading.set(false);
       },
+    });
+  }
+
+  onCustomDateSubmit(): void {
+    console.log('Custom date range submitted:', {
+      startDate: this.customStartDate(),
+      endDate: this.customEndDate(),
     });
   }
 
