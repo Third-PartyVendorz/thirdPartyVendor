@@ -10,7 +10,7 @@
     min-height: 100vh;
 }
 
-.error-banner {
+.message-banner {
     position: fixed;
     top: 0;
     left: 0;
@@ -23,7 +23,7 @@
     pointer-events: none;
 }
 
-.error-banner__panel {
+.message-banner__panel {
     position: relative;
     pointer-events: auto;
     display: flex;
@@ -32,33 +32,48 @@
     gap: 1rem;
     width: min(100%, 720px);
     padding: 1.25rem 1.4rem;
-    border: 1px solid rgba(3, 61, 108, 0.22);
     border-radius: 18px;
-    background: linear-gradient(135deg, rgba(3, 61, 108, 0.98), rgba(2, 43, 74, 0.96));
-    color: #eff6ff;
     box-shadow: 0 24px 60px rgba(15, 23, 42, 0.32);
     animation: banner-drop 180ms ease-out;
 }
 
-.error-banner__content {
+.message-banner--error .message-banner__panel {
+    border: 1px solid rgba(3, 61, 108, 0.22);
+    background: linear-gradient(135deg, rgba(3, 61, 108, 0.98), rgba(2, 43, 74, 0.96));
+    color: #eff6ff;
+}
+
+.message-banner--success .message-banner__panel {
+    border: 1px solid rgba(21, 128, 61, 0.22);
+    background: linear-gradient(135deg, rgba(22, 101, 52, 0.98), rgba(20, 83, 45, 0.96));
+    color: #ecfdf5;
+}
+
+.message-banner--info .message-banner__panel {
+    border: 1px solid rgba(30, 64, 175, 0.22);
+    background: linear-gradient(135deg, rgba(30, 64, 175, 0.98), rgba(23, 37, 84, 0.96));
+    color: #eff6ff;
+}
+
+.message-banner__content {
     position: relative;
     display: grid;
     gap: 0.25rem;
 }
 
-.error-banner__content strong {
+.message-banner__content strong {
     font-size: 0.85rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: rgba(255, 255, 255, 0.86);
 }
 
-.error-banner__content span {
+.message-banner__content span {
     font-size: 0.98rem;
     line-height: 1.4;
 }
 
-.error-banner__dismiss {
+.message-banner__dismiss {
     position: relative;
     flex: 0 0 auto;
     border: 0;
@@ -71,12 +86,12 @@
     transition: transform 120ms ease, background-color 120ms ease;
 }
 
-.error-banner__dismiss:hover {
+.message-banner__dismiss:hover {
     background: rgba(255, 255, 255, 0.2);
     transform: translateY(-1px);
 }
 
-.error-banner__dismiss:active {
+.message-banner__dismiss:active {
     transform: translateY(0);
 }
 
