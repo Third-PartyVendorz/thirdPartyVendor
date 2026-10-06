@@ -96,6 +96,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 1rem;
+    min-height: 2.5rem;
     margin-bottom: 1.5rem;
 
     h3 {
@@ -125,6 +127,7 @@
 
 .toggle-buttons {
     display: flex;
+    flex-shrink: 0;
     gap: 0.5rem;
     background: #f1f5f9;
     padding: 0.25rem;
@@ -132,6 +135,8 @@
 }
 
 .toggle-btn {
+    // Fixed width so the toggle never changes size when the active button changes
+    min-width: 5rem;
     padding: 0.5rem 1rem;
     border: none;
     background: transparent;
@@ -153,7 +158,148 @@
     }
 }
 
-/* Order Distribution Section */
+/* ---------------------------------------------------------------------------
+   Shared bar chart (used by Order Distribution and Market Interval)
+   Every part (y-axis ticks, gridlines, bars, x labels) is positioned from the
+   same percentages / flex columns, so labels always line up with their bars.
+   --------------------------------------------------------------------------- */
+.bar-chart {
+    --plot-height: 250px;
+    --bar-max-width: 56px;
+
+    display: grid;
+    grid-template-columns: 56px minmax(0, 1fr);
+    column-gap: 0.5rem;
+    padding-top: 0.5rem;
+    width: 100%;
+
+    .y-axis {
+        position: relative;
+        height: var(--plot-height);
+    }
+
+    .y-tick {
+        position: absolute;
+        right: 0;
+        transform: translateY(50%);
+        font-size: 0.75rem;
+        font-weight: 600;
+        line-height: 1;
+        color: #94a3b8;
+        white-space: nowrap;
+    }
+
+    .plot-area {
+        min-width: 0;
+    }
+
+    .plot {
+        position: relative;
+        height: var(--plot-height);
+        border-left: 1px solid #cbd5e1;
+        border-bottom: 1px solid #cbd5e1;
+    }
+
+    .gridline {
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: #f1f5f9;
+        transform: translateY(50%);
+    }
+
+    .columns {
+        position: absolute;
+        inset: 0;
+        display: flex;
+    }
+
+    .column {
+        flex: 1 1 0;
+        min-width: 0;
+        height: 100%;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+    }
+
+    .bar-stack {
+        display: flex;
+        flex-direction: column;
+        width: 60%;
+        max-width: var(--bar-max-width);
+        border-radius: 4px 4px 0 0;
+        overflow: hidden;
+        cursor: pointer;
+        transition: opacity 0.2s ease;
+
+        &:hover {
+            opacity: 0.85;
+        }
+    }
+
+    .bar-segment {
+        flex: 0 0 auto;
+        width: 100%;
+    }
+
+    .x-labels {
+        display: flex;
+        margin-top: 0.5rem;
+    }
+
+    .x-label {
+        flex: 1 1 0;
+        min-width: 0;
+        display: flex;
+        justify-content: center;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #475569;
+    }
+
+    .x-labels.rotated {
+        .x-label {
+            align-items: flex-start;
+            font-size: 0.7rem;
+            color: #64748b;
+        }
+
+        .x-text {
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            white-space: nowrap;
+        }
+    }
+}
+
+/* Shared legend */
+.chart-legend {
+    display: flex;
+    gap: 1.5rem;
+    min-height: 1.5rem; // reserved so switching modes never shifts the layout
+    margin-top: 1rem;
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+        color: #475569;
+    }
+
+    .legend-box {
+        width: 16px;
+        height: 16px;
+        border-radius: 3px;
+        flex-shrink: 0;
+    }
+}
+
+/* ---------------------------------------------------------------------------
+   Order Distribution Section
+   --------------------------------------------------------------------------- */
 .order-distribution-section {
     margin-bottom: 2rem;
 }
@@ -163,95 +309,39 @@
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 2rem;
+        align-items: center;
+    }
+
+    .bar-chart {
+        --bar-max-width: 96px;
     }
 }
 
 .distribution-chart {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-
-    &.bar-chart {
-        .chart-wrapper {
-            display: grid;
-            grid-template-columns: 50px 1fr;
-            gap: 0.75rem;
-            height: 250px;
-
-            .chart-axis-y {
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between;
-                align-items: flex-end;
-                font-size: 0.75rem;
-                color: #94a3b8;
-                font-weight: 600;
-                padding-right: 0.5rem;
-                line-height: 1;
-
-                .axis-label {
-                    height: 0;
-                    display: flex;
-                    align-items: center;
-                }
-            }
-
-            .chart-svg {
-                width: 100%;
-                height: 100%;
-                background: linear-gradient(to top, #f1f5f9 1px, transparent 1px);
-                background-size: 100% 20%;
-
-                .bar {
-                    transition: opacity 0.2s ease;
-                    cursor: pointer;
-
-                    &:hover {
-                        opacity: 0.8;
-                    }
-                }
-            }
-        }
-
-        .chart-labels {
-            display: grid;
-            grid-template-columns: 50px 1fr;
-
-            span {
-                grid-column: 2;
-                font-size: 0.75rem;
-                font-weight: 600;
-                color: #475569;
-                text-align: center;
-                padding: 0.25rem;
-
-                &:first-child {
-                    text-align: left;
-                }
-
-                &:last-child {
-                    text-align: right;
-                }
-            }
-        }
-    }
+    min-width: 0;
 
     &.pie-chart {
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
         align-items: center;
         justify-content: center;
+        gap: 2rem;
 
         .pie-svg {
-            width: 150px;
-            height: 150px;
+            width: 200px;
+            height: 200px;
+            flex-shrink: 0;
+
+            .pie-empty {
+                fill: #e2e8f0;
+            }
 
             .pie-slice {
                 cursor: pointer;
                 transition: opacity 0.2s ease;
 
                 &:hover {
-                    opacity: 0.8;
+                    opacity: 0.85;
                 }
             }
         }
@@ -260,13 +350,13 @@
             display: flex;
             flex-direction: column;
             gap: 0.75rem;
-            margin-top: 1rem;
 
             .legend-item {
                 display: flex;
                 align-items: center;
                 gap: 0.75rem;
                 font-size: 0.9rem;
+                color: #475569;
 
                 .legend-dot {
                     width: 12px;
@@ -279,107 +369,24 @@
     }
 }
 
-/* Market Interval Section */
+/* ---------------------------------------------------------------------------
+   Market Interval Section
+   --------------------------------------------------------------------------- */
 .market-interval-section {
     margin-bottom: 2rem;
 
-    .chart-wrapper {
-        display: grid;
-        grid-template-columns: 50px 1fr;
-        gap: 0.75rem;
-        margin-bottom: 1rem;
-        height: 250px;
-
-        .chart-axis-y {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: flex-end;
-            font-size: 0.75rem;
-            color: #94a3b8;
-            font-weight: 600;
-            padding-right: 0.5rem;
-            line-height: 1;
-
-            .axis-label {
-                height: 0;
-                display: flex;
-                align-items: center;
-            }
-        }
-
-        .chart-svg {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(to top, #f1f5f9 1px, transparent 1px);
-            background-size: 100% 20%;
-
-            .bar {
-                transition: opacity 0.2s ease;
-                cursor: pointer;
-
-                &:hover {
-                    opacity: 0.8;
-                }
-            }
-        }
+    .bar-chart {
+        --bar-max-width: 44px;
     }
 
-    .chart-labels-row {
-        display: grid;
-        gap: 0.25rem;
-        font-size: 0.7rem;
-        color: #64748b;
-        font-weight: 600;
-        text-align: center;
-        margin-bottom: 1rem;
-
-        &.time-labels {
-            grid-template-columns: repeat(auto-fit, minmax(30px, 1fr));
-
-            .time-label {
-                overflow: visible;
-                text-overflow: clip;
-                white-space: nowrap;
-                writing-mode: vertical-rl;
-                text-orientation: mixed;
-                transform: rotate(180deg);
-                display: flex;
-                align-items: flex-end;
-                justify-content: center;
-                height: 80px;
-            }
-        }
-    }
-
-    .chart-legend {
-        display: flex;
-        gap: 1.5rem;
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.9rem;
-
-            .legend-box {
-                width: 16px;
-                height: 16px;
-                border-radius: 3px;
-
-                &.buy {
-                    background: #10B981;
-                }
-
-                &.sell {
-                    background: #EF4444;
-                }
-            }
-        }
+    .x-labels.rotated .x-label {
+        height: 4.5rem;
     }
 }
 
-/* Volume by Date Section */
+/* ---------------------------------------------------------------------------
+   Volume by Date Section
+   --------------------------------------------------------------------------- */
 .volume-by-date-section {
     margin-bottom: 2rem;
 
@@ -409,7 +416,7 @@
 
     .date-item {
         display: grid;
-        grid-template-columns: 100px 1fr;
+        grid-template-columns: 100px minmax(0, 1fr) 110px;
         gap: 1rem;
         align-items: center;
         padding: 0.75rem 0;
@@ -427,36 +434,42 @@
             padding-right: 0.5rem;
         }
 
-        .bar-container {
+        .bar-track {
+            height: 24px;
+            background: #f8fafc;
+            border-radius: 3px;
+        }
+
+        .date-bar {
             display: flex;
-            align-items: center;
-            gap: 1rem;
+            height: 100%;
+            border-radius: 3px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
 
-            .bar {
-                flex-shrink: 0;
-                height: 24px;
-                background: linear-gradient(90deg, #F59E0B 0%, #FCD34D 100%);
-                border-radius: 3px;
-                transition: opacity 0.2s ease;
-                cursor: pointer;
-                min-width: 10px;
-
-                &:hover {
-                    opacity: 0.8;
-                }
+            &:hover {
+                opacity: 0.85;
             }
+        }
 
-            .bar-value {
-                font-size: 0.85rem;
-                color: #64748b;
-                font-weight: 600;
-                white-space: nowrap;
-            }
+        .date-segment {
+            flex: 0 0 auto;
+            height: 100%;
+        }
+
+        .bar-value {
+            font-size: 0.85rem;
+            color: #64748b;
+            font-weight: 600;
+            white-space: nowrap;
         }
     }
 }
 
-/* Top Assets Section */
+/* ---------------------------------------------------------------------------
+   Top Assets Section
+   --------------------------------------------------------------------------- */
 .top-assets-section {
     margin-bottom: 2rem;
 
@@ -553,6 +566,14 @@
         align-items: flex-start;
         gap: 1rem;
     }
+
+    .volume-by-date-section .date-item {
+        grid-template-columns: 80px minmax(0, 1fr) 90px;
+        gap: 0.5rem;
+    }
+
+    .distribution-chart.pie-chart {
+        flex-direction: column;
+        gap: 1rem;
+    }
 }
-
-
