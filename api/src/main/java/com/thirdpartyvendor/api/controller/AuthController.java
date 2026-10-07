@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.thirdpartyvendor.api.dto.AuthenticationJwtModel;
 import com.thirdpartyvendor.api.dto.AuthenticationRequest;
@@ -84,5 +85,26 @@ public class AuthController {
 	@GetMapping("/me")
 	public ResponseEntity<Void> me() {
 		return ResponseEntity.ok().build();
+	}
+
+	@PostMapping("/refresh")
+	public ResponseEntity<Void> refresh(
+			HttpServletRequest httpRequest,
+			HttpServletResponse response) {
+		String refreshToken = null;
+		for (var cookie : httpRequest.getCookies()) {
+				if ("refreshToken".equals(cookie.getName())) {
+					refreshToken = cookie.getValue();
+					break;
+				}
+		}
+		if (refreshToken == null) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Please login again");
+		}
+
+		return ResponseEntity.ok().build();
+		
+
+
 	}
 }
