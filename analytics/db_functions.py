@@ -37,3 +37,15 @@ def execute_fetch_query(query, conn):
             dict(zip(columns, row))
             for row in rows
         ]
+        
+def execute_fetch_query_with_params(query, params, conn):
+    with conn.cursor() as cur:
+        cur.execute(query, params)
+
+        columns = [desc[0] for desc in cur.description]
+        rows = cur.fetchall()
+
+        return [
+            dict(zip(columns, row))
+            for row in rows
+        ]

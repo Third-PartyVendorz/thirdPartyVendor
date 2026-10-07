@@ -13,10 +13,26 @@ def run_analytics_job():
 
     df = pd.DataFrame(results)
 
-    analytics_payload = af.perform_analytics(df, date_tag)
+    analytics_payload = af.perform_analytics(df)
 
     db.close_db_connection(conn)
 
     print("Analytics job completed successfully.")
+    
+    return analytics_payload
+
+def run_custom_analytics_job(start_date, end_date):
+    query, params = msc.get_custom_date_trades_query(start_date, end_date)
+    conn = db.open_db_connection()
+
+    results = db.execute_fetch_query_with_params(query, params, conn)
+
+    df = pd.DataFrame(results)
+
+    analytics_payload = af.perform_analytics(df)
+
+    db.close_db_connection(conn)
+
+    print("Custom analytics job completed successfully.")
     
     return analytics_payload

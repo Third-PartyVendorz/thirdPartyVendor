@@ -44,3 +44,17 @@ def get_current_month_trades_query():
     JOIN orders o ON ft.order_id = o.order_id
     JOIN holdings h ON o.user_id = h.user_id AND o.asset_id = h.asset_id;
     """
+    
+def get_custom_date_trades_query(start_date, end_date):
+    query = """
+    WITH filtered_trades AS (
+        SELECT t.*
+        FROM trade t
+        WHERE t.trade_timestamp BETWEEN %s AND %s
+    )
+    SELECT ft.*, o.*, h.*
+    FROM filtered_trades ft
+    JOIN orders o ON ft.order_id = o.order_id
+    JOIN holdings h ON o.user_id = h.user_id AND o.asset_id = h.asset_id;
+    """
+    return query, (start_date, end_date)

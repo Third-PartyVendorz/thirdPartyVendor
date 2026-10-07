@@ -178,7 +178,7 @@ def k_most_traded_assets(df, k=5):
 
 
 # ===== Main analytics function =====
-def perform_analytics(df, date_tag, k=5):
+def perform_analytics(df, k=5):
     """Perform all analytics with comprehensive error handling."""
     formatted_payload = {}
     
