@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, inject, DestroyRef, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, DestroyRef, ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TradeSide } from '../../shared/trade-side';
 import { AssetTradeDetails } from '../../asset-result/asset-result';
@@ -26,6 +26,9 @@ export class TradeFormComponent {
   @Input() ticker = '';
   @Input() assetDetails: AssetTradeDetails | null = null;
   @Output() tradeSubmitted = new EventEmitter<void>();
+  @Output() summaryToggled = new EventEmitter<boolean>();
+
+  @ViewChild('formContainer') formContainer!: ElementRef;
 
   private tradeService: TradeService = inject(TradeService);
   private destroyRef: DestroyRef = inject(DestroyRef);
@@ -40,24 +43,42 @@ export class TradeFormComponent {
   currentUnit: UnitType = UnitType.SHARES;
   showInsufficientFundsMessage: boolean = false;
   showInsufficientSharesMessage: boolean = false;
+  showOrderSummaryPanel: boolean = false;
+
+  currency: string;
+  buyingPower: number = 0;
 
   constructor(private fb: FormBuilder) {
     this.form = this.fb.group({
       inputValue: ['']
     });
+    this.currency = this.assetDetails?.quote?.currency || 'USD';
+    this.tradeService.getCashHoldingByCurrencyCode(this.currency)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          this.buyingPower = response.balance;
+          this.cdr.markForCheck();
+        },
+        error: (error) => {
+          console.error('Error retrieving cash holding:', error);
+          this.buyingPower = 0;
+          this.cdr.markForCheck();
+        }
+      });
   }
-  
+
   inputPlaceholder = () => {
     let placeholderString: String = "Enter a ";
     if (this.currentUnit === UnitType.SHARES) {
       placeholderString += "quantity ";
     } else {
-      placeholderString += "dollar amount "
+      placeholderString += "dollar amount ";
     }
     if (this.currentSide === TradeSide.BUY) {
-      placeholderString += "to buy..."
+      placeholderString += "to buy...";
     } else {
-      placeholderString += "to sell..."
+      placeholderString += "to sell...";
     }
     return placeholderString;
   }
@@ -80,7 +101,6 @@ export class TradeFormComponent {
     if (!shares) return '0';
 
     const trimmedShares = stripTrailingZeros(shares, 4);
-    
     return addCommasToNumber(trimmedShares);
   }
 
@@ -123,9 +143,25 @@ export class TradeFormComponent {
     this.showInsufficientSharesMessage = false;
   }
 
-  onTradeButtonClick = (): void => {
-    this.closeInsufficientFundsMessage();
+  closeOrderSummaryPanel(): void {
+    this.showOrderSummaryPanel = false;
+    this.summaryToggled.emit(false);
+    this.cdr.markForCheck();
+  }
 
+  get hasInsufficientFunds(): boolean {
+    if (this.currentSide !== TradeSide.BUY) {
+      return false;
+    }
+    
+    if (this.estimatedTotal <= 0) {
+      return false;
+    }
+    
+    return this.estimatedTotal > this.buyingPower;
+  }
+
+  onContinueToOrderSummary = (): void => {
     if (this.isInvalidTrade()) {
       console.warn('Trade validation failed');
       return;
@@ -133,20 +169,48 @@ export class TradeFormComponent {
 
     const estimatedPrice = this.estimatedTotal;
 
-    const currency = this.assetDetails?.quote?.currency || 'USD';
-
-
     if (this.currentSide === TradeSide.BUY) {
-      this.tradeService.getCashHoldingByCurrencyCode(currency)
+      this.tradeService.getCashHoldingByCurrencyCode(this.currency)
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: (response) => {
-            console.log('Cash holding retrieved:', response);
-            console.log("response.balance: " + response.balance);
-            console.log("estimated price: " + estimatedPrice);
             if (response.balance < estimatedPrice) {
               this.displayInsufficientFundsMessage();
             } else {
+              this.showOrderSummaryPanel = true;
+              this.summaryToggled.emit(true);
+              this.cdr.markForCheck();
+            }
+          },
+          error: (error) => {
+            console.error('Error retrieving cash holding:', error);
+          }
+        });
+    } else {
+      this.showOrderSummaryPanel = true;
+      this.summaryToggled.emit(true);
+      this.cdr.markForCheck();
+    }
+  }
+
+  onPlaceTradeFromPanel = (): void => {
+    if (this.isInvalidTrade()) {
+      console.warn('Trade validation failed');
+      return;
+    }
+
+    const estimatedPrice = this.estimatedTotal;
+
+    if (this.currentSide === TradeSide.BUY) {
+      this.tradeService.getCashHoldingByCurrencyCode(this.currency)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: (response) => {
+            if (response.balance < estimatedPrice) {
+              this.displayInsufficientFundsMessage();
+              this.closeOrderSummaryPanel();
+            } else {
+              this.summaryToggled.emit(false);
               this.tradeSubmitted.emit();
             }
           },
@@ -154,17 +218,14 @@ export class TradeFormComponent {
             console.error('Error retrieving cash holding:', error);
           }
         });
-      } else {
-
-      }
+    } else {
+      this.summaryToggled.emit(false);
+      this.tradeSubmitted.emit();
+    }
   }
 
   isInvalidTrade = (): boolean => {
-    if (!this.assetDetails) {
-      return true;
-    }
-
-    if (!this.assetDetails.quote?.price) {
+    if (!this.assetDetails || !this.assetDetails.quote?.price) {
       return true;
     }
 
@@ -176,15 +237,10 @@ export class TradeFormComponent {
 
     const parsedValue = parseFormattedNumber(inputValue);
 
-    if (isNaN(parsedValue) || parsedValue <= 0) {
-      return true;
-    }
-
-    if (this.calculatedShares <= 0) {
+    if (isNaN(parsedValue) || parsedValue <= 0 || this.calculatedShares <= 0 || this.hasInsufficientFunds) {
       return true;
     }
 
     return false;
   }
-
 }

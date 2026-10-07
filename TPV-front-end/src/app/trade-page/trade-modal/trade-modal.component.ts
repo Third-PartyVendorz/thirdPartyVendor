@@ -16,11 +16,18 @@ export class TradeModalComponent {
   @Input() assetDetails: AssetTradeDetails | null = null;
   @Output() closeModal = new EventEmitter<void>();
 
+  isSummaryOpen = false;
+
   close() {
+    this.isSummaryOpen = false;
     this.closeModal.emit();
   }
 
   onBackdropClick() {
     this.close();
+  }
+
+  onSummaryToggled(isOpen: boolean) {
+    this.isSummaryOpen = isOpen;
   }
 }
