@@ -6,6 +6,9 @@ import { CommonModule } from '@angular/common';
 import { AuthenticationRequest } from '../dto/AuthenticationRequest';
 import { Router } from '@angular/router';
 import { MessageService } from '../services/message.service';
+import { UserContextService } from '../services/user-context.service';
+import { UserContext } from '../dto/UserContext';
+import { AuthenticationResponse } from '../dto/AuthenticationResponse';
 
 @Component({
   standalone: true,
@@ -18,6 +21,7 @@ export class LoginContainer {
   constructor(
     private authService: AuthService,
     private messageService: MessageService,
+    private userContextService: UserContextService,
     private router: Router,
   ) {}
 
@@ -78,8 +82,16 @@ export class LoginContainer {
 
   authenticate (request: AuthenticationRequest) {
     this.authService.authenticate(request).subscribe({
-      next: () => {
+      next: (response: AuthenticationResponse) => {
         this.messageService.setSuccessMessage('Login successful.');
+                const userContext: UserContext = {
+          firstName: response.firstName,
+          lastName: response.lastName,
+          phoneNumber: response.phoneNumber,
+          dateOfBirth: response.dateOfBirth,
+          email: response.email
+        }
+        this.userContextService.setUserContext(userContext);
         this.router.navigateByUrl('/');
       },
       error: (error) => {

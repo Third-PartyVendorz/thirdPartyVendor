@@ -47,7 +47,14 @@ public class AuthenticationService {
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
 		}
 
-		return new AuthenticationResponse(jwtService.generateToken(user));
+		return new AuthenticationResponse(
+			jwtService.generateToken(user),
+			user.getFirstName(),
+			user.getLastName(),
+			user.getPhoneNumber(),
+			user.getDateOfBirth(),
+			user.getEmail()
+		);
 	}
 
 	private String normalizeEmail(String email) {
