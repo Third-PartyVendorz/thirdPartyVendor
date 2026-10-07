@@ -155,6 +155,25 @@ class OrderServiceTest {
             "USD"
         );
 
+        Mockito.when(marketDataAPIClient.fetchQuote("AAPL")).thenReturn(
+            new MarketQuoteAPIResponse(
+                new MarketQuoteAPIResponse.Data(
+                    "AAPL",
+                    BigDecimal.valueOf(100.0),
+                    null,
+                    null,
+                    null,
+                    "USD",
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                ),
+                null
+            )
+        );
+
         Order newOrder = new Order();
         Long userId = 1L;
         newOrder.setId(1L);
@@ -183,7 +202,7 @@ class OrderServiceTest {
             Order.OrderIntent.BUY,
             BigDecimal.valueOf(10.0),
             null,
-            "usd"
+            null   // Missing currency - should throw BadOrderException
         );
 
         Long userId = 1L;
