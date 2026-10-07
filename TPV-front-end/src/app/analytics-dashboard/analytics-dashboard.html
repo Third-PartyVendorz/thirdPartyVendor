@@ -94,7 +94,13 @@
         [value]="customEndDate()"
         (change)="customEndDate.set($any($event.target).value)" />
     </div>
-    <button type="submit" class="submit-btn">Submit</button>
+    <button 
+      type="submit" 
+      class="submit-btn" 
+      [disabled]="!isCustomDateFormValid()"
+      [title]="isCustomDateFormValid() ? 'Submit custom date range' : 'End date cannot be before start date'">
+      Submit
+    </button>
   </form>
 
   <!-- Summary Cards -->

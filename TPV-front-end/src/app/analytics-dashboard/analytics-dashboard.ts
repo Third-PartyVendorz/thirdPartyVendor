@@ -94,7 +94,26 @@ export class AnalyticsDashboard implements OnInit {
     });
   }
 
+  // ---------------------------------------------------------------------------
+  // Custom date form validation
+  // ---------------------------------------------------------------------------
+  readonly isCustomDateFormValid = computed(() => {
+    const startDate = this.customStartDate();
+    const endDate = this.customEndDate();
+    
+    // Both dates must be provided
+    if (!startDate || !endDate) return false;
+    
+    // End date must be greater than or equal to start date
+    return endDate >= startDate;
+  });
+
   onCustomDateSubmit(): void {
+    if (!this.isCustomDateFormValid()) {
+      console.error('Invalid date range: end date cannot be before start date');
+      return;
+    }
+
     console.log('Custom date range submitted:', {
       startDate: this.customStartDate(),
       endDate: this.customEndDate(),
