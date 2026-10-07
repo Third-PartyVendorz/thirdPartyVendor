@@ -3,7 +3,7 @@ import { Component, DestroyRef, Input, OnInit, inject, signal } from '@angular/c
 import { MarketQuoteData } from '../dto/MarketQuoteAPIResponse';
 import { MarketSymbolData } from '../dto/MarketSymbolAPIResponse';
 import { MarketApiService } from '../services/marketApi.service';
-import { ErrorService } from '../services/error.service';
+import { MessageService } from '../services/message.service';
 import { forkJoin, of, ReplaySubject } from 'rxjs';
 import { catchError, distinctUntilChanged, switchMap, tap } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -68,7 +68,7 @@ export class AssetResultComponent implements OnInit {
 
 	constructor(
 		private marketApiService: MarketApiService,
-		private errorService: ErrorService,
+		private messageService: MessageService,
 	) {}
 
 	ngOnInit(): void {
@@ -116,7 +116,7 @@ export class AssetResultComponent implements OnInit {
 					this.notFound.set(true);
 				}
 				this.errorMessage.set('Unable to load the latest quote data.');
-				this.errorService.setErrorMessage('Unable to load the latest quote data.');
+				this.messageService.setErrorMessage('Unable to load the latest quote data.');
 				return of(null);
 			}),
 		);
@@ -129,7 +129,7 @@ export class AssetResultComponent implements OnInit {
 					this.notFound.set(true);
 				}
 				this.errorMessage.set('Unable to load the asset data.');
-				this.errorService.setErrorMessage('Unable to load the asset data.');
+				this.messageService.setErrorMessage('Unable to load the asset data.');
 				return of(null);
 			}),
 		);
@@ -139,14 +139,14 @@ export class AssetResultComponent implements OnInit {
 		return this.marketApiService.fetchHistoricalCandles(ticker, this.historicalFrom, this.historicalTo).pipe(
 			catchError(() => {
 				this.historicalError.set('Historical data is unavailable right now.');
-				this.errorService.setErrorMessage('Historical data is unavailable right now.');
+				this.messageService.setErrorMessage('Historical data is unavailable right now.');
 				return of(null);
 			}),
 		);
 	}
 
 	private resetState(): void {
-		this.errorService.clearErrorMessage();
+		this.messageService.clearMessage();
 		this.quote.set(null);
 		this.asset.set(null);
 		this.candles.set([]);

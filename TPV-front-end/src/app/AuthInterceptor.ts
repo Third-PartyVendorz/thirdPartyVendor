@@ -8,14 +8,14 @@ import {
 import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 import { AuthService } from './services/auth.service';
-import { ErrorService } from './services/error.service';
+import { MessageService } from './services/message.service';
 
 export function authInterceptor(
   req: HttpRequest<unknown>,
   next: HttpHandlerFn,
 ): import('rxjs').Observable<HttpEvent<unknown>> {
   const authService = inject(AuthService);
-  const errorService = inject(ErrorService);
+  const messageService = inject(MessageService);
   const router = inject(Router);
   const authToken = authService.getAuthToken();
   const isAuthEndpoint = req.url.includes('/auth/authenticate') || req.url.includes('/auth/register');
@@ -32,11 +32,11 @@ export function authInterceptor(
         if (error.status === 401) {
           authService.clearAuthToken();
           router.navigateByUrl('/login');
-          errorService.setErrorMessage('Your session has expired. Please log in again.');
+          messageService.setErrorMessage('Your session has expired. Please log in again.');
         }
 
         if (error.status === 403) {
-          errorService.setErrorMessage('You do not have permission to access this resource.');
+          messageService.setErrorMessage('You do not have permission to access this resource.');
         }
       }
 
