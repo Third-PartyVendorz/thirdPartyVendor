@@ -10,7 +10,7 @@ import com.thirdpartyvendor.api.dto.ForexRequest;
 import com.thirdpartyvendor.api.dto.ForexResponse;
 import com.thirdpartyvendor.api.dto.MarketQuoteAPIResponse;
 import com.thirdpartyvendor.api.entity.ForexLog;
-import com.thirdpartyvendor.api.model.Currency;
+import com.thirdpartyvendor.api.error.ForexExceptions.ExchangeAmountExcpetion;
 import com.thirdpartyvendor.api.repository.ForexLogRepository;
 
 import jakarta.transaction.Transactional;
@@ -31,32 +31,46 @@ public class ForexService {
     @Transactional 
     public ForexResponse executeExchange(ForexRequest forexRequest, Long userId) {
 
-        Currency fromCurrency = Currency.of(forexRequest.fromCurrency());
-        Currency toCurrency = Currency.of(forexRequest.toCurrency());
+        String fromCurrency = forexRequest.fromCurrency().trim();
+        String toCurrency = forexRequest.toCurrency().trim();
+
+        cashHoldingsService.validateCurrencyCode(fromCurrency);
+        cashHoldingsService.validateCurrencyCode(toCurrency);
 
         BigDecimal amountToConvert = forexRequest.amount();
         
+        // validate amount is positive
         if (amountToConvert.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new ExchangeAmountException("Exchange amount must be positive");
+            throw new ExchangeAmountExcpetion("Exchange amount must be positive");
         }
 
-        MarketQuoteAPIResponse quoteResponse = marketDataAPIClient
-            .fetchForexQuote(fromCurrency.getCode(), toCurrency.getCode());
+        // validate user has sufficient cash in the fromCurrency and deduct it
+        cashHoldingsService.updateCashHolding(fromCurrency, amountToConvert.negate(), userId);
+            
+        // ensure the holding in the to currency exists, create holding entry if not exists
+        cashHoldingsService.ensureCashHoldingExists(toCurrency, userId);
 
+        // fetch exchange rate
+        MarketQuoteAPIResponse quoteResponse = marketDataAPIClient
+            .fetchForexQuote(fromCurrency, toCurrency);
+
+        // convert
         BigDecimal exchangeRate = quoteResponse.data().price();
         BigDecimal convertedAmount = amountToConvert.multiply(exchangeRate);
 
-        cashHoldingsService.subtractCashHolding(fromCurrency, amountToConvert, userId);
-        cashHoldingsService.addCashHolding(toCurrency, convertedAmount, userId);
+        // add converted amount to the toCurrency holding
+        cashHoldingsService.updateCashHolding(toCurrency, convertedAmount, userId);
 
+        // create log entry for the exchange
         ForexLog forexLog = new ForexLog();
         forexLog.setUserId(userId);
-        forexLog.setFromCurrency(fromCurrency.getCode());
-        forexLog.setToCurrency(toCurrency.getCode());
+        forexLog.setFromCurrency(fromCurrency);
+        forexLog.setToCurrency(toCurrency);
         forexLog.setFromAmount(amountToConvert);
         forexLog.setToAmount(convertedAmount);
         forexLog.setExchangeRate(exchangeRate);
 
+        // save log
         ForexLog savedLog = forexLogRepository.save(forexLog);
 
         return new ForexResponse(
@@ -84,11 +98,5 @@ public class ForexService {
                 log.getExchangeTimestamp()
             ))
             .toList();
-    }
-
-    public static class ExchangeAmountException extends RuntimeException {
-        public ExchangeAmountException(String message) {
-            super(message);
-        }
     }
 }
