@@ -16,15 +16,11 @@ export class AuthService {
   constructor(private http: HttpClient) { }
 
   register(registerRequest: RegisterRequest) {
-    return this.http.post<RegisterResponse>(`${environment.apiBaseUrl}/auth/register`, registerRequest, {
-      withCredentials: true,
-    });
+    return this.http.post<RegisterResponse>(`${environment.apiBaseUrl}/auth/register`, registerRequest);
   }
 
   authenticate(authenticationRequest: AuthenticationRequest) {
-    return this.http.post<AuthenticationResponse>(`${environment.apiBaseUrl}/auth/authenticate`, authenticationRequest, {
-      withCredentials: true,
-    }).pipe(
+    return this.http.post<AuthenticationResponse>(`${environment.apiBaseUrl}/auth/authenticate`, authenticationRequest).pipe(
       tap(() => {
         this.markSessionAuthenticated();
       }),
@@ -32,9 +28,7 @@ export class AuthService {
   }
 
   checkSession(): Observable<boolean> {
-    return this.http.get<void>(`${environment.apiBaseUrl}/auth/me`, {
-      withCredentials: true,
-    }).pipe(
+    return this.http.get<void>(`${environment.apiBaseUrl}/auth/me`).pipe(
       map(() => {
         this.markSessionAuthenticated();
         return true;
