@@ -4,7 +4,6 @@ import { RegisterRequest } from '../dto/RegisterRequest';
 import { RegisterResponse } from '../dto/RegisterResponse';
 import { CommonModule } from '@angular/common';
 import { AuthenticationRequest } from '../dto/AuthenticationRequest';
-import { AuthenticationResponse } from '../dto/AuthenticationResponse';
 import { Router } from '@angular/router';
 import { MessageService } from '../services/message.service';
 
@@ -79,9 +78,8 @@ export class LoginContainer {
 
   authenticate (request: AuthenticationRequest) {
     this.authService.authenticate(request).subscribe({
-      next: (response: AuthenticationResponse) => {
+      next: () => {
         this.messageService.setSuccessMessage('Login successful.');
-        this.authService.setAuthToken(response.jwtToken);
         this.router.navigateByUrl('/');
       },
       error: (error) => {

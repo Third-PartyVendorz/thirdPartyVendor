@@ -4,16 +4,16 @@ import { provideHttpClientTesting, HttpTestingController } from '@angular/common
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { authInterceptor } from './AuthInterceptor';
-import { ErrorService } from './services/error.service';
+import { MessageService } from './services/message.service';
+import { environment } from '../../environments/environment.local';
 
 describe('authInterceptor', () => {
   let httpClient: HttpClient;
   let httpTestingController: HttpTestingController;
   let router: { navigateByUrl: ReturnType<typeof vi.fn> };
-  let errorService: ErrorService;
+  let messageService: MessageService;
 
   beforeEach(() => {
-    localStorage.clear();
     router = {
       navigateByUrl: vi.fn(),
     };
@@ -28,46 +28,46 @@ describe('authInterceptor', () => {
 
     httpClient = TestBed.inject(HttpClient);
     httpTestingController = TestBed.inject(HttpTestingController);
-    errorService = TestBed.inject(ErrorService);
-    errorService.clearErrorMessage();
+    messageService = TestBed.inject(MessageService);
+    messageService.clearMessage();
   });
 
   afterEach(() => {
     httpTestingController.verify();
-    localStorage.clear();
-    errorService.clearErrorMessage();
+    messageService.clearMessage();
     vi.restoreAllMocks();
   });
 
-  it('should clear token and redirect to login on 401', () => {
-    localStorage.setItem('authToken', 'fake-token');
-
-    httpClient.get('/secure-resource').subscribe({
+  it('should send credentialed API requests and redirect on 401', () => {
+    httpClient.get(`${environment.apiBaseUrl}/secure-resource`).subscribe({
       error: () => undefined,
     });
 
-    const request = httpTestingController.expectOne('/secure-resource');
-    expect(request.request.headers.get('Authorization')).toBe('Bearer fake-token');
+    const request = httpTestingController.expectOne(`${environment.apiBaseUrl}/secure-resource`);
+    expect(request.request.withCredentials).toBe(true);
+    expect(request.request.headers.has('Authorization')).toBe(false);
 
     request.flush({ message: 'Unauthorized' }, { status: 401, statusText: 'Unauthorized' });
 
-    expect(localStorage.getItem('authToken')).toBeNull();
     expect(router.navigateByUrl).toHaveBeenCalledWith('/login');
-    expect(errorService.errorMessage()).toBeNull();
+    expect(messageService.message()).toEqual({
+      type: 'error',
+      text: 'Your session has expired. Please log in again.',
+    });
   });
 
   it('should set a shared error message on 403', () => {
-    localStorage.setItem('authToken', 'fake-token');
-
-    httpClient.get('/secure-resource').subscribe({
+    httpClient.get(`${environment.apiBaseUrl}/secure-resource`).subscribe({
       error: () => undefined,
     });
 
-    const request = httpTestingController.expectOne('/secure-resource');
+    const request = httpTestingController.expectOne(`${environment.apiBaseUrl}/secure-resource`);
     request.flush({ message: 'Forbidden' }, { status: 403, statusText: 'Forbidden' });
 
-    expect(localStorage.getItem('authToken')).toBe('fake-token');
     expect(router.navigateByUrl).not.toHaveBeenCalled();
-    expect(errorService.errorMessage()).toBe('You do not have permission to access this resource.');
+    expect(messageService.message()).toEqual({
+      type: 'error',
+      text: 'You do not have permission to access this resource.',
+    });
   });
 });

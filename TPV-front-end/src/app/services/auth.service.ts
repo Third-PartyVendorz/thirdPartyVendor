@@ -5,31 +5,57 @@ import { RegisterResponse } from '../dto/RegisterResponse';
 import { AuthenticationRequest } from '../dto/AuthenticationRequest';
 import { AuthenticationResponse } from '../dto/AuthenticationResponse';
 import { environment } from '../../environments/environment.local';
+import { catchError, map, Observable, of, tap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+  private authenticatedSession: boolean | null = null;
+
   constructor(private http: HttpClient) { }
 
   register(registerRequest: RegisterRequest) {
-    return this.http.post<RegisterResponse>(`${environment.apiBaseUrl}/auth/register`, registerRequest);
+    return this.http.post<RegisterResponse>(`${environment.apiBaseUrl}/auth/register`, registerRequest, {
+      withCredentials: true,
+    });
   }
 
   authenticate(authenticationRequest: AuthenticationRequest) {
-    return this.http.post<AuthenticationResponse>(`${environment.apiBaseUrl}/auth/authenticate`, authenticationRequest);
+    return this.http.post<AuthenticationResponse>(`${environment.apiBaseUrl}/auth/authenticate`, authenticationRequest, {
+      withCredentials: true,
+    }).pipe(
+      tap(() => {
+        this.markSessionAuthenticated();
+      }),
+    );
   }
 
-  getAuthToken() {
-    return localStorage.getItem('authToken');
+  checkSession(): Observable<boolean> {
+    return this.http.get<void>(`${environment.apiBaseUrl}/auth/me`, {
+      withCredentials: true,
+    }).pipe(
+      map(() => {
+        this.markSessionAuthenticated();
+        return true;
+      }),
+      catchError(() => {
+        this.markSessionExpired();
+        return of(false);
+      }),
+    );
   }
 
-  setAuthToken(token: string) {
-    localStorage.setItem('authToken', token);
+  getSessionState() {
+    return this.authenticatedSession;
   }
 
-  clearAuthToken() {
-    localStorage.removeItem('authToken');
+  markSessionAuthenticated() {
+    this.authenticatedSession = true;
+  }
+
+  markSessionExpired() {
+    this.authenticatedSession = false;
   }
 
 }
