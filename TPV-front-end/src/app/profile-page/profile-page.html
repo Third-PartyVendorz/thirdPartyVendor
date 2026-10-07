@@ -1,0 +1,68 @@
+<section class="profile-page">
+	<header class="profile-hero card-shell">
+		<div class="profile-identity">
+			<div class="avatar-wrap" aria-hidden="true">
+				<img src="/profile-icon.jpg" alt="" />
+			</div>
+
+			<div class="identity-copy">
+				<p class="eyebrow">Profile</p>
+				<h1>{{ userContext?.firstName || 'FirstName' }} {{ userContext?.lastName || 'LastName' }}</h1>
+				<p class="role-line">Trader</p>
+				<p class="supporting-copy">Manage your account details, contact information, and security settings from one place.</p>
+			</div>
+		</div>
+
+		<div class="hero-actions">
+			<button class="secondary-action" type="button">Edit profile</button>
+			<button class="primary-action" type="button">Delete / Pause Account</button>
+		</div>
+	</header>
+
+	<div class="profile-grid">
+		<div class="profile-main">
+			<section class="details-card card-shell">
+				<div class="section-heading">
+					<div>
+						<p class="eyebrow">Account Details</p>
+						<h2>Public and login information</h2>
+					</div>
+				</div>
+
+				<div class="details-list">
+					<div class="detail-row">
+						<span class="label">Username</span>
+						<span class="value-pill">{{ userContext?.firstName || 'currentUsrName' }}</span>
+						<span class="muted-action">NewUsrName</span>
+					</div>
+					<div class="detail-row">
+						<span class="label">Password</span>
+						<span class="value-pill">************</span>
+						<span class="muted-action">Update</span>
+					</div>
+				</div>
+			</section>
+
+			<section class="contact-card card-shell">
+				<div class="section-heading">
+					<div>
+						<p class="eyebrow">Contact Information</p>
+						<h2>Where we can reach you</h2>
+					</div>
+				</div>
+
+				<div class="contact-grid">
+					<div class="contact-item">
+						<span class="label">Email</span>
+						<span class="value-pill">{{ userContext?.email || 'Not available' }}</span>
+					</div>
+					<div class="contact-item">
+						<span class="label">Phone Number</span>
+						<span class="value-pill">{{ userContext?.phoneNumber || 'Not available' }}</span>
+					</div>
+				</div>
+			</section>
+		</div>
+
+	</div>
+</section>

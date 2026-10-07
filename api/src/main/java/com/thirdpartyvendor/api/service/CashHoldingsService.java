@@ -93,4 +93,30 @@ public class CashHoldingsService {
             ))
             .toList();
     }
+
+    public CashHoldingResponse deposit(String currencyCode, BigDecimal amount, Long userId) {
+        validateCurrencyCode(currencyCode);
+
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new InvalidCurrencyException("Deposit amount must be greater than 0");
+        }
+
+        CashHolding cashHolding = cashHoldingsRepository.findByUserIdAndCurrencyCode(userId, currencyCode)
+            .orElseGet(() -> {
+                CashHolding newHolding = new CashHolding();
+                newHolding.setUserId(userId);
+                newHolding.setCurrencyCode(currencyCode);
+                newHolding.setBalance(BigDecimal.ZERO);
+                return newHolding;
+            });
+
+        BigDecimal newBalance = cashHolding.getBalance().add(amount);
+        cashHolding.setBalance(newBalance);
+        cashHoldingsRepository.save(cashHolding);
+
+        return new CashHoldingResponse(
+            cashHolding.getCurrencyCode(),
+            cashHolding.getBalance()
+        );
+    }
 }

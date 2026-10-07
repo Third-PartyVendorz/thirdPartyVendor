@@ -6,7 +6,9 @@ import { CommonModule } from '@angular/common';
 import { AuthenticationRequest } from '../dto/AuthenticationRequest';
 import { AuthenticationResponse } from '../dto/AuthenticationResponse';
 import { Router } from '@angular/router';
-import { ErrorService } from '../services/error.service';
+import { MessageService } from '../services/message.service';
+import { UserContextService } from '../services/user-context.service';
+import { UserContext } from '../dto/UserContext';
 
 @Component({
   standalone: true,
@@ -18,7 +20,8 @@ import { ErrorService } from '../services/error.service';
 export class LoginContainer {
   constructor(
     private authService: AuthService,
-    private errorService: ErrorService,
+    private messageService: MessageService,
+    private userContextService: UserContextService,
     private router: Router,
   ) {}
 
@@ -46,6 +49,8 @@ export class LoginContainer {
       dateOfBirth: new Date(String(formData.get('dateOfBirth') ?? '')),
     };
 
+    form.reset();
+
     this.register(request);
   }
 
@@ -58,16 +63,19 @@ export class LoginContainer {
       email: String(formData.get('email') ?? ''),
       password: String(formData.get('password') ?? ''),
     };
+
+    form.reset();
+
     this.authenticate(request);
   }
 
   register(request: RegisterRequest) {
     this.authService.register(request).subscribe({
       next: (response: RegisterResponse) => {
-        console.log('Registration successful: ', response);
+        this.messageService.setSuccessMessage('Registration successful. You can now log in.');
       },
       error: (error) => {
-        console.error('Registration failed: ', error);
+        this.messageService.setErrorMessage('Registration failed: ' + error.error.message);
       },
     });
   }
@@ -75,13 +83,20 @@ export class LoginContainer {
   authenticate (request: AuthenticationRequest) {
     this.authService.authenticate(request).subscribe({
       next: (response: AuthenticationResponse) => {
-        this.errorService.clearErrorMessage();
+        this.messageService.setSuccessMessage('Login successful.');
         this.authService.setAuthToken(response.jwtToken);
+        const userContext: UserContext = {
+          firstName: response.firstName,
+          lastName: response.lastName,
+          phoneNumber: response.phoneNumber,
+          dateOfBirth: response.dateOfBirth,
+          email: response.email
+        }
+        this.userContextService.setUserContext(userContext);
         this.router.navigateByUrl('/');
-        console.log('Login Successful');
       },
       error: (error) => {
-        console.error('Login failed: ', error);
+        this.messageService.setErrorMessage('Login failed: ' + error.error.message);
       }
     })
   }

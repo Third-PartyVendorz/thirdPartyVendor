@@ -5,6 +5,9 @@
   "compilerOptions": {
     "types": []
   },
+  "files": [
+    "src/environments/environment.local.ts"
+  ],
   "include": [
     "src/**/*.ts"
   ],
