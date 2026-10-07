@@ -38,10 +38,7 @@ export class HoldingsTable implements OnInit {
     this.isLoading = true;
     this.errorMessage = null;
 
-    // TODO: Get actual userId from your auth/user service
-    const userId = 'user123'; // Replace with actual user ID
-
-    this.holdingService.fetchHoldings(userId).subscribe({
+    this.holdingService.fetchHoldings().subscribe({
       next: (data: Holding[]) => {
         this.holdings = data;
         this.isLoading = false;
