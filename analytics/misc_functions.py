@@ -50,7 +50,8 @@ def get_custom_date_trades_query(start_date, end_date):
     WITH filtered_trades AS (
         SELECT t.*
         FROM trade t
-        WHERE t.trade_timestamp BETWEEN %s AND %s
+        WHERE CAST(t.trade_timestamp AS DATE) >= CAST(%s AS DATE) 
+          AND CAST(t.trade_timestamp AS DATE) <= CAST(%s AS DATE)
     )
     SELECT ft.*, o.*, h.*
     FROM filtered_trades ft

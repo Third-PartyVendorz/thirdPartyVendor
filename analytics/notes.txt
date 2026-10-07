@@ -23,12 +23,12 @@ Plan:
  - Finalize basic analytics - done
  - API send basic payload to frontend - done
  - Implement basic frontend - done
- - Implement custom job
- - Major clean-up
-    - rounding errors
-    - Total orders and volume instead of split
-    - 
-    - 
+ - Implement custom job - done
+ - Clean up:
+      - Date validation check for custom job - done
+      - Clean up queries --> inclusivity and same day - done
+      - Handling empty DF on Frontend
+      - Query for count and volume metrics?
  - Implement non-blocking scheduling of some variety
  - Implement non-blocking strategy with frontend
  - Verify Valid Auth flow
