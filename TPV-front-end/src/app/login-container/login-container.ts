@@ -84,7 +84,7 @@ export class LoginContainer {
     this.authService.authenticate(request).subscribe({
       next: (response: AuthenticationResponse) => {
         this.messageService.setSuccessMessage('Login successful.');
-                const userContext: UserContext = {
+          const userContext: UserContext = {
           firstName: response.firstName,
           lastName: response.lastName,
           phoneNumber: response.phoneNumber,

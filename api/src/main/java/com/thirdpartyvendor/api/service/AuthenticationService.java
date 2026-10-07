@@ -13,6 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.thirdpartyvendor.api.dto.AuthenticationRequest;
 import com.thirdpartyvendor.api.dto.AuthenticationResponse;
+import com.thirdpartyvendor.api.dto.AuthenticationJwtModel;
 import com.thirdpartyvendor.api.repository.AppUserRepository;
 import com.thirdpartyvendor.api.entity.AppUser;
 
@@ -32,7 +33,7 @@ public class AuthenticationService {
 		this.jwtService = jwtService;
 	}
 
-	public AuthenticationResponse authenticate(AuthenticationRequest request) {
+	public AuthenticationJwtModel authenticate(AuthenticationRequest request) {
 		String email = normalizeEmail(request.email());
 		String password = request.password() == null ? null : request.password().trim();
 
@@ -47,13 +48,14 @@ public class AuthenticationService {
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
 		}
 
-		return new AuthenticationResponse(
-			jwtService.generateToken(user),
+		return new AuthenticationJwtModel(
 			user.getFirstName(),
 			user.getLastName(),
 			user.getPhoneNumber(),
 			user.getDateOfBirth(),
-			user.getEmail()
+			user.getEmail(),
+			jwtService.generateToken(user),
+			user.getId()
 		);
 	}
 
