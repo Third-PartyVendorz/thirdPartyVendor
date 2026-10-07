@@ -7,7 +7,7 @@
 
 			<div class="identity-copy">
 				<p class="eyebrow">Profile</p>
-				<h1>FirstName LastName</h1>
+				<h1>{{ userContext?.firstName || 'FirstName' }} {{ userContext?.lastName || 'LastName' }}</h1>
 				<p class="role-line">Trader</p>
 				<p class="supporting-copy">Manage your account details, contact information, and security settings from one place.</p>
 			</div>
@@ -32,7 +32,7 @@
 				<div class="details-list">
 					<div class="detail-row">
 						<span class="label">Username</span>
-						<span class="value-pill">currentUsrName</span>
+						<span class="value-pill">{{ userContext?.firstName || 'currentUsrName' }}</span>
 						<span class="muted-action">NewUsrName</span>
 					</div>
 					<div class="detail-row">
@@ -53,24 +53,12 @@
 
 				<div class="contact-grid">
 					<div class="contact-item">
-						<span class="label">Home Phone</span>
-						<span class="value-pill">1-(555)-456-7890</span>
-					</div>
-					<div class="contact-item">
-						<span class="label">Home Address 1</span>
-						<span class="value-pill">123 Example St.</span>
-					</div>
-					<div class="contact-item">
 						<span class="label">Email</span>
-						<span class="value-pill">maryjane123@gmail.com</span>
+						<span class="value-pill">{{ userContext?.email || 'Not available' }}</span>
 					</div>
 					<div class="contact-item">
-						<span class="label">Cell Phone</span>
-						<span class="value-pill">1-(555)-222-9999</span>
-					</div>
-					<div class="contact-item">
-						<span class="label">Home Address 2</span>
-						<span class="value-pill">Apartment 4B</span>
+						<span class="label">Phone Number</span>
+						<span class="value-pill">{{ userContext?.phoneNumber || 'Not available' }}</span>
 					</div>
 				</div>
 			</section>

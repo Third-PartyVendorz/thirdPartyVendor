@@ -7,6 +7,8 @@ import { AuthenticationRequest } from '../dto/AuthenticationRequest';
 import { AuthenticationResponse } from '../dto/AuthenticationResponse';
 import { Router } from '@angular/router';
 import { MessageService } from '../services/message.service';
+import { UserContextService } from '../services/user-context.service';
+import { UserContext } from '../dto/UserContext';
 
 @Component({
   standalone: true,
@@ -19,6 +21,7 @@ export class LoginContainer {
   constructor(
     private authService: AuthService,
     private messageService: MessageService,
+    private userContextService: UserContextService,
     private router: Router,
   ) {}
 
@@ -82,6 +85,14 @@ export class LoginContainer {
       next: (response: AuthenticationResponse) => {
         this.messageService.setSuccessMessage('Login successful.');
         this.authService.setAuthToken(response.jwtToken);
+        const userContext: UserContext = {
+          firstName: response.firstName,
+          lastName: response.lastName,
+          phoneNumber: response.phoneNumber,
+          dateOfBirth: response.dateOfBirth,
+          email: response.email
+        }
+        this.userContextService.setUserContext(userContext);
         this.router.navigateByUrl('/');
       },
       error: (error) => {
