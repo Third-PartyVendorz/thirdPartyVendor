@@ -533,6 +533,82 @@
     }
 }
 
+/* ---------------------------------------------------------------------------
+   Custom Date Range Form
+   --------------------------------------------------------------------------- */
+.custom-date-form {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-end;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e2e8f0;
+    margin-bottom: 2rem;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1;
+
+    label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #475569;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+}
+
+.date-input {
+    padding: 0.75rem 1rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    color: #0f172a;
+    background: white;
+    font-family: inherit;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+    &:hover {
+        border-color: #94a3b8;
+    }
+
+    &:focus {
+        outline: none;
+        border-color: #033D6C;
+        box-shadow: 0 0 0 3px rgba(3, 61, 108, 0.1);
+    }
+}
+
+.submit-btn {
+    padding: 0.75rem 2rem;
+    background: #033D6C;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+    white-space: nowrap;
+
+    &:hover {
+        background: #025a96;
+        box-shadow: 0 4px 12px rgba(3, 61, 108, 0.3);
+    }
+
+    &:active {
+        background: #01437a;
+    }
+}
+
 @media (max-width: 1024px) {
     .order-distribution-card {
         .distribution-content {

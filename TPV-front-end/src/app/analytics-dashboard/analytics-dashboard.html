@@ -75,28 +75,30 @@
   </div>
 
   <!-- Custom Date Range Form -->
-  <form *ngIf="timelineMode() === 'custom'" (ngSubmit)="onCustomDateSubmit()">
-    <div>
+  <form *ngIf="timelineMode() === 'custom'" class="custom-date-form" (ngSubmit)="onCustomDateSubmit()">
+    <div class="form-group">
       <label for="startDate">Start Date:</label>
       <input
         id="startDate"
         type="date"
+        class="date-input"
         [value]="customStartDate()"
         (change)="customStartDate.set($any($event.target).value)" />
     </div>
-    <div>
+    <div class="form-group">
       <label for="endDate">End Date:</label>
       <input
         id="endDate"
         type="date"
+        class="date-input"
         [value]="customEndDate()"
         (change)="customEndDate.set($any($event.target).value)" />
     </div>
-    <button type="submit">Submit</button>
+    <button type="submit" class="submit-btn">Submit</button>
   </form>
 
   <!-- Summary Cards -->
-  <section class="summary-section" *ngIf="timelineMode() === 'monthly'">
+  <section class="summary-section" *ngIf="hasActiveData()">
     <div *ngFor="let card of summaryCards()" class="summary-card">
       <div class="card-icon" [style.background]="card.color"></div>
       <div class="card-content">
@@ -107,7 +109,7 @@
   </section>
 
   <!-- Order Distribution Section -->
-  <section class="order-distribution-section" *ngIf="timelineMode() === 'monthly'">
+  <section class="order-distribution-section" *ngIf="hasActiveData()">
     <article class="chart-card order-distribution-card">
       <div class="card-header-with-toggle">
         <h3>Order Distribution by {{ orderDistributionMode() === 'count' ? 'Count' : 'Volume' }}</h3>
@@ -160,7 +162,7 @@
   </section>
 
   <!-- Order Volume by 30 Minute Market Interval -->
-  <section class="market-interval-section" *ngIf="timelineMode() === 'monthly'">
+  <section class="market-interval-section" *ngIf="hasActiveData()">
     <article class="chart-card">
       <div class="card-header-with-toggle">
         <h3>Order Volume by 30 Minute Market Interval</h3>
@@ -191,7 +193,7 @@
   </section>
 
   <!-- Order Volume by Date - Scrollable -->
-  <section class="volume-by-date-section" *ngIf="timelineMode() === 'monthly'">
+  <section class="volume-by-date-section" *ngIf="hasActiveData()">
     <article class="chart-card">
       <div class="card-header-with-toggle">
         <h3>Order Volume by Date</h3>
@@ -235,7 +237,7 @@
   </section>
 
   <!-- Top K Most Traded Assets - Scrollable -->
-  <section class="top-assets-section" *ngIf="timelineMode() === 'monthly'">
+  <section class="top-assets-section" *ngIf="hasActiveData()">
     <article class="chart-card">
       <div class="card-header">
         <h3>Top K Most Traded Assets</h3>

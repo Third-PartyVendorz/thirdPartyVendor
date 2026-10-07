@@ -55,6 +55,7 @@ const EMPTY_CHART: BarChartModel = { ticks: [], columns: [] };
 })
 export class AnalyticsDashboard implements OnInit {
   analyticsResult = signal<AnalyticsResponse | null>(null);
+  customAnalyticsResult = signal<AnalyticsResponse | null>(null);
   loading = signal(false);
 
   // Toggle states for sections
@@ -103,7 +104,7 @@ export class AnalyticsDashboard implements OnInit {
       endDate: this.customEndDate()
     }).subscribe({
       next: (response) => {
-        this.analyticsResult.set(response);
+        this.customAnalyticsResult.set(response);
         console.log('Custom date range analytics response:', response);
       },
       error: (err) => {
@@ -113,10 +114,19 @@ export class AnalyticsDashboard implements OnInit {
   }
 
   // ---------------------------------------------------------------------------
+  // Active analytics data (returns monthly or custom based on timelineMode)
+  // ---------------------------------------------------------------------------
+  readonly activeAnalyticsData = computed<AnalyticsResponse | null>(() => {
+    return this.timelineMode() === 'custom' ? this.customAnalyticsResult() : this.analyticsResult();
+  });
+
+  readonly hasActiveData = computed(() => this.activeAnalyticsData() !== null);
+
+  // ---------------------------------------------------------------------------
   // Summary cards (template section is currently commented out)
   // ---------------------------------------------------------------------------
   readonly summaryCards = computed(() => {
-    const data = this.analyticsResult();
+    const data = this.activeAnalyticsData();
     if (!data) return [];
     return [
       // { label: 'Buy Orders', value: data.buy_count, color: BUY_COLOR },
@@ -132,7 +142,7 @@ export class AnalyticsDashboard implements OnInit {
   // Order distribution: bar + pie (count / volume)
   // ---------------------------------------------------------------------------
   private readonly buySellValues = computed(() => {
-    const data = this.analyticsResult();
+    const data = this.activeAnalyticsData();
     if (!data) return null;
     const isCount = this.orderDistributionMode() === 'count';
     return {
@@ -186,7 +196,7 @@ export class AnalyticsDashboard implements OnInit {
   // Order volume by 30 minute market interval (volume / side)
   // ---------------------------------------------------------------------------
   readonly marketHoursChart = computed<BarChartModel>(() => {
-    const data = this.analyticsResult();
+    const data = this.activeAnalyticsData();
     const sides = data?.volume_by_market_interval_and_side;
     if (!sides) return EMPTY_CHART;
 
@@ -239,7 +249,7 @@ export class AnalyticsDashboard implements OnInit {
   // Order volume by date (volume / side)
   // ---------------------------------------------------------------------------
   readonly volumeByDateRows = computed<DateRow[]>(() => {
-    const data = this.analyticsResult();
+    const data = this.activeAnalyticsData();
     if (!data || !data.trade_volume_by_date) return [];
 
     const buyData = data.trade_volume_by_date_and_side?.['BUY'] ?? {};
@@ -279,7 +289,7 @@ export class AnalyticsDashboard implements OnInit {
   // Top K most traded assets
   // ---------------------------------------------------------------------------
   readonly topAssetsList = computed<Array<{ rank: number; symbol: string; value: number }>>(() => {
-    const data = this.analyticsResult();
+    const data = this.activeAnalyticsData();
     if (!data || !data.top_5_most_traded_assets) return [];
 
     return Object.entries(data.top_5_most_traded_assets)
