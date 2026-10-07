@@ -4,7 +4,6 @@ import { AuthPage } from './auth-page/auth-page';
 import { authGuard } from './auth.guard';
 import { DashboardPage } from './dashboard/dashboard-page/dashboard-page';
 import { HistoryPage } from './history-page/history-page';
-import { TradePage } from './trade-page/trade-page';
 import { MainLayoutComponent } from './layouts/main-layout';
 import { AssetsPage } from './assets-page/assets-page';
 
@@ -30,13 +29,6 @@ export const routes: Routes = [
     component: MainLayoutComponent,
     children: [
       { path: '', component: HistoryPage },
-    ],
-  },
-  {
-    path: 'trade',
-    component: MainLayoutComponent,
-    children: [
-      { path: '', component: TradePage },
     ],
   },
   {

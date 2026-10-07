@@ -1,0 +1,56 @@
+:host {
+  display: inline-block;
+  font-family: inherit;
+}
+
+.slider-track {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  background-color: #e4e4e7; 
+  border-radius: 8px;
+  padding: 4px;
+  cursor: pointer;
+  user-select: none;
+  box-sizing: border-box;
+  outline: none;
+}
+
+.slider-track:focus-visible {
+  box-shadow: 0 0 0 2px #3b82f6;
+}
+
+.track-side {
+  flex: 1;
+  padding: 8px 20px;
+  text-align: center;
+  font-weight: 600;
+  color: white;
+  white-space: nowrap;
+}
+
+.slider-thumb {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  width: calc(50% - 4px);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), 
+              background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.thumb-label {
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+
+.slider-track.active-right .slider-thumb {
+  transform: translateX(100%);
+}

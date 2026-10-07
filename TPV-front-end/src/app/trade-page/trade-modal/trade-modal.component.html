@@ -1,0 +1,5 @@
+<div *ngIf="isOpen" class="modal-backdrop" (click)="onBackdropClick()"></div>
+<div *ngIf="isOpen" class="modal-container">
+	<button class="modal-close" (click)="close()">×</button>
+	<app-trade-form-selector [ticker]="ticker" [assetDetails]="assetDetails" (tradeSubmitted)="close()"></app-trade-form-selector>
+</div>

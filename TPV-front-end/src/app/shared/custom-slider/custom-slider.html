@@ -1,0 +1,23 @@
+<div 
+  class="slider-track" 
+  [class.active-right]="value === rightValue"
+  [style.width]="fullWidth ? '100%' : 'auto'"
+  (click)="toggle()"
+  tabindex="0"
+  (keydown.space)="$event.preventDefault(); toggle()"
+  (keydown.enter)="toggle()"
+  role="switch"
+  [attr.aria-checked]="value === rightValue"
+>
+  <div 
+    class="slider-thumb"
+    [style.background-color]="currentColor"
+  >
+    <span class="thumb-label">
+      {{ value === leftValue ? leftLabel : rightLabel }}
+    </span>
+  </div>
+
+  <div class="track-side">{{ leftLabel }}</div>
+  <div class="track-side">{{ rightLabel }}</div>
+</div>

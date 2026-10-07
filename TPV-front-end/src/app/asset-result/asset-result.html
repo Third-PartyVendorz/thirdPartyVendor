@@ -16,6 +16,10 @@
 							<p class="asset-kicker">{{ currentAsset.exchange }} • {{ currentAsset.currency }}</p>
 							<h1>{{ currentAsset.name }}</h1>
 						</div>
+						<button (click)="onTradeButtonClick(currentAsset.symbol)" class="trade-button">
+							Trade
+							<span class="material-icons-outlined trade-button__icon">compare_arrows</span>
+						</button>
 					</div>
 
 					<div class="asset-price-panel">

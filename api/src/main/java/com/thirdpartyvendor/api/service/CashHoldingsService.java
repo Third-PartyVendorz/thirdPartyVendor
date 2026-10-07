@@ -76,6 +76,12 @@ public class CashHoldingsService {
             });
     }
 
+    public CashHoldingResponse getCashHoldingByUserAndCurrencyCode(Long userId, String currencyCode) {
+        return cashHoldingsRepository.findByUserIdAndCurrencyCode(userId, currencyCode)
+                .map(holding -> new CashHoldingResponse(holding.getCurrencyCode(), holding.getBalance()))
+                .orElseGet(() -> new CashHoldingResponse(currencyCode, BigDecimal.ZERO));
+    }
+
     public List<CashHoldingResponse> getCashHoldingsByUser(Long userId) {
         return cashHoldingsRepository.findByUserId(userId).stream()
             .map(holding -> new CashHoldingResponse(

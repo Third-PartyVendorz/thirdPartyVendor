@@ -1,5 +1,5 @@
 import { CurrencyPipe, DatePipe, DecimalPipe, NgFor, NgIf } from '@angular/common';
-import { Component, DestroyRef, Input, OnInit, inject, signal } from '@angular/core';
+import { Component, DestroyRef, EventEmitter, Input, OnInit, Output, inject, signal } from '@angular/core';
 import { MarketQuoteData } from '../dto/MarketQuoteAPIResponse';
 import { MarketSymbolData } from '../dto/MarketSymbolAPIResponse';
 import { MarketApiService } from '../services/marketApi.service';
@@ -24,6 +24,12 @@ type HistoricalRange = '7d' | '30d' | '1y';
 type HistoricalRangeOption = {
 	value: HistoricalRange;
 	label: string;
+};
+
+export type AssetTradeDetails = {
+	symbol: string;
+	asset: MarketSymbolData;
+	quote: MarketQuoteData;
 };
 
 @Component({
@@ -65,6 +71,8 @@ export class AssetResultComponent implements OnInit {
 			this.tickerInput$.next(normalizedTicker);
 		}
 	}
+
+	@Output() tradeButtonClicked = new EventEmitter<AssetTradeDetails>();
 
 	constructor(
 		private marketApiService: MarketApiService,
@@ -363,5 +371,18 @@ export class AssetResultComponent implements OnInit {
 		const shifted = new Date(date);
 		shifted.setDate(shifted.getDate() + days);
 		return shifted;
+	}
+
+	onTradeButtonClick(symbol: string): void {
+		const assetData = this.asset();
+		const quoteData = this.quote();
+		
+		if (assetData && quoteData) {
+			this.tradeButtonClicked.emit({
+				symbol,
+				asset: assetData,
+				quote: quoteData,
+			});
+		}
 	}
 }

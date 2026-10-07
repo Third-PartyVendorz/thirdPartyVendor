@@ -17,7 +17,7 @@
 	</header>
 
 	<ng-container *ngIf="activeTicker; else emptyState">
-		<app-asset-result [ticker]="activeTicker"></app-asset-result>
+		<app-asset-result [ticker]="activeTicker" (tradeButtonClicked)="openTradeModal($event)"></app-asset-result>
 	</ng-container>
 
 	<ng-template #emptyState>
@@ -27,3 +27,5 @@
 		</article>
 	</ng-template>
 </section>
+
+<app-trade-modal [isOpen]="isTradeModalOpen()" [ticker]="tradeModalTicker()" [assetDetails]="tradeModalAssetDetails()" (closeModal)="closeTradeModal()"></app-trade-modal>

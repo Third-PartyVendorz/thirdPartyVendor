@@ -114,11 +114,12 @@ class OrderServiceTest {
                 null
             )
         );
+    }
 
     @Test
     @DisplayName("Test createOrder successfully with orderPrice")
     void testCreateOrderSuccessfullyWithOrderPrice() {
-        CreateOrderRequest request = new CreateOrderRequest(
+        CreateOrderRequest createOrderRequest = new CreateOrderRequest(
             100L,
             "AAPL",
             Order.OrderIntent.BUY,

@@ -1,0 +1,106 @@
+<div class="trade-form-container">
+	<div *ngIf="assetDetails!" class="trade-header">
+		<div class="trade-header__top">
+			<p class="trade-eyebrow">Trade</p>
+			<div class="asset-hero__identity">
+				<div class="asset-badge">{{ assetDetails.asset.symbol }}</div>
+				<div>
+					<p class="asset-kicker">{{ assetDetails.asset.exchange }} • {{ assetDetails.asset.currency }}</p>
+					<h1>{{ assetDetails.asset.name }}</h1>
+				</div>
+			</div>
+		</div>
+		
+		<div class="trade-header__price">
+			<div class="price-display">
+				<span class="price-value">{{ assetDetails.quote.price | currency:assetDetails.quote.currency:'symbol':'1.2-2' }}</span>
+				<span class="price-change" [class.positive]="assetDetails.quote.change > 0" [class.negative]="assetDetails.quote.change < 0">
+					{{ assetDetails.quote.change > 0 ? '+' : '' }}{{ assetDetails.quote.change | currency:assetDetails.quote.currency:'symbol':'1.2-2' }}
+					<span class="change-percent">({{ assetDetails.quote.changePercent > 0 ? '+' : '' }}{{ assetDetails.quote.changePercent | number:'1.2-2' }}%)</span>
+				</span>
+			</div>
+		</div>
+	</div>
+
+	<app-custom-slider
+      [leftValue]="TradeSide.BUY"
+      [rightValue]="TradeSide.SELL"
+      leftLabel="Buy"
+      rightLabel="Sell"
+      leftColor="#10b981"  
+      rightColor="#ef4444" 
+      [(value)]="currentSide"
+	  style="justify-self: center;"
+    ></app-custom-slider>
+
+	<span class="trade-amount-form" [formGroup]="form">
+		<app-custom-slider
+		[leftValue]="UnitType.SHARES"
+		[rightValue]="UnitType.DOLLARS"
+		leftLabel="Shares"
+		rightLabel="Dollars"
+		leftColor="#3b82f6" 
+		rightColor="#3b82f6"
+		[(value)]="currentUnit"
+		(click)="clearValueInput()"
+		></app-custom-slider>
+		<div style="display: flex; width: 100%; align-items: center;">
+			@if (currentUnit === UnitType.DOLLARS) {
+				<input
+					#inputValue
+					type="text" 
+					inputmode="decimal" 
+					[currencyMask]="{ allowNegative: false, prefix: '$ ', thousands: ',', decimal: '.', precision: 2, align: 'left' }"
+					formControlName="inputValue" 
+					placeholder={{inputPlaceholder()}}
+				/>
+			} @else {
+				<input
+					type="text" 
+					inputmode="decimal" 
+					formControlName="inputValue" 
+					placeholder={{inputPlaceholder()}}
+					(input)="validateDecimalInput($event)"
+				/>
+			}
+		</div>
+	</span>
+	@if (calculatedShares > 0) {
+        <div class="trade-summary">
+            <p>
+              {{ currentSide }} {{ formattedShares }} shares of {{ assetDetails?.asset?.symbol }} 
+              @ {{ assetDetails?.quote?.price | currency:assetDetails?.quote?.currency:'symbol':'1.2-2' }}/share
+            </p>
+            <p>
+              Estimated total: {{ estimatedTotal | currency:assetDetails?.quote?.currency:'symbol':'1.2-2' }}
+            </p>
+        </div>
+    }
+	<button (click)="onTradeButtonClick()" class="trade-button" style="justify-self: center" [disabled]="isInvalidTrade()">
+		Place Trade
+		<span class="material-icons-outlined trade-button__icon">compare_arrows</span>
+	</button>
+
+	@if (showInsufficientFundsMessage) {
+		<div class="insufficient-funds-message">
+			<div class="message-content">
+				<span class="message-text">You have insufficient funds to complete this trade.</span>
+				<button class="close-button" (click)="closeInsufficientFundsMessage()" aria-label="Close message">
+					<span class="material-icons-outlined">close</span>
+				</button>
+			</div>
+		</div>
+	}
+
+	@if (showInsufficientSharesMessage) {
+		<div class="insufficient-funds-message">
+			<div class="message-content">
+				<span class="message-text">You have insufficient shares to complete this trade.</span>
+				<button class="close-button" (click)="closeInsufficientSharesMessage()" aria-label="Close message">
+					<span class="material-icons-outlined">close</span>
+				</button>
+			</div>
+		</div>
+	}
+
+</div>
