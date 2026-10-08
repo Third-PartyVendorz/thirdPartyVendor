@@ -15,6 +15,7 @@ import com.thirdpartyvendor.api.service.AdminService;
 import com.thirdpartyvendor.api.dto.UserResponse;
 import com.thirdpartyvendor.api.dto.OrderResponse;
 import com.thirdpartyvendor.api.dto.TradeResponse;
+import com.thirdpartyvendor.api.dto.CashHoldingResponse;
 import java.util.List;
 
 @RestController
@@ -82,6 +83,14 @@ public class AdminController {
         @AuthenticationPrincipal AppUser currentUser
     ) {
         return adminService.getUserTrades(userId, currentUser);
+    }
+
+    @GetMapping("/users/{userId}/cash-holdings")
+    public List<CashHoldingResponse> getUserCashHoldings(
+        @PathVariable long userId,
+        @AuthenticationPrincipal AppUser currentUser
+    ) {
+        return adminService.getUserCashHoldings(userId, currentUser);
     }
 
 }

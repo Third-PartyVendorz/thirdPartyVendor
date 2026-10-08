@@ -8,24 +8,34 @@ import org.springframework.stereotype.Service;
 import com.thirdpartyvendor.api.dto.UserResponse;
 import com.thirdpartyvendor.api.dto.OrderResponse;
 import com.thirdpartyvendor.api.dto.TradeResponse;
+import com.thirdpartyvendor.api.dto.CashHoldingResponse;
 import com.thirdpartyvendor.api.entity.AppUser;
 import com.thirdpartyvendor.api.entity.Order;
 import com.thirdpartyvendor.api.repository.AppUserRepository;
 import com.thirdpartyvendor.api.repository.OrderRepository;
 import com.thirdpartyvendor.api.repository.TradeRepository;
+import com.thirdpartyvendor.api.repository.CashHoldingsRepository;
 import com.thirdpartyvendor.api.util.AuthorizationUtil;
 import com.thirdpartyvendor.api.error.UserExceptions.UserNotFoundException;
+
 
 @Service
 public class AdminService {
     private final AppUserRepository userRepository;
     private final OrderRepository orderRepository;
     private final TradeRepository tradeRepository;
+    private final CashHoldingsRepository cashHoldingsRepository;
 
-    public AdminService(AppUserRepository userRepository, OrderRepository orderRepository, TradeRepository tradeRepository) {
+    public AdminService(
+        AppUserRepository userRepository, 
+        OrderRepository orderRepository, 
+        TradeRepository tradeRepository,
+        CashHoldingsRepository cashHoldingsRepository
+    ) {
         this.userRepository = userRepository;
         this.orderRepository = orderRepository;
         this.tradeRepository = tradeRepository;
+        this.cashHoldingsRepository = cashHoldingsRepository;
     }
 
     public List<UserResponse> getAllUsers(AppUser currentUser) {
@@ -85,6 +95,17 @@ public class AdminService {
                     trade.getTradeCurrency()
                 );
             }).collect(Collectors.toList());
+    }
+
+    public List<CashHoldingResponse> getUserCashHoldings(Long userId, AppUser currentUser) {
+        AuthorizationUtil.requireAdmin(currentUser);
+
+        return cashHoldingsRepository.findByUserId(userId).stream()
+            .map(
+                cashHoldings -> new CashHoldingResponse(
+                    cashHoldings.getCurrencyCode(),
+                    cashHoldings.getBalance()
+            )).collect(Collectors.toList());
     }
 
     private UserResponse mapToResponse(AppUser user) {
