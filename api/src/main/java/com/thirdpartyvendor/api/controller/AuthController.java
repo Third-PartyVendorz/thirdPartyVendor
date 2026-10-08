@@ -21,6 +21,7 @@ import com.thirdpartyvendor.api.dto.RegisterRequest;
 import com.thirdpartyvendor.api.dto.RegisterResponse;
 import com.thirdpartyvendor.api.entity.RefreshToken;
 import com.thirdpartyvendor.api.service.AuthenticationService;
+import com.thirdpartyvendor.api.service.JwtService;
 import com.thirdpartyvendor.api.service.RefreshService;
 import com.thirdpartyvendor.api.service.RegistrationService;
 
@@ -34,14 +35,23 @@ public class AuthController {
 	private final RegistrationService registrationService;
 	private final AuthenticationService authenticationService;
 	private final RefreshService refreshService;
+	private final JwtService jwtService;
 
 	@Value("${app.jwt.expiration-ms}")
 	private long jwtExpirationMs;
 
-	public AuthController(RegistrationService registrationService, AuthenticationService authenticationService, RefreshService refreshService) {
+	@Value("${app.jwt.refresh-expiration-ms}")
+	private long refreshExpirationMs;
+
+	public AuthController(
+			RegistrationService registrationService,
+			AuthenticationService authenticationService,
+			RefreshService refreshService,
+			JwtService jwtService) {
 		this.registrationService = registrationService;
 		this.authenticationService = authenticationService;
 		this.refreshService = refreshService;
+		this.jwtService = jwtService;
 	}
 
 	@PostMapping("/register")
@@ -56,22 +66,10 @@ public class AuthController {
 			HttpServletResponse response) {
 		AuthenticationJwtModel authJwtModel = authenticationService.authenticate(request);
 		RefreshToken refreshToken = refreshService.createRefreshToken(authJwtModel.userId());
-		ResponseCookie authCookie = ResponseCookie.from("authToken", authJwtModel.jwtToken())
-			.httpOnly(true)
-			.secure(httpRequest.isSecure())
-			.path("/")
-			.maxAge(Duration.ofMillis(jwtExpirationMs))
-			.sameSite("Strict")
-			.build();
-		ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", refreshToken.getToken())
-			.httpOnly(true)
-			.secure(httpRequest.isSecure())
-			.path("/auth/refresh")
-			.maxAge(Duration.ofMillis(jwtExpirationMs))
-			.sameSite("Strict")
-			.build();
-		response.addHeader(HttpHeaders.SET_COOKIE, authCookie.toString());
-		response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+
+		response.addHeader(HttpHeaders.SET_COOKIE, buildAuthCookie(httpRequest, authJwtModel.jwtToken()).toString());
+		response.addHeader(HttpHeaders.SET_COOKIE, buildRefreshCookie(httpRequest, refreshToken.getToken()).toString());
+
 		AuthenticationResponse authResponse = new AuthenticationResponse(
 			authJwtModel.firstName(),
 			authJwtModel.lastName(),
@@ -91,20 +89,53 @@ public class AuthController {
 	public ResponseEntity<Void> refresh(
 			HttpServletRequest httpRequest,
 			HttpServletResponse response) {
-		String refreshToken = null;
-		for (var cookie : httpRequest.getCookies()) {
-				if ("refreshToken".equals(cookie.getName())) {
-					refreshToken = cookie.getValue();
-					break;
-				}
-		}
+		String refreshToken = getCookieValue(httpRequest, "refreshToken");
 		if (refreshToken == null) {
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Please login again");
 		}
 
+		RefreshToken rotatedRefreshToken = refreshService.rotateRefreshToken(refreshToken);
+		if (rotatedRefreshToken == null) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Please login again");
+		}
+
+		response.addHeader(HttpHeaders.SET_COOKIE, buildRefreshCookie(httpRequest, rotatedRefreshToken.getToken()).toString());
+		response.addHeader(HttpHeaders.SET_COOKIE, buildAuthCookie(httpRequest, jwtService.generateToken(rotatedRefreshToken.getUser())).toString());
+
 		return ResponseEntity.ok().build();
-		
+	}
 
+	private String getCookieValue(HttpServletRequest request, String cookieName) {
+		if (request.getCookies() == null) {
+			return null;
+		}
 
+		for (var cookie : request.getCookies()) {
+			if (cookieName.equals(cookie.getName())) {
+				return cookie.getValue();
+			}
+		}
+
+		return null;
+	}
+
+	private ResponseCookie buildAuthCookie(HttpServletRequest request, String value) {
+		return ResponseCookie.from("authToken", value)
+			.httpOnly(true)
+			.secure(request.isSecure())
+			.path("/")
+			.maxAge(Duration.ofMillis(jwtExpirationMs))
+			.sameSite("Strict")
+			.build();
+	}
+
+	private ResponseCookie buildRefreshCookie(HttpServletRequest request, String value) {
+		return ResponseCookie.from("refreshToken", value)
+			.httpOnly(true)
+			.secure(request.isSecure())
+			.path("/auth/refresh")
+			.maxAge(Duration.ofMillis(refreshExpirationMs))
+			.sameSite("Strict")
+			.build();
 	}
 }

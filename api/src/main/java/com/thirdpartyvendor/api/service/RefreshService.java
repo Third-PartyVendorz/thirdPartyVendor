@@ -35,4 +35,16 @@ public class RefreshService {
     public boolean isRefreshTokenExpired(RefreshToken token) {
         return token.getExpiryDate().isBefore(Instant.now());
     }
+
+
+    public RefreshToken rotateRefreshToken(String refreshToken) {
+        RefreshToken existingToken = refreshRepository.findByToken(refreshToken).orElse(null);
+        if (existingToken != null && !isRefreshTokenExpired(existingToken)) {
+            existingToken.setToken(UUID.randomUUID().toString());
+            existingToken.setExpiryDate(Instant.now().plusMillis(refreshExpirationMs));
+            return refreshRepository.save(existingToken);
+        }
+        return null;
+
+    }
 }

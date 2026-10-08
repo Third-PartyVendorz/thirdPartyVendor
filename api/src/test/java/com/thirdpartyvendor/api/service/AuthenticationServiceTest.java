@@ -15,7 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.thirdpartyvendor.api.dto.AuthenticationRequest;
-import com.thirdpartyvendor.api.dto.AuthenticationResponse;
+import com.thirdpartyvendor.api.dto.AuthenticationJwtModel;
 import com.thirdpartyvendor.api.entity.AppUser;
 import com.thirdpartyvendor.api.entity.AppUser.UserRole;
 import com.thirdpartyvendor.api.repository.AppUserRepository;
@@ -39,10 +39,12 @@ class AuthenticationServiceTest {
 
 		when(appUserRepository.findByEmailAndActiveTrue("jane.doe@example.com")).thenReturn(Optional.of(user));
 
-		AuthenticationResponse response = authenticationService.authenticate(new AuthenticationRequest(
+		AuthenticationJwtModel response = authenticationService.authenticate(new AuthenticationRequest(
 			"jane.doe@example.com",
 			"secret123"));
 
+		assertEquals("jane.doe@example.com", response.email());
+		assertEquals(1L, response.userId());
 		assertNotNull(response.jwtToken());
 		assertEquals(true, response.jwtToken().length() > 0);
 	}
