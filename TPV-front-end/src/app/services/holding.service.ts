@@ -19,16 +19,9 @@ export class HoldingService {
         return of(MOCK_HOLDINGS);
     }
 
-    private fetchHoldingsFromAPI(): Observable<Holding[]> {
-        const token = this.authService.getAuthToken();
-        const headers = new HttpHeaders({
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-        });
-
+    fetchHoldingsFromAPI(): Observable<Holding[]> {
         return this.http.get<Holding[]>(
-            `${environment.apiBaseUrl}/holdings/}`,
-            { headers }
+            `${environment.apiBaseUrl}/holdings`,
         );
     }
 }
