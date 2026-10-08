@@ -27,10 +27,20 @@ Plan:
  - Clean up:
       - Date validation check for custom job - done
       - Clean up queries --> inclusivity and same day - done
-      - Handling empty DF on Frontend
-      - Query for count and volume metrics?
- - Implement non-blocking scheduling of some variety
- - Implement non-blocking strategy with frontend
- - Verify Valid Auth flow
+ - Implement non-blocking scheduling of some variety - done
+ - Implement non-blocking strategy with frontend - done
+ - Clean up 2:
+      - Cleaning up queries
+          - Not all columns needed
+          - Correct joins with trade and orders tables --> data leakage
+      - Clean up frontend
+          - Small details like order vs trade - done
+          - Display current month on default analytics job
  - Dockerize analytics service
+
+
+
+
+
+ - ********Verify Valid Auth flow********* --> This shit boutta be hard
 
