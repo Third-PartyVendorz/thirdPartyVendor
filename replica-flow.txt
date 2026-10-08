@@ -1,0 +1,48 @@
+https://medium.com/@thisis-Shitanshu/read-replica-using-postgresql-a4a70a0e96a3
+
+
+
+
+Logical Replication Workflow:
+
+1. Build out docker-compose file--> Tweaks from medium.com example
+
+2. docker-compose up -d
+
+3. run spring api --> loads schema into main db
+
+4. Connect to main db --> docker exec -it tpv-postgres psql -U postgres -d tpvdb
+
+5. Create PUBLICATION in main db: -----> This needs to be Flyway
+
+CREATE PUBLICATION pub_tpvdb FOR TABLE
+   cash_holdings,
+   exchange_log,
+   holdings,
+   orders,
+   trade,
+   users;
+
+6. Connect to replica db --> docker exec -it tpv-replica psql -U analyst -d tpvdbreplica
+
+7. Initialize the duplicate schema in replica db --> Must be identical because we are on replica mode ---> Init command in replica compose
+    - With logical mode you can pick and choose which tables to replicate
+
+8. Add subscription in replica table ---> Init command in replica DB
+
+CREATE SUBSCRIPTION sub_tpvreplica
+CONNECTION 'host=tpv-postgres port=5432 dbname=tpvdb user=$$$ password=$$$'
+PUBLICATION pub_tpvdb
+WITH (create_slot = true, copy_data = true);
+
+9. Test with an insert statement
+
+INSERT INTO orders (order_id, user_id, asset_id, order_intent, quantity, order_price, status, created_at, order_currency) VALUES
+(7, 1, 1, 'BUY', 5.0000, 155.00, 'FILLED', '2026-09-01 09:35:00', 'USD');
+
+
+Streaming Workflow:
+
+https://medium.com/@gurungswastik1990/configuring-streaming-replication-in-postgresql-using-docker-46951f3d2fb7
+
+

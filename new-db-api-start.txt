@@ -1,0 +1,31 @@
+INITIALIZE YOUR DB WITH:
+
+1. 
+
+docker-compose up -d
+
+2. 
+
+mvn spring-boot:run
+
+3. 
+
+source ./.env
+
+docker exec -it tpv-replica psql -U ${REPLICA_POSTGRES_USER} -d ${REPLICA_POSTGRES_DB} -c "CREATE SUBSCRIPTION sub_tpvreplica
+CONNECTION 'host=tpv-postgres port=5432 dbname=${POSTGRES_DB} user=${POSTGRES_USER} password=${POSTGRES_PASSWORD}'
+PUBLICATION pub_tpvdb
+WITH (create_slot = true, copy_data = true);"
+
+
+
+STOP OR START DB WITH:
+
+docker-compose stop
+
+docker-compose start
+
+
+IF YOU RUN:
+
+docker-compose down  -->  YOU WILL NEED TO REINITIALIZE THE DB
