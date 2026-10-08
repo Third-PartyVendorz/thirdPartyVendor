@@ -16,8 +16,6 @@ import com.thirdpartyvendor.api.repository.TradeRepository;
 
 import jakarta.transaction.Transactional;
 
-import com.thirdpartyvendor.api.model.Currency;
-
 @Service
 public class OrderExecutionService {
 
@@ -60,17 +58,15 @@ public class OrderExecutionService {
         BigDecimal executionQuantity = resolveExecutionQuantity(order, executionPrice);
         BigDecimal tradeAmount = resolveTradeAmount(order, executionQuantity, executionPrice);
 
-        Currency currency = Currency.of(order.getOrderCurrency());
-
         if (order.getOrderIntent() == Order.OrderIntent.BUY) {
-            cashHoldingsService.validateSufficientCash(currency, tradeAmount, userId);
+            cashHoldingsService.ensureSufficientCash(order.getOrderCurrency(), tradeAmount, userId);
         }
 
         Holding holding = loadExecutionHolding(order, userId);
 
         applyHoldingChange(order, holding, executionQuantity);
 
-        cashHoldingsService.ensureCashHoldingExists(currency, userId);
+        cashHoldingsService.ensureCashHoldingExists(order.getOrderCurrency(), userId);
         applyCashChange(order, userId, tradeAmount);
 
         Trade trade = new Trade();
@@ -137,12 +133,12 @@ public class OrderExecutionService {
     }
 
     private void applyCashChange(Order order, Long userId, BigDecimal tradeAmount) {
-        Currency currency = Currency.of(order.getOrderCurrency());
         if (order.getOrderIntent() == Order.OrderIntent.BUY) {
-            cashHoldingsService.subtractCashHolding(currency, tradeAmount, userId);
+            cashHoldingsService.updateCashHolding(order.getOrderCurrency(), tradeAmount.negate(), userId);
             return;
         }
-        cashHoldingsService.addCashHolding(currency, tradeAmount, userId);
+
+        cashHoldingsService.updateCashHolding(order.getOrderCurrency(), tradeAmount, userId);
     }
 
     public static class OrderExecutionException extends RuntimeException {
