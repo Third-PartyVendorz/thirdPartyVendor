@@ -118,7 +118,7 @@
   <section class="order-distribution-section" *ngIf="hasActiveData()">
     <article class="chart-card order-distribution-card">
       <div class="card-header-with-toggle">
-        <h3>Order Distribution by {{ orderDistributionMode() === 'count' ? 'Count' : 'Volume' }}</h3>
+        <h3>Trade Distribution by {{ orderDistributionMode() === 'count' ? 'Count' : 'Volume' }}</h3>
         <div class="toggle-buttons">
           <button
             type="button"
@@ -171,7 +171,7 @@
   <section class="market-interval-section" *ngIf="hasActiveData()">
     <article class="chart-card">
       <div class="card-header-with-toggle">
-        <h3>Order Volume by 30 Minute Market Interval</h3>
+        <h3>Trade Volume by 30 Minute Market Interval</h3>
         <div class="toggle-buttons">
           <button
             type="button"
@@ -202,7 +202,7 @@
   <section class="volume-by-date-section" *ngIf="hasActiveData()">
     <article class="chart-card">
       <div class="card-header-with-toggle">
-        <h3>Order Volume by Date</h3>
+        <h3>Trade Volume by Date</h3>
         <div class="toggle-buttons">
           <button
             type="button"
