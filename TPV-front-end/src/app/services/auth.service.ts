@@ -6,6 +6,7 @@ import { AuthenticationRequest } from '../dto/AuthenticationRequest';
 import { AuthenticationResponse } from '../dto/AuthenticationResponse';
 import { environment } from '../../environments/environment.local';
 import { catchError, map, Observable, of, tap } from 'rxjs';
+import { UserContextService } from './user-context.service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +14,7 @@ import { catchError, map, Observable, of, tap } from 'rxjs';
 export class AuthService {
   private authenticatedSession: boolean | null = null;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private userContextService: UserContextService) { }
 
   register(registerRequest: RegisterRequest) {
     return this.http.post<RegisterResponse>(`${environment.apiBaseUrl}/auth/register`, registerRequest);
@@ -21,6 +22,14 @@ export class AuthService {
 
   authenticate(authenticationRequest: AuthenticationRequest) {
     return this.http.post<AuthenticationResponse>(`${environment.apiBaseUrl}/auth/authenticate`, authenticationRequest).pipe(
+      tap(() => {
+        this.markSessionAuthenticated();
+      }),
+    );
+  }
+
+  refreshToken() {
+    return this.http.post<void>(`${environment.apiBaseUrl}/auth/refresh`, {}).pipe(
       tap(() => {
         this.markSessionAuthenticated();
       }),
@@ -50,6 +59,7 @@ export class AuthService {
 
   markSessionExpired() {
     this.authenticatedSession = false;
+    this.userContextService.clearUserContext();
   }
 
 }

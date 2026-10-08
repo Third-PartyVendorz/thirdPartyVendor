@@ -4,5 +4,16 @@
     <p class="home-page__eyebrow">You are logged in</p>
     <h1>Welcome back</h1>
     <p class="home-page__copy">Your account is active and you can continue using the app.</p>
+    <div class="home-page__tester">
+      <button type="button" class="home-page__button" (click)="testProtectedRequest()" [disabled]="isTesting">
+        {{ isTesting ? 'Testing...' : 'Test expired access token' }}
+      </button>
+      <p class="home-page__status">{{ testStatus }}</p>
+      <p class="home-page__result" *ngIf="testResult">{{ testResult }}</p>
+      <p class="home-page__hint">
+        Temporary test only: wait for the access token to expire, then click the button and confirm the protected request
+        still succeeds through the refresh flow.
+      </p>
+    </div>
   </div>
 </section>

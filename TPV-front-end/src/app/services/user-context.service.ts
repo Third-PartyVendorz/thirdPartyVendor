@@ -36,4 +36,8 @@ export class UserContextService {
   setUserContext(userContext: UserContext) {
     localStorage.setItem('userContext', JSON.stringify(userContext));
   }
+
+  clearUserContext() {
+    localStorage.removeItem('userContext');
+  }
 }

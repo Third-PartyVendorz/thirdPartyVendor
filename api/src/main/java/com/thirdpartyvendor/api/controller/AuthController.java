@@ -13,12 +13,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import com.thirdpartyvendor.api.dto.AuthenticationJwtModel;
 import com.thirdpartyvendor.api.dto.AuthenticationRequest;
 import com.thirdpartyvendor.api.dto.AuthenticationResponse;
 import com.thirdpartyvendor.api.dto.RegisterRequest;
 import com.thirdpartyvendor.api.dto.RegisterResponse;
+import com.thirdpartyvendor.api.entity.AppUser;
 import com.thirdpartyvendor.api.entity.RefreshToken;
 import com.thirdpartyvendor.api.service.AuthenticationService;
 import com.thirdpartyvendor.api.service.JwtService;
@@ -81,7 +83,11 @@ public class AuthController {
 	}
 
 	@GetMapping("/me")
-	public ResponseEntity<Void> me() {
+	public ResponseEntity<Void> me(@AuthenticationPrincipal AppUser currentUser) {
+		if (currentUser == null) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Please login again");
+		}
+
 		return ResponseEntity.ok().build();
 	}
 

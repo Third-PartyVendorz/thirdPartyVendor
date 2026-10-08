@@ -25,7 +25,7 @@ public class RefreshService {
     }
 
     public RefreshToken createRefreshToken(Long userId) {
-        RefreshToken token = new RefreshToken();
+        RefreshToken token = refreshRepository.findByUser_Id(userId).orElseGet(RefreshToken::new);
         token.setUser(userRepository.findById(userId).get());
         token.setToken(UUID.randomUUID().toString());
         token.setExpiryDate(Instant.now().plusMillis(refreshExpirationMs));
@@ -36,7 +36,6 @@ public class RefreshService {
         return token.getExpiryDate().isBefore(Instant.now());
     }
 
-
     public RefreshToken rotateRefreshToken(String refreshToken) {
         RefreshToken existingToken = refreshRepository.findByToken(refreshToken).orElse(null);
         if (existingToken != null && !isRefreshTokenExpired(existingToken)) {
@@ -44,7 +43,7 @@ public class RefreshService {
             existingToken.setExpiryDate(Instant.now().plusMillis(refreshExpirationMs));
             return refreshRepository.save(existingToken);
         }
-        return null;
 
+        return null;
     }
 }

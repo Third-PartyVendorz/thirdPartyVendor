@@ -2,7 +2,7 @@ import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from './services/auth.service';
 import { MessageService } from './services/message.service';
-import { map } from 'rxjs';
+import { catchError, map, of, switchMap } from 'rxjs';
 
 export const authGuard: CanActivateFn = () => {
   const authService = inject(AuthService);
@@ -20,18 +20,20 @@ export const authGuard: CanActivateFn = () => {
     return true;
   }
 
-  if (authService.getSessionState() === false) {
-    return redirectToLogin();
-  }
-
   return authService.checkSession().pipe(
-    map((isAuthenticated) => {
+    switchMap((isAuthenticated) => {
       if (isAuthenticated) {
         messageService.clearMessage();
-        return true;
+        return of(true);
       }
 
-      return redirectToLogin();
+      return authService.refreshToken().pipe(
+        map(() => {
+          messageService.clearMessage();
+          return true;
+        }),
+        catchError(() => of(redirectToLogin())),
+      );
     }),
   );
 };
