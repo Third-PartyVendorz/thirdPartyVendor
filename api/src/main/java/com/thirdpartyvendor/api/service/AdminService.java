@@ -11,6 +11,7 @@ import com.thirdpartyvendor.api.entity.AppUser;
 import com.thirdpartyvendor.api.repository.AppUserRepository;
 import com.thirdpartyvendor.api.repository.OrderRepository;
 import com.thirdpartyvendor.api.util.AuthorizationUtil;
+import com.thirdpartyvendor.api.error.UserExceptions.UserNotFoundException;
 
 @Service
 public class AdminService {
@@ -46,6 +47,14 @@ public class AdminService {
                 order.getCreatedAt(),
                 order.getOrderCurrency()
             )).collect(Collectors.toList());
+    }
+
+    public UserResponse getUserById(Long userId, AppUser currentUser) {
+        AuthorizationUtil.requireAdmin(currentUser);
+
+        AppUser user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        return mapToResponse(user);
     }
 
     private UserResponse mapToResponse(AppUser user) {

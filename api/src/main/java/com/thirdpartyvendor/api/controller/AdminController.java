@@ -58,4 +58,12 @@ public class AdminController {
         return adminService.getAllUsers(currentUser);
     }
 
+    @GetMapping("/users/{userId}")
+    public UserResponse getUserById(
+        @PathVariable Long userId, 
+        @AuthenticationPrincipal AppUser currentUser
+    ) {
+        return adminService.getUserById(userId, currentUser);
+    }
+
 }
