@@ -10,7 +10,6 @@ public record UserResponse(
     String phoneNumber,
     LocalDate dateOfBirth,
     String email,
-    String passwordHash,
     LocalDateTime createdAt,
     LocalDateTime updatedAt,
     boolean frozen,
