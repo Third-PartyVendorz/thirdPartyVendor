@@ -13,6 +13,8 @@ import com.thirdpartyvendor.api.entity.AppUser;
 import com.thirdpartyvendor.api.service.UserService;
 import com.thirdpartyvendor.api.service.AdminService;
 import com.thirdpartyvendor.api.dto.UserResponse;
+import com.thirdpartyvendor.api.dto.OrderResponse;
+import com.thirdpartyvendor.api.dto.TradeResponse;
 import java.util.List;
 
 @RestController
@@ -64,6 +66,22 @@ public class AdminController {
         @AuthenticationPrincipal AppUser currentUser
     ) {
         return adminService.getUserById(userId, currentUser);
+    }
+
+    @GetMapping("/users/{userId}/orders")
+    public List<OrderResponse> getUserOrders(
+        @PathVariable Long userId,
+        @AuthenticationPrincipal AppUser currentUser
+    ){
+        return adminService.getUserOrders(currentUser, userId);
+    }
+
+    @GetMapping("/users/{userId}/trades")
+    public List<TradeResponse> getUserTrades(
+        @PathVariable long userId,
+        @AuthenticationPrincipal AppUser currentUser
+    ) {
+        return adminService.getUserTrades(userId, currentUser);
     }
 
 }

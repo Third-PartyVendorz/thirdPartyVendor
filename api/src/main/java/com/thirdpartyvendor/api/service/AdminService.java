@@ -7,9 +7,12 @@ import org.springframework.stereotype.Service;
 
 import com.thirdpartyvendor.api.dto.UserResponse;
 import com.thirdpartyvendor.api.dto.OrderResponse;
+import com.thirdpartyvendor.api.dto.TradeResponse;
 import com.thirdpartyvendor.api.entity.AppUser;
+import com.thirdpartyvendor.api.entity.Order;
 import com.thirdpartyvendor.api.repository.AppUserRepository;
 import com.thirdpartyvendor.api.repository.OrderRepository;
+import com.thirdpartyvendor.api.repository.TradeRepository;
 import com.thirdpartyvendor.api.util.AuthorizationUtil;
 import com.thirdpartyvendor.api.error.UserExceptions.UserNotFoundException;
 
@@ -17,10 +20,12 @@ import com.thirdpartyvendor.api.error.UserExceptions.UserNotFoundException;
 public class AdminService {
     private final AppUserRepository userRepository;
     private final OrderRepository orderRepository;
+    private final TradeRepository tradeRepository;
 
-    public AdminService(AppUserRepository userRepository, OrderRepository orderRepository) {
+    public AdminService(AppUserRepository userRepository, OrderRepository orderRepository, TradeRepository tradeRepository) {
         this.userRepository = userRepository;
         this.orderRepository = orderRepository;
+        this.tradeRepository = tradeRepository;
     }
 
     public List<UserResponse> getAllUsers(AppUser currentUser) {
@@ -55,6 +60,31 @@ public class AdminService {
         AppUser user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
 
         return mapToResponse(user);
+    }
+
+    // This looks so ugly becuase we Trade doesn't have a ticker value, 
+    // so in every lookup we have to reference the orderId to get the ticker.
+    public List<TradeResponse> getUserTrades(Long userId, AppUser currentUser) {
+        AuthorizationUtil.requireAdmin(currentUser);
+
+        List<Order> userOrders = orderRepository.findByUserId(userId);
+        List<Long> orderIds = userOrders.stream().map(Order::getId).collect(Collectors.toList());
+
+        return tradeRepository.findAll().stream()
+            .filter(trade -> orderIds.contains(trade.getOrderId()))
+            .map(trade -> {
+                Order order = orderRepository.findById(trade.getOrderId()).orElse(null);
+                String ticker = order != null ? order.getTicker() : "UNKNOWN";
+                return new TradeResponse(
+                    trade.getTradeId(),
+                    trade.getOrderId(),
+                    ticker,
+                    trade.getExecutionPrice(),
+                    trade.getExecutionQuantity(),
+                    trade.getTradeTimestamp(),
+                    trade.getTradeCurrency()
+                );
+            }).collect(Collectors.toList());
     }
 
     private UserResponse mapToResponse(AppUser user) {
