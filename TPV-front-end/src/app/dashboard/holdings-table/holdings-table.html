@@ -23,17 +23,12 @@
                     <th class="sortable" (click)="toggleSort('ticker')">
                         Ticker {{ getSortIndicator('ticker') }}
                     </th>
-                    <!-- <th class="numeric sortable" (click)="toggleSort('numShares')">
-                        Shares {{ getSortIndicator('numShares') }}
-                    </th> -->
-
-                    
                     <!-- <th class="sortable" (click)="toggleSort('companyName')">
                         Name {{ getSortIndicator('companyName') }}
                     </th> -->
-                    <!-- <th class="numeric sortable" (click)="toggleSort('shares')">
-                        Shares {{ getSortIndicator('numShares') }}
-                    </th> -->
+                    <th class="numeric sortable" (click)="toggleSort('shares')">
+                        Shares {{ getSortIndicator('shares') }}
+                    </th>
                     <!-- <th class="numeric sortable" (click)="toggleSort('averageCost')">
                         Avg. Cost {{ getSortIndicator('averageCost') }}
                     </th>
@@ -54,8 +49,9 @@
             <tbody>
                 <tr *ngFor="let holding of holdings">
                     <td data-label="Ticker">{{ holding.ticker }}</td>
+                    <td class="numeric" data-label="Shares">{{ holding.numShares }}</td>
                     <!-- <td data-label="Name">{{ holding.companyName }}</td>
-                    <td class="numeric" data-label="Shares">{{ holding.shares }}</td>
+                    
                     <td class="numeric" data-label="Avg. Cost">{{ holding.averageCost | currency }}</td>
                     <td class="numeric" data-label="Last Price">{{ holding.lastPrice | currency }}</td>
                     <td class="numeric" data-label="Market Value">{{ holding.marketValue | currency }}</td>
@@ -86,13 +82,13 @@
                     <span class="mobile-holdings-label">Ticker</span>
                     <span class="mobile-holdings-value company-name">{{ holding.ticker }}</span>
                 </div>
+                <div class="mobile-holdings-row">
+                    <span class="mobile-holdings-label">Shares</span>
+                    <span class="mobile-holdings-value">{{ holding.numShares }}</span>
+                </div>
                 <!-- <div class="mobile-holdings-row">
                     <span class="mobile-holdings-label">Name</span>
                     <span class="mobile-holdings-value company-name">{{ holding.companyName }}</span>
-                </div>
-                <div class="mobile-holdings-row">
-                    <span class="mobile-holdings-label">Shares</span>
-                    <span class="mobile-holdings-value">{{ holding.shares }}</span>
                 </div>
                 <div class="mobile-holdings-row">
                     <span class="mobile-holdings-label">Avg. Cost</span>
