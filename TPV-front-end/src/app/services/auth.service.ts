@@ -12,9 +12,12 @@ import { UserContextService } from './user-context.service';
   providedIn: 'root'
 })
 export class AuthService {
-  private authenticatedSession: boolean | null = null;
+  private static readonly authenticatedSessionKey = 'authenticatedSession';
+  private authenticatedSession: boolean | null;
 
-  constructor(private http: HttpClient, private userContextService: UserContextService) { }
+  constructor(private http: HttpClient, private userContextService: UserContextService) {
+    this.authenticatedSession = this.readSessionState();
+  }
 
   register(registerRequest: RegisterRequest) {
     return this.http.post<RegisterResponse>(`${environment.apiBaseUrl}/auth/register`, registerRequest);
@@ -49,7 +52,6 @@ export class AuthService {
         return true;
       }),
       catchError(() => {
-        this.markSessionExpired();
         return of(false);
       }),
     );
@@ -61,11 +63,27 @@ export class AuthService {
 
   markSessionAuthenticated() {
     this.authenticatedSession = true;
+    localStorage.setItem(AuthService.authenticatedSessionKey, 'true');
   }
 
   markSessionExpired() {
     this.authenticatedSession = false;
+    localStorage.setItem(AuthService.authenticatedSessionKey, 'false');
     this.userContextService.clearUserContext();
+  }
+
+  private readSessionState(): boolean | null {
+    const storedSessionState = localStorage.getItem(AuthService.authenticatedSessionKey);
+
+    if (storedSessionState === 'true') {
+      return true;
+    }
+
+    if (storedSessionState === 'false') {
+      return false;
+    }
+
+    return null;
   }
 
 }

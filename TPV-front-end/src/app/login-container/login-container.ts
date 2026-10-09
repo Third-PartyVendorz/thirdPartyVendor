@@ -25,7 +25,7 @@ export class LoginContainer {
     private router: Router,
   ) {}
 
-  activeTab: 'login' | 'register' = 'register';
+  activeTab: 'login' | 'register' = 'login';
 
   showLogin() {
     this.activeTab = 'login';
@@ -73,6 +73,7 @@ export class LoginContainer {
     this.authService.register(request).subscribe({
       next: (response: RegisterResponse) => {
         this.messageService.setSuccessMessage('Registration successful. You can now log in.');
+        this.showLogin();
       },
       error: (error) => {
         this.messageService.setErrorMessage('Registration failed: ' + error.error.message);

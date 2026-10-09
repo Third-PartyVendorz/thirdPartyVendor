@@ -15,6 +15,8 @@ export const authGuard: CanActivateFn = () => {
     return router.parseUrl('/login');
   };
 
+  console.log('Session state:', authService.getSessionState());
+
   if (authService.getSessionState() === true) {
     messageService.clearMessage();
     return true;
