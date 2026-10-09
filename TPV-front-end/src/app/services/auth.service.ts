@@ -21,7 +21,9 @@ export class AuthService {
   }
 
   authenticate(authenticationRequest: AuthenticationRequest) {
-    return this.http.post<AuthenticationResponse>(`${environment.apiBaseUrl}/auth/authenticate`, authenticationRequest).pipe(
+    return this.http.post<AuthenticationResponse>(`${environment.apiBaseUrl}/auth/authenticate`, authenticationRequest, {
+      withCredentials: true,
+    }).pipe(
       tap(() => {
         this.markSessionAuthenticated();
       }),
@@ -29,7 +31,9 @@ export class AuthService {
   }
 
   refreshToken() {
-    return this.http.post<void>(`${environment.apiBaseUrl}/auth/refresh`, {}).pipe(
+    return this.http.post<void>(`${environment.apiBaseUrl}/auth/refresh`, {}, {
+      withCredentials: true,
+    }).pipe(
       tap(() => {
         this.markSessionAuthenticated();
       }),
@@ -37,7 +41,9 @@ export class AuthService {
   }
 
   checkSession(): Observable<boolean> {
-    return this.http.get<void>(`${environment.apiBaseUrl}/auth/me`).pipe(
+    return this.http.get<void>(`${environment.apiBaseUrl}/auth/me`, {
+      withCredentials: true,
+    }).pipe(
       map(() => {
         this.markSessionAuthenticated();
         return true;
