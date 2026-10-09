@@ -10,5 +10,5 @@ public record TradeResponse(
     BigDecimal executionPrice,
     BigDecimal executionQuantity,
     LocalDateTime tradeTimestamp,
-    String TradeCurrency
+    String tradeCurrency
 ){}
