@@ -29,19 +29,22 @@ public class OrderService {
     private final HoldingRepository holdingRepository;
     private final CashHoldingsService cashHoldingsService;
     private final MarketDataAPIClient marketDataAPIClient;
+    private final OrderExecutionService orderExecutionService;
 
     public OrderService(
         OrderRepository orderRepository,
         OrderValidator orderValidator,
         HoldingRepository holdingRepository,
         CashHoldingsService cashHoldingsService,
-        MarketDataAPIClient marketDataAPIClient
+        MarketDataAPIClient marketDataAPIClient,
+        OrderExecutionService orderExecutionService
     ) {
         this.orderRepository = orderRepository;
         this.orderValidator = orderValidator;
         this.holdingRepository = holdingRepository;
         this.cashHoldingsService = cashHoldingsService;
         this.marketDataAPIClient = marketDataAPIClient;
+        this.orderExecutionService = orderExecutionService;
     }
 
     public OrderResponse createOrder(CreateOrderRequest createOrderRequest, Long userId) {
@@ -60,17 +63,23 @@ public class OrderService {
 
         Order savedOrder = orderRepository.save(newOrder);
 
+        orderExecutionService.executeOrder(savedOrder.getId(), userId);
+
+        Order executedOrder = orderRepository.findById(savedOrder.getId())
+            .orElseThrow(() -> new OrderNotFoundException("Order not found"));
+        
+
         return new OrderResponse(
-            savedOrder.getId(),
-            savedOrder.getUserId(),
-            savedOrder.getAssetId(),
-            savedOrder.getTicker(),
-            savedOrder.getOrderIntent(),
-            savedOrder.getQuantity(),
-            savedOrder.getOrderPrice(),
-            savedOrder.getStatus(),
-            savedOrder.getCreatedAt(),
-            savedOrder.getOrderCurrency()
+            executedOrder.getId(),
+            executedOrder.getUserId(),
+            executedOrder.getAssetId(),
+            executedOrder.getTicker(),
+            executedOrder.getOrderIntent(),
+            executedOrder.getQuantity(),
+            executedOrder.getOrderPrice(),
+            executedOrder.getStatus(),
+            executedOrder.getCreatedAt(),
+            executedOrder.getOrderCurrency()
         );
     }
 
@@ -135,7 +144,7 @@ public class OrderService {
     }
 
     public OrderResponse cancelOrder(Long orderId, Long userId) {
-        Order order = orderRepository.findById(userId)
+        Order order = orderRepository.findById(orderId)
             .orElseThrow(() -> new OrderNotFoundException("Order not found"));
 
         order.setStatus(OrderStatus.CANCELLED);

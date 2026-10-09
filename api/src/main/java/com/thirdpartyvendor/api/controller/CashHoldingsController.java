@@ -13,6 +13,10 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import com.thirdpartyvendor.api.dto.DepositRequest;
+import org.springframework.http.ResponseEntity;
 
 @RestController 
 @RequestMapping("/cashHoldings")
@@ -33,5 +37,17 @@ public class CashHoldingsController {
     @GetMapping
     public List<CashHoldingResponse> getCashHoldingsByUser(@AuthenticationPrincipal AppUser currentUser) {
         return cashHoldingsService.getCashHoldingsByUser(currentUser.getId());
+    }
+
+    @PostMapping 
+    public ResponseEntity<CashHoldingResponse> deposit(
+        @RequestBody DepositRequest depositRequest,
+        @AuthenticationPrincipal AppUser currentUser
+    ) {
+        return ResponseEntity.ok(cashHoldingsService.deposit(
+            depositRequest.currencyCode(),
+            depositRequest.amount(),
+            currentUser.getId()
+        ));
     }
 }

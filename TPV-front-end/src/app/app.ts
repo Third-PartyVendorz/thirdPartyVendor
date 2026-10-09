@@ -1,6 +1,6 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { ErrorService } from './services/error.service';
+import { MessageService } from './services/message.service';
 
 @Component({
   standalone: true,
@@ -10,7 +10,7 @@ import { ErrorService } from './services/error.service';
   templateUrl: './app.html',
 })
 export class App {
-  constructor(public errorService: ErrorService) {}
+  constructor(public messageService: MessageService) {}
 
   protected readonly title = signal('TPV-front-end');
 }

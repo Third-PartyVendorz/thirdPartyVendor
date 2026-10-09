@@ -4,24 +4,25 @@
     </div>
     <nav class="desktop-nav">
         <ul>
-            <li><a href="/dashboard">Portfolio</a></li>
-            <li><a href="/portfolio-history">Portfolio History</a></li>
-            <li><a href="/explore-assets">Explore Assets</a></li>
+            <li><a routerLink="/dashboard">Portfolio</a></li>
+            <li><a routerLink="/portfolio-history">Portfolio History</a></li>
+            <li><a routerLink="/explore-assets">Explore Assets</a></li>
+            <li><a routerLink="/profile">Profile</a></li>
         </ul>
     </nav>
 
-    <button class="profile-button">
-        <img src='../../../profile-icon.jpg' alt="Profile Icon">
-    </button>
+    <a class="profile-button" routerLink="/profile" aria-label="Open profile page">
+        <img src="/profile-icon.jpg" alt="Profile Icon">
+    </a>
 
     <button class="mobile-menu-button" (click)="isMenuOpen = !isMenuOpen">
         ☰
     </button>
 </div>
 
-<div class="mobile-nav" *ngIf="isMenuOpen" (click)="$event.stopPropagation()">
-    <a href="/">Portfolio</a>
-    <a href="/portfolio-history">Portfolio History</a>
-    <a href="/explore-assets">Explore Assets</a>
-    <a href="/profile">Profile</a>
+<div class="mobile-nav" *ngIf="isMenuOpen" (click)="closeMenu()">
+    <a routerLink="/dashboard">Portfolio</a>
+    <a routerLink="/portfolio-history">Portfolio History</a>
+    <a routerLink="/explore-assets">Explore Assets</a>
+    <a routerLink="/profile">Profile</a>
 </div>

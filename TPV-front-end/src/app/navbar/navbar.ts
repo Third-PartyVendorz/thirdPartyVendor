@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostListener } from '@angular/core';
+import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 @Component({
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   selector: 'app-navbar',
   styleUrl: './navbar.scss',
   templateUrl: './navbar.html',
@@ -10,13 +11,7 @@ import { Component, HostListener } from '@angular/core';
 export class Navbar {
   isMenuOpen = false;
 
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent): void {
-    const target = event.target as HTMLElement;
-    const navbar = (event.currentTarget as Document).querySelector('app-navbar');
-    
-    if (navbar && !navbar.contains(target)) {
-      this.isMenuOpen = false;
-    }
+  closeMenu(): void {
+    this.isMenuOpen = false;
   }
 }

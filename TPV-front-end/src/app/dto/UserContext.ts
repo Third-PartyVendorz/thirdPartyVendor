@@ -1,5 +1,4 @@
-export interface AuthenticationResponse {
-    jwtToken: string;
+export interface UserContext {
     firstName: string;
     lastName: string;
     phoneNumber: string;

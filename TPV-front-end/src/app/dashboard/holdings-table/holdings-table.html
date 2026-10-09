@@ -23,13 +23,13 @@
                     <th class="sortable" (click)="toggleSort('ticker')">
                         Ticker {{ getSortIndicator('ticker') }}
                     </th>
-                    <th class="sortable" (click)="toggleSort('companyName')">
+                    <!-- <th class="sortable" (click)="toggleSort('companyName')">
                         Name {{ getSortIndicator('companyName') }}
-                    </th>
+                    </th> -->
                     <th class="numeric sortable" (click)="toggleSort('shares')">
                         Shares {{ getSortIndicator('shares') }}
                     </th>
-                    <th class="numeric sortable" (click)="toggleSort('averageCost')">
+                    <!-- <th class="numeric sortable" (click)="toggleSort('averageCost')">
                         Avg. Cost {{ getSortIndicator('averageCost') }}
                     </th>
                     <th class="numeric sortable" (click)="toggleSort('lastPrice')">
@@ -43,14 +43,15 @@
                     </th>
                     <th class="numeric sortable" (click)="toggleSort('dailyChangePercent')">
                         Day Change {{ getSortIndicator('dailyChangePercent') }}
-                    </th>
+                    </th> -->
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let holding of displayedHoldings">
+                <tr *ngFor="let holding of holdings">
                     <td data-label="Ticker">{{ holding.ticker }}</td>
-                    <td data-label="Name">{{ holding.companyName }}</td>
-                    <td class="numeric" data-label="Shares">{{ holding.shares }}</td>
+                    <td class="numeric" data-label="Shares">{{ holding.numShares }}</td>
+                    <!-- <td data-label="Name">{{ holding.companyName }}</td>
+                    
                     <td class="numeric" data-label="Avg. Cost">{{ holding.averageCost | currency }}</td>
                     <td class="numeric" data-label="Last Price">{{ holding.lastPrice | currency }}</td>
                     <td class="numeric" data-label="Market Value">{{ holding.marketValue | currency }}</td>
@@ -60,7 +61,7 @@
                     </td>
                     <td class="numeric" data-label="Day Change" [class.positive]="holding.dailyChangePercent > 0" [class.negative]="holding.dailyChangePercent < 0">
                         {{ holding.dailyChangePercent > 0 ? '▲' : '▼' }} {{ holding.dailyChangePercent }}%
-                    </td>
+                    </td> -->
                 </tr>
             </tbody>
         </table>
@@ -68,11 +69,12 @@
 
     <!-- Mobile Card View -->
     <div class="mobile-holdings">
-        <div class="mobile-holdings-item" *ngFor="let holding of displayedHoldings" [class.expanded]="isExpanded(holding.ticker)">
+        <div class="mobile-holdings-item" *ngFor="let holding of holdings" [class.expanded]="isExpanded(holding.ticker)">
             <div class="mobile-holdings-header">
                 <button (click)="toggleExpand(holding.ticker)" class="expand-button">
                     <span class="expand-icon">{{ isExpanded(holding.ticker) ? '▼' : '▶' }}</span>
-                    {{ holding.companyName }} ({{ holding.ticker }})
+                    <!-- {{ holding.companyName }}  -->
+                    ({{ holding.ticker }})
                 </button>
             </div>
             <div class="mobile-summary-card" *ngIf="isExpanded(holding.ticker)">
@@ -81,12 +83,12 @@
                     <span class="mobile-holdings-value company-name">{{ holding.ticker }}</span>
                 </div>
                 <div class="mobile-holdings-row">
+                    <span class="mobile-holdings-label">Shares</span>
+                    <span class="mobile-holdings-value">{{ holding.numShares }}</span>
+                </div>
+                <!-- <div class="mobile-holdings-row">
                     <span class="mobile-holdings-label">Name</span>
                     <span class="mobile-holdings-value company-name">{{ holding.companyName }}</span>
-                </div>
-                <div class="mobile-holdings-row">
-                    <span class="mobile-holdings-label">Shares</span>
-                    <span class="mobile-holdings-value">{{ holding.shares }}</span>
                 </div>
                 <div class="mobile-holdings-row">
                     <span class="mobile-holdings-label">Avg. Cost</span>
@@ -112,7 +114,7 @@
                     <span class="mobile-holdings-value" [class.positive]="holding.dailyChangePercent > 0" [class.negative]="holding.dailyChangePercent < 0">
                         {{ holding.dailyChangePercent > 0 ? '▲' : '▼' }} {{ holding.dailyChangePercent }}%
                     </span>
-                </div>
+                </div> -->
             </div>
         </div>
     </div>

@@ -176,7 +176,7 @@ td {
 
 .mobile-holdings-item {
     border: 1px solid #e5e7eb;
-    border-radius: 8px;
+    border-radius: 12px;
     overflow: hidden;
     background: #ffffff;
     margin-bottom: 0;
@@ -295,7 +295,6 @@ td {
     color: #111827;
 }
 
-// Footer and load more button
 .table-footer {
     padding: 1rem 1.5rem;
     border-top: 1px solid #e5e7eb;
@@ -310,14 +309,13 @@ td {
 
 .load-more-btn {
     padding: 0.75rem 1.5rem;
-    background: #033D6C;
+    background: linear-gradient(135deg, #033d6c, #0b5ca5);
     color: #ffffff;
     border: none;
-    border-radius: 6px;
+    border-radius: 10px;
     font-size: 0.95rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s ease;
     box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
 
     &:hover {

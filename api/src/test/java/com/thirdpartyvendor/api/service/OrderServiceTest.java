@@ -12,7 +12,6 @@ import static org.mockito.Mockito.when;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -32,11 +31,11 @@ import com.thirdpartyvendor.api.validator.OrderValidator;
 class OrderServiceTest {
 
     private OrderRepository orderRepository;
-    private OrderValidator orderValidator;
     private OrderService orderService;
     private HoldingRepository holdingRepository;
     private CashHoldingsService cashHoldingsService;
     private MarketDataAPIClient marketDataAPIClient;
+    private OrderExecutionService orderExecutionService;
 
     @BeforeEach
     void setUp() {
@@ -44,8 +43,9 @@ class OrderServiceTest {
         holdingRepository = mock(HoldingRepository.class);
         cashHoldingsService = mock(CashHoldingsService.class);
         marketDataAPIClient = mock(MarketDataAPIClient.class);
+        orderExecutionService = mock(OrderExecutionService.class);
         OrderValidator orderValidator = new OrderValidator();
-        orderService = new OrderService(orderRepository, orderValidator, holdingRepository, cashHoldingsService, marketDataAPIClient);
+        orderService = new OrderService(orderRepository, orderValidator, holdingRepository, cashHoldingsService, marketDataAPIClient, orderExecutionService);
     }
 
     @Test
@@ -114,12 +114,39 @@ class OrderServiceTest {
                 null
             )
         );
+        CreateOrderRequest request = new CreateOrderRequest(
+            100L,
+            "AAPL",
+            Order.OrderIntent.BUY,
+            BigDecimal.valueOf(10.0),
+            null,
+            "USD"
+        );
+
+        Long userId = 1L;
+        Order newOrder = new Order();
+        newOrder.setId(1L);
+        newOrder.setUserId(userId);
+        newOrder.setAssetId(request.assetId());
+        newOrder.setTicker(request.ticker());
+        newOrder.setOrderIntent(request.orderIntent());
+        newOrder.setQuantity(request.quantity());
+        newOrder.setOrderPrice(request.orderPrice());
+        newOrder.setOrderCurrency(request.orderCurrency());
+
+        when(orderRepository.save(any(Order.class))).thenReturn(newOrder);
+
+        OrderResponse result = orderService.createOrder(request, userId);
+
+        assertEquals(newOrder.getId(), result.orderId());
+        verify(orderRepository).save(any(Order.class));
+        verify(marketDataAPIClient).fetchQuote("AAPL");
     }
 
     @Test
     @DisplayName("Test createOrder successfully with orderPrice")
     void testCreateOrderSuccessfullyWithOrderPrice() {
-        CreateOrderRequest createOrderRequest = new CreateOrderRequest(
+        CreateOrderRequest request = new CreateOrderRequest(
             100L,
             "AAPL",
             Order.OrderIntent.BUY,
@@ -128,20 +155,39 @@ class OrderServiceTest {
             "USD"
         );
 
+        Mockito.when(marketDataAPIClient.fetchQuote("AAPL")).thenReturn(
+            new MarketQuoteAPIResponse(
+                new MarketQuoteAPIResponse.Data(
+                    "AAPL",
+                    BigDecimal.valueOf(100.0),
+                    null,
+                    null,
+                    null,
+                    "USD",
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                ),
+                null
+            )
+        );
+
         Order newOrder = new Order();
         Long userId = 1L;
         newOrder.setId(1L);
         newOrder.setUserId(userId);
-        newOrder.setAssetId(createOrderRequest.assetId());
-        newOrder.setTicker(createOrderRequest.ticker());
-        newOrder.setOrderIntent(createOrderRequest.orderIntent());
-        newOrder.setQuantity(createOrderRequest.quantity());
-        newOrder.setOrderPrice(createOrderRequest.orderPrice());
-        newOrder.setOrderCurrency(createOrderRequest.orderCurrency());
+        newOrder.setAssetId(request.assetId());
+        newOrder.setTicker(request.ticker());
+        newOrder.setOrderIntent(request.orderIntent());
+        newOrder.setQuantity(request.quantity());
+        newOrder.setOrderPrice(request.orderPrice());
+        newOrder.setOrderCurrency(request.orderCurrency());
 
         when(orderRepository.save(any(Order.class))).thenReturn(newOrder);
 
-        OrderResponse result = orderService.createOrder(createOrderRequest, userId);
+        OrderResponse result = orderService.createOrder(request, userId);
 
         assertEquals(newOrder.getId(), result.orderId());
         verify(orderRepository).save(any(Order.class));
@@ -156,7 +202,7 @@ class OrderServiceTest {
             Order.OrderIntent.BUY,
             BigDecimal.valueOf(10.0),
             null,
-            "usd"
+            null   // Missing currency - should throw BadOrderException
         );
 
         Long userId = 1L;
@@ -168,4 +214,4 @@ class OrderServiceTest {
         assertEquals("Order currency is required", exception.getMessage());
         verify(orderRepository, never()).save(any(Order.class));
     }
-}
+}       

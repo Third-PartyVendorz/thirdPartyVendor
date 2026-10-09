@@ -1,79 +1,77 @@
-<h2 *ngIf="activeTab === 'register'">Register</h2>
-<h2 *ngIf="activeTab === 'login'">Login</h2>
-
-<div class="switch-card">
-    <div class="tabs">
-        <button [class.active]="activeTab === 'login'"
-        (click)="showLogin()">Login</button>
-
-        <button [class.active]="activeTab === 'register'"
-        (click)="showRegister()">Register</button>
+<section class="auth-card">
+    <div class="auth-card__header">
+        <h2 *ngIf="activeTab === 'register'">Register</h2>
+        <h2 *ngIf="activeTab === 'login'">Login</h2>
+        <p *ngIf="activeTab === 'register'">Set up access to manage assets and market activity.</p>
+        <p *ngIf="activeTab === 'login'">Use your credentials to continue.</p>
     </div>
-</div>
 
-<!-- <ng-container *ngIf="activeTab === 'register'">
-    <div class="row">
-        <div>
-            <label>First name</label>
-            <input type="text" name="firstName" />
-        </div>
-        <div>
-            <label>Last name</label>
-            <input type="text" name="lastName" />
-        </div>
-    </div>
-</ng-container>
+    <div class="switch-card" role="tablist" aria-label="Authentication mode">
+        <div class="tabs">
+            <button
+                type="button"
+                [class.active]="activeTab === 'login'"
+                (click)="showLogin()"
+                role="tab"
+                [attr.aria-selected]="activeTab === 'login'"
+            >
+                Login
+            </button>
 
-<ng-container *ngIf="activeTab === 'login'">
-    <div class="row">
-        <div>
-            <label>First name</label>
-            <input type="text" name="firstName" />
-        </div>
-        <div>
-            <label>Last name</label>
-            <input type="text" name="lastName" />
+            <button
+                type="button"
+                [class.active]="activeTab === 'register'"
+                (click)="showRegister()"
+                role="tab"
+                [attr.aria-selected]="activeTab === 'register'"
+            >
+                Register
+            </button>
         </div>
     </div>
-</ng-container> -->
 
-<form class="auth-card" *ngIf="activeTab === 'login'" (submit)="onLogin($event)">
-    <div class="form-group">
-        <label for="email">Email</label>
-        <input type="email" id="email" name="email" required autocomplete="email">
-    </div>
-    <div class="form-group">
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" required>
-    </div>
+    <form class="auth-form" *ngIf="activeTab === 'login'" (submit)="onLogin($event)">
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required autocomplete="email" placeholder="you@example.com">
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required autocomplete="current-password" placeholder="Enter your password">
+        </div>
 
-    <button type="submit" class="auth-button">Login</button>
-</form>
+        <button type="submit" class="auth-button">Login</button>
+    </form>
 
-<form class="auth-card" *ngIf="activeTab === 'register'" (submit)="onRegister($event)">
-    <div class="form-group">
-        <label for="first-name">First Name</label>
-        <input type="text" id="first-name" name="firstName" required autocomplete="given-name">
-    </div>
-    <div class="form-group">
-        <label for="last-name">Last Name</label>
-        <input type="text" id="last-name" name="lastName" required autocomplete="family-name">
-    </div>
-    <div class="form-group">
-        <label for="email">Email</label>
-        <input type="email" id="email" name="email" required autocomplete="email">
-    </div>
-    <div class="form-group">
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" required>
-    </div>
-    <div class="form-group">
-        <label for="phone-number">Phone Number</label>
-        <input type="tel" id="phone-number" name="phoneNumber" required>
-    </div>
-    <div class="form-group">
-        <label for="date-of-birth">Date of Birth</label>
-        <input type="date" id="dob" name="dateOfBirth" required>
-    </div>
-    <button type="submit" class="auth-button">Register</button>
-</form>
+    <form class="auth-form" *ngIf="activeTab === 'register'" (submit)="onRegister($event)">
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="first-name">First Name</label>
+                <input type="text" id="first-name" name="firstName" required autocomplete="given-name" placeholder="First name">
+            </div>
+            <div class="form-group">
+                <label for="last-name">Last Name</label>
+                <input type="text" id="last-name" name="lastName" required autocomplete="family-name" placeholder="Last name">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required autocomplete="email" placeholder="you@example.com">
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required autocomplete="new-password" placeholder="Create a password">
+        </div>
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="phone-number">Phone Number</label>
+                <input type="tel" id="phone-number" name="phoneNumber" required autocomplete="tel" placeholder="(555) 555-5555">
+            </div>
+            <div class="form-group">
+                <label for="date-of-birth">Date of Birth</label>
+                <input type="date" id="dob" name="dateOfBirth" required autocomplete="bday">
+            </div>
+        </div>
+        <button type="submit" class="auth-button">Register</button>
+    </form>
+</section>
