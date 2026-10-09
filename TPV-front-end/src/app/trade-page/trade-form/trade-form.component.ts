@@ -1,5 +1,6 @@
-import { Component, Input, Output, EventEmitter, inject, DestroyRef, ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, Input, Output, EventEmitter, inject, DestroyRef, ChangeDetectorRef, ViewChild, ElementRef, OnInit } from '@angular/core';
+import { CommonModule, getCurrencySymbol } from '@angular/common';
+import { Router } from '@angular/router';
 import { TradeSide } from '../../shared/trade-side';
 import { AssetTradeDetails } from '../../asset-result/asset-result';
 import { CustomSliderComponent } from '../../shared/custom-slider/custom-slider';
@@ -8,6 +9,8 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup } from '@angul
 import { parseFormattedNumber, stripTrailingZeros, addCommasToNumber, validateAndFormatDecimalInput } from '../../shared/utils/number-formatter';
 import { TradeService } from '../trade.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { OrderResponse } from '../../dto/OrderResponse';
+import { OrderRequest } from '../../dto/OrderRequest';
 
 enum UnitType {
   SHARES = "SHARES",
@@ -21,7 +24,7 @@ enum UnitType {
   templateUrl: './trade-form.component.html',
   styleUrl: './trade-form.component.scss',
 })
-export class TradeFormComponent {
+export class TradeFormComponent implements OnInit {
 
   @Input() ticker = '';
   @Input() assetDetails: AssetTradeDetails | null = null;
@@ -33,6 +36,7 @@ export class TradeFormComponent {
   private tradeService: TradeService = inject(TradeService);
   private destroyRef: DestroyRef = inject(DestroyRef);
   private cdr: ChangeDetectorRef = inject(ChangeDetectorRef);
+  private router: Router = inject(Router);
 
   TradeSide = TradeSide;
   UnitType = UnitType;
@@ -41,28 +45,61 @@ export class TradeFormComponent {
 
   currentSide: TradeSide = TradeSide.BUY;
   currentUnit: UnitType = UnitType.SHARES;
-  showInsufficientFundsMessage: boolean = false;
-  showInsufficientSharesMessage: boolean = false;
   showOrderSummaryPanel: boolean = false;
+  showBuyingPowerChangedModal: boolean = false;
+  showSharesOwnedChangedModal: boolean = false;
+  isSubmittingOrder: boolean = false;
+  orderSubmitted: boolean = false;
+  orderError: boolean = false;
+  orderErrorMessage: string = '';
+  submittedOrderResponse: OrderResponse | null = null;
 
-  currency: string;
+  currency: string = 'USD';
   buyingPower: number = 0;
+  buyingPowerAtOrderSummaryOpen: number = 0;
+  hasCurrency: boolean | null = null;
+
+  sharesOwned: number = 0;
+  sharedOwnedAtOrderSummaryOpen: number = 0;
 
   constructor(private fb: FormBuilder) {
     this.form = this.fb.group({
       inputValue: ['']
     });
-    this.currency = this.assetDetails?.quote?.currency || 'USD';
+  }
+
+  ngOnInit(): void {
+    if (!this.assetDetails?.quote?.currency) {
+      console.warn('AssetDetails or currency not available in trade form - defaulting to USD');
+    }
+    this.currency = this.assetDetails?.quote?.currency ?? 'USD';
+
     this.tradeService.getCashHoldingByCurrencyCode(this.currency)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response) => {
           this.buyingPower = response.balance;
+          this.hasCurrency = response.balance > 0;
           this.cdr.markForCheck();
         },
         error: (error) => {
           console.error('Error retrieving cash holding:', error);
           this.buyingPower = 0;
+          this.hasCurrency = false;
+          this.cdr.markForCheck();
+        }
+      });
+
+    this.tradeService.getQuantitySharesOwned(this.ticker)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          this.sharesOwned = response.numShares;
+          this.cdr.markForCheck();
+        },
+        error: (error) => {
+          console.error('Error retrieving shares owned:', error);
+          this.sharesOwned = 0;
           this.cdr.markForCheck();
         }
       });
@@ -119,35 +156,35 @@ export class TradeFormComponent {
 
   getInputValue = () => this.form.get('inputValue')?.value;
 
+  getCurrencySymbol(): string {
+    return getCurrencySymbol(this.currency, 'wide', 'en-US');
+  }
+
   validateDecimalInput(event: Event): void {
     const input = event.target as HTMLInputElement;
     const formattedValue = validateAndFormatDecimalInput(input.value, 4);
     this.form.get('inputValue')?.setValue(formattedValue, { emitEvent: false });
   }
 
-  displayInsufficientFundsMessage(): void {
-    this.showInsufficientFundsMessage = true;
-    this.cdr.markForCheck();
-  }
-
-  displayInsufficientSharesMessage(): void {
-    this.showInsufficientSharesMessage = true;
-    this.cdr.markForCheck();
-  }
-
-  closeInsufficientFundsMessage(): void {
-    this.showInsufficientFundsMessage = false;
-  }
-
-  closeInsufficientSharesMessage(): void { 
-    this.showInsufficientSharesMessage = false;
-  }
 
   closeOrderSummaryPanel(): void {
     this.showOrderSummaryPanel = false;
     this.summaryToggled.emit(false);
     this.cdr.markForCheck();
   }
+
+  closeBuyingPowerChangedModal(): void {
+    this.showBuyingPowerChangedModal = false;
+    this.closeOrderSummaryPanel();
+    this.cdr.markForCheck();
+  }
+
+  closeSharesOwnedChangedModal(): void {
+    this.showSharesOwnedChangedModal = false;
+    this.closeOrderSummaryPanel();
+    this.cdr.markForCheck();
+  }
+
 
   get hasInsufficientFunds(): boolean {
     if (this.currentSide !== TradeSide.BUY) {
@@ -161,57 +198,57 @@ export class TradeFormComponent {
     return this.estimatedTotal > this.buyingPower;
   }
 
+  get shouldShowInsufficientFundsMessage(): boolean {
+    return this.hasInsufficientFunds;
+  }
+
+  get hasInsufficientShares(): boolean {
+    if (this.currentSide !== TradeSide.SELL) {
+      return false;
+    }
+    
+    return this.calculatedShares > this.sharesOwned;
+  }
+
+  get shouldShowInsufficientSharesMessage(): boolean {
+    return this.hasInsufficientShares;
+  }
+
   onContinueToOrderSummary = (): void => {
     if (this.isInvalidTrade()) {
       console.warn('Trade validation failed');
       return;
     }
 
-    const estimatedPrice = this.estimatedTotal;
-
-    if (this.currentSide === TradeSide.BUY) {
-      this.tradeService.getCashHoldingByCurrencyCode(this.currency)
-        .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe({
-          next: (response) => {
-            if (response.balance < estimatedPrice) {
-              this.displayInsufficientFundsMessage();
-            } else {
-              this.showOrderSummaryPanel = true;
-              this.summaryToggled.emit(true);
-              this.cdr.markForCheck();
-            }
-          },
-          error: (error) => {
-            console.error('Error retrieving cash holding:', error);
-          }
-        });
-    } else {
-      this.showOrderSummaryPanel = true;
-      this.summaryToggled.emit(true);
-      this.cdr.markForCheck();
-    }
+    this.buyingPowerAtOrderSummaryOpen = this.buyingPower;
+    this.sharedOwnedAtOrderSummaryOpen = this.sharesOwned;
+    this.showOrderSummaryPanel = true;
+    this.summaryToggled.emit(true);
+    this.cdr.markForCheck();
   }
 
-  onPlaceTradeFromPanel = (): void => {
+  onPlaceOrder = (): void => {
     if (this.isInvalidTrade()) {
       console.warn('Trade validation failed');
       return;
     }
 
-    const estimatedPrice = this.estimatedTotal;
-
     if (this.currentSide === TradeSide.BUY) {
       this.tradeService.getCashHoldingByCurrencyCode(this.currency)
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: (response) => {
-            if (response.balance < estimatedPrice) {
-              this.displayInsufficientFundsMessage();
+            if (response.balance < this.buyingPowerAtOrderSummaryOpen) {
+              this.buyingPower = response.balance;
+              this.showBuyingPowerChangedModal = true;
+              this.cdr.markForCheck();
+              return;
+            }
+
+            if (response.balance < this.estimatedTotal) {
               this.closeOrderSummaryPanel();
             } else {
-              this.summaryToggled.emit(false);
-              this.tradeSubmitted.emit();
+              this.submitOrder();
             }
           },
           error: (error) => {
@@ -219,8 +256,27 @@ export class TradeFormComponent {
           }
         });
     } else {
-      this.summaryToggled.emit(false);
-      this.tradeSubmitted.emit();
+      this.tradeService.getQuantitySharesOwned(this.ticker)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: (response) => {
+            if (response.numShares < this.sharedOwnedAtOrderSummaryOpen) {
+              this.sharesOwned = response.numShares;
+              this.showSharesOwnedChangedModal = true;
+              this.cdr.markForCheck();
+              return;
+            }
+
+            if (response.numShares < this.calculatedShares) {
+              this.closeOrderSummaryPanel();
+            } else {
+              this.submitOrder();
+            }
+          },
+          error: (error) => {
+            console.error('Error retrieving cash holding:', error);
+          }
+        });
     }
   }
 
@@ -237,10 +293,70 @@ export class TradeFormComponent {
 
     const parsedValue = parseFormattedNumber(inputValue);
 
-    if (isNaN(parsedValue) || parsedValue <= 0 || this.calculatedShares <= 0 || this.hasInsufficientFunds) {
+    if (isNaN(parsedValue) || parsedValue <= 0 || this.calculatedShares <= 0 || this.hasInsufficientFunds || this.hasInsufficientShares) {
       return true;
     }
 
     return false;
   }
+
+  submitOrder = (): void => {
+    const orderRequest: OrderRequest = {
+      symbol: this.ticker,
+      side: this.currentSide,
+      quantity: this.calculatedShares,
+      price: this.assetDetails?.quote?.price || 0,
+      currency: this.currency
+    };
+
+    this.showOrderSummaryPanel = false;
+
+    this.isSubmittingOrder = true;
+    this.orderSubmitted = false;
+    this.orderError = false;
+    this.orderErrorMessage = '';
+    this.cdr.markForCheck();
+
+    this.tradeService.postOrder(orderRequest)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response: OrderResponse) => {
+          this.isSubmittingOrder = false;
+          this.orderSubmitted = true;
+          this.submittedOrderResponse = response;
+          this.cdr.markForCheck();
+        },
+        error: (error) => {
+          this.isSubmittingOrder = false;
+          this.orderError = true;
+          this.orderErrorMessage = error.message || 'Order submission failed. Please try again.';
+          this.cdr.markForCheck();
+        }
+      });
+  }
+
+  resetOrderState = (): void => {
+    this.isSubmittingOrder = false;
+    this.orderSubmitted = false;
+    this.orderError = false;
+    this.orderErrorMessage = '';
+    this.submittedOrderResponse = null;
+    this.cdr.markForCheck();
+  }
+
+  navigateToDashboard = (): void => {
+    this.resetOrderState();
+    this.summaryToggled.emit(false);
+    this.tradeSubmitted.emit();
+    this.router.navigate(['/dashboard']);
+  }
+
+  navigateToForex = (): void => {
+    this.router.navigate(['/forex'], { queryParams: { from: this.currency, to: this.currency } });
+  }
+
+  navigateToFunding = (): void => {
+    this.router.navigate(['/funding']);
+  }
 }
+

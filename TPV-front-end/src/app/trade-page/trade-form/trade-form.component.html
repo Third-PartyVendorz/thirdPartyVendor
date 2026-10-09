@@ -1,5 +1,4 @@
 <div class="trade-form-wrapper" [class.summary-active]="showOrderSummaryPanel">
-    <!-- Left Column: Form Inputs -->
     <div class="trade-form-container" [class.disabled-form]="showOrderSummaryPanel">
         <div *ngIf="assetDetails!" class="trade-header">
             <div class="trade-header__top">
@@ -27,6 +26,8 @@
             </div>
         </div>
 
+
+
         <app-custom-slider
           [leftValue]="TradeSide.BUY"
           [rightValue]="TradeSide.SELL"
@@ -38,7 +39,31 @@
           style="justify-self: center;"
         ></app-custom-slider>
 
-        <span class="trade-amount-form" [formGroup]="form">
+                @if (hasCurrency === false && currentSide === TradeSide.BUY) {
+            <div class="currency-required-banner">
+                <div class="banner-icon">
+                    <span class="material-icons-outlined">currency_exchange</span>
+                </div>
+                <div class="banner-content">
+                    <h3>You Need {{ currency }} to Buy This Asset</h3>
+                    <p>This asset trades in {{ currency }}, but you don't currently hold any {{ currency }}.</p>
+                    <p>To start trading, you'll need to either exchange your funds or add funds to your account.</p>
+                </div>
+                <div class="banner-actions">
+                    <button (click)="navigateToForex()" class="action-button forex-button">
+                        <span class="material-icons-outlined">swap_horiz</span>
+                        Exchange Currency
+                    </button>
+                    <button (click)="navigateToFunding()" class="action-button funding-button">
+                        <span class="material-icons-outlined">account_balance_wallet</span>
+                        Add Funds
+                    </button>
+                </div>
+            </div>
+        }
+
+        @if (hasCurrency === true || currentSide === TradeSide.SELL) {
+            <span class="trade-amount-form" [formGroup]="form">
             <app-custom-slider
               [leftValue]="UnitType.SHARES"
               [rightValue]="UnitType.DOLLARS"
@@ -55,7 +80,14 @@
                         #inputValue
                         type="text" 
                         inputmode="decimal" 
-                        [currencyMask]="{ allowNegative: false, prefix: '$ ', thousands: ',', decimal: '.', precision: 2, align: 'left' }"
+                        [currencyMask]="{ 
+                            allowNegative: false, 
+                            prefix: getCurrencySymbol() + ' ', 
+                            thousands: ',', 
+                            decimal: '.', 
+                            precision: 2, 
+                            align: 'left' 
+                        }"
                         formControlName="inputValue" 
                         placeholder={{inputPlaceholder()}}
                     />
@@ -90,28 +122,24 @@
             </button>
         }
 
-        @if (hasInsufficientFunds || showInsufficientFundsMessage) {
+        @if (shouldShowInsufficientFundsMessage) {
             <div class="insufficient-funds-message">
-                <div class="message-content">
+                <div class="message-content" style="justify-content: center;">
 					<span class="material-icons-outlined" style="font-size:larger">warning</span>
-                    <span class="message-text">
-						
-						You have insufficient funds to complete this trade.
-					</span>
+                    <span class="message-text">You have insufficient funds to complete this trade.</span>
                 </div>
             </div>
         }
 
-        @if (showInsufficientSharesMessage) {
+        @if (shouldShowInsufficientSharesMessage) {
             <div class="insufficient-funds-message">
                 <div class="message-content">
+                    <span class="material-icons-outlined" style="font-size:larger">warning</span>
                     <span class="message-text">You have insufficient shares to complete this trade.</span>
-                    <!-- <button class="close-button" (click)="closeInsufficientSharesMessage()" aria-label="Close message">
-                        <span class="material-icons-outlined">close</span>
-                    </button> -->
                 </div>
             </div>
         }
+    }
     </div>
 
     <!-- Right Column: Order Summary -->
@@ -158,7 +186,7 @@
                 @if (currentSide === TradeSide.BUY) {
                     <div class="summary-section">
                         <div class="summary-row">
-                            <span class="summary-label">Buying Power Before</span>
+                            <span class="summary-label">Current Buying Power</span>
                             <span class="summary-value">{{ buyingPower | currency:assetDetails?.quote?.currency:'symbol':'1.2-2' }}</span>
                         </div>
 						<div class="summary-row" style="display: flex; justify-content: space-between; align-items: center;">
@@ -176,28 +204,143 @@
                             <span class="summary-label">Cash Remaining</span>
                             <span class="summary-value">{{ (buyingPower - estimatedTotal) | currency:assetDetails?.quote?.currency:'symbol':'1.2-2' }}</span>
                         </div>
+                        
+                    </div>
+                    <div class="divider"></div>
+                    <div class="summary-section">
+                        <div class="summary-row">
+                            <span class="summary-label total-value">Order Total</span>
+                            <span class="summary-value total-value">{{ estimatedTotal | currency:assetDetails?.quote?.currency:'symbol':'1.2-2' }}</span>
+                        </div>
+                    </div>
+                } @else {
+                    <div class="summary-section">
+                        <div class="summary-row">
+                            <span class="summary-label">Shares Owned</span>
+                            <span class="summary-value">{{ sharesOwned | number:'1.0-4' }}</span>
+                        </div>
+						<div class="summary-row" style="display: flex; justify-content: space-between; align-items: center;">
+                            <span class="summary-label">Shares Selling</span>
+                            <span class="summary-value">
+                                {{ calculatedShares | number:'1.0-4' }}
+                                ({{ (calculatedShares / sharesOwned)*100 | number:'1.0-2'}}% of total owned)
+                            </span>
+                        </div>
+                        
+                        <div class="summary-row">
+                            <span class="summary-label">Shares Remaining</span>
+                            <span class="summary-value">{{ (sharesOwned - calculatedShares) | number:'1.0-4' }}</span>
+                        </div>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="summary-section">
+                        <div class="summary-row">
+                            <span class="summary-label total-value">Sale Proceeds</span>
+                            <span class="summary-value total-value">{{ estimatedTotal | currency:assetDetails?.quote?.currency:'symbol':'1.2-2' }}</span>
+                        </div>
                     </div>
                 }
 
-				<div class="summary-section total-section">
-                    <div class="summary-row total-row">
-                        <span class="summary-label">Estimated Total</span>
-                        <span class="summary-value total-value">{{ estimatedTotal | currency:assetDetails?.quote?.currency:'symbol':'1.2-2' }}</span>
-                    </div>
-                </div>
-
                 <div class="panel-actions">
-                    <button (click)="onPlaceTradeFromPanel()" class="place-trade-button" [disabled]="isInvalidTrade()">
-                        Place Trade
-                        <span class="material-icons-outlined trade-button__icon">compare_arrows</span>
-                    </button>
+                    @if (!isSubmittingOrder && !orderSubmitted && !orderError) {
+                        <button (click)="onPlaceOrder()" class="place-trade-button" [disabled]="isInvalidTrade()">
+                            Place Order
+                            <span class="material-icons-outlined trade-button__icon">compare_arrows</span>
+                        </button>
 
-                    <button (click)="closeOrderSummaryPanel()" class="back-button">
-                        <span class="material-icons-outlined">arrow_back</span>
-                        Back to Trade
-                    </button>
+                        <button (click)="closeOrderSummaryPanel()" class="back-button">
+                            <span class="material-icons-outlined">arrow_back</span>
+                            Back to Trade
+                        </button>
+                    }
                 </div>
             </div>
         </div>
     }
+
+    <!-- Order Submission Modal Overlay -->
+    @if (isSubmittingOrder || orderSubmitted || orderError) {
+        <div class="order-modal-overlay">
+            @if (isSubmittingOrder) {
+                <div class="order-submission-modal">
+                    <div class="spinner"></div>
+                    <p>Submitting order...</p>
+                </div>
+            }
+
+            @if (orderSubmitted && submittedOrderResponse) {
+                <div class="order-success-modal">
+                    <span class="material-icons-outlined success-icon">check_circle</span>
+                    <div class="success-content">
+                        <p class="success-title">Order Submitted Successfully</p>
+                        <div class="order-confirmation">
+                            <p><strong>Asset:</strong> {{ submittedOrderResponse.symbol }}</p>
+                            <p><strong>Status:</strong> {{ submittedOrderResponse.status }}</p>
+                            <p><strong>Quantity:</strong> {{ submittedOrderResponse.quantity }} shares</p>
+                            <p><strong>Price:</strong> {{ submittedOrderResponse.price | currency:submittedOrderResponse.currency:'symbol':'1.2-2' }}/share</p>
+                        </div>
+                        <button (click)="navigateToDashboard()" class="dashboard-button">
+                            Go to Dashboard
+                            <span class="material-icons-outlined">arrow_forward</span>
+                        </button>
+                    </div>
+                </div>
+            }
+
+            @if (orderError) {
+                <div class="order-error-modal">
+                    <span class="material-icons-outlined error-icon">error</span>
+                    <div class="error-content">
+                        <p class="error-title">Order Submission Failed</p>
+                        <p class="error-text">{{ orderErrorMessage }}</p>
+                        <button (click)="resetOrderState()" class="try-again-button">
+                            Back to Trade
+                        </button>
+                    </div>
+                </div>
+            }
+        </div>
+    }
 </div>
+
+@if (showBuyingPowerChangedModal) {
+    <div class="modal-overlay" (click)="closeBuyingPowerChangedModal()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h3>Buying Power Updated</h3>
+                <span class="material-icons-outlined modal-close" (click)="closeBuyingPowerChangedModal()">close</span>
+            </div>
+            <div class="modal-body">
+                <p>Your buying power has changed since you opened this order.</p>
+                <p><strong>Updated buying power: {{ buyingPower | currency:assetDetails?.quote?.currency:'symbol':'1.2-2' }}</strong></p>
+                <p>Please review your order and try again.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-button" (click)="closeBuyingPowerChangedModal()">
+                    Acknowledge
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+@if (showSharesOwnedChangedModal) {
+    <div class="modal-overlay" (click)="closeSharesOwnedChangedModal()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h3>Buying Power Updated</h3>
+                <span class="material-icons-outlined modal-close" (click)="closeSharesOwnedChangedModal()">close</span>
+            </div>
+            <div class="modal-body">
+                <p>Your quantity of {{ticker}} shares owned has changed since you opened this order.</p>
+                <p><strong>Updated shares owned: {{ sharesOwned | currency:assetDetails?.quote?.currency:'symbol':'1.2-2' }}</strong></p>
+                <p>Please review your order and try again.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-button" (click)="closeSharesOwnedChangedModal()">
+                    Acknowledge
+                </button>
+            </div>
+        </div>
+    </div>
+}
