@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 import { Component, HostListener } from '@angular/core';
 
 @Component({
+  standalone: true,
   imports: [RouterLink, CommonModule],
   selector: 'app-navbar',
   styleUrl: './navbar.scss',

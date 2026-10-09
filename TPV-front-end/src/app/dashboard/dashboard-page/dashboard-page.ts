@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PortfolioSummary } from '../portfolio-summary/portfolio-summary';
 import { Navbar } from '../../navbar/navbar';
@@ -7,7 +7,6 @@ import { PortfolioGraphics } from '../portfolio-graphics/portfolio-graphics';
 import { HoldingService } from '../../services/holding.service';
 import { AuthService } from '../../services/auth.service';
 import { Holding } from '../holdings-table/holding.model';
-import { MOCK_HOLDINGS } from '../holdings-table/mock-holdings';
 
 @Component({
   standalone: true,
@@ -15,6 +14,7 @@ import { MOCK_HOLDINGS } from '../holdings-table/mock-holdings';
   selector: 'app-dashboard-page',
   styleUrl: './dashboard-page.scss',
   templateUrl: './dashboard-page.html',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DashboardPage implements OnInit {
   holdings: Holding[] = [];
@@ -23,7 +23,8 @@ export class DashboardPage implements OnInit {
 
   constructor(
     private holdingService: HoldingService,
-    private authService: AuthService
+    private authService: AuthService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -33,17 +34,21 @@ export class DashboardPage implements OnInit {
   loadHoldings(): void {
     this.isLoading = true;
     this.errorMessage = null;
-
-    this.holdingService.fetchHoldings().subscribe({
+    this.cdr.markForCheck();
+    
+    this.holdingService.fetchHoldingsFromAPI().subscribe({
       next: (data: Holding[]) => {
         this.holdings = data;
+        console.log('Holdings loaded:', data);
         this.isLoading = false;
+        this.cdr.markForCheck();  // Notify change detection
       },
       error: (error) => {
         console.error('Error fetching holdings:', error);
-        this.errorMessage = 'Failed to load holdings. Using mock data.';
-        this.holdings = MOCK_HOLDINGS; // Fallback to mock data on error
+        this.errorMessage = 'Failed to load holdings from API.';
+        this.holdings = [];
         this.isLoading = false;
+        this.cdr.markForCheck();  // Notify change detection
       }
     });
   }

@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule, CurrencyPipe, DecimalPipe } from '@angular/common';
 import { Holding } from './holding.model';
 
@@ -6,10 +6,12 @@ type SortColumn = 'ticker' | 'companyName' | 'shares' | 'averageCost' | 'lastPri
 type SortDirection = 'asc' | 'desc' | null;
 
 @Component({
+  standalone: true,
   imports: [CommonModule, CurrencyPipe, DecimalPipe],
   selector: 'app-holdings-table',
   styleUrl: './holdings-table.scss',
   templateUrl: './holdings-table.html',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HoldingsTable {
   @Input() holdings: Holding[] = [];
@@ -33,34 +35,34 @@ export class HoldingsTable {
           aValue = a.ticker;
           bValue = b.ticker;
           break;
-        case 'companyName':
-          aValue = a.companyName;
-          bValue = b.companyName;
-          break;
-        case 'shares':
-          aValue = a.shares;
-          bValue = b.shares;
-          break;
-        case 'averageCost':
-          aValue = a.averageCost;
-          bValue = b.averageCost;
-          break;
-        case 'lastPrice':
-          aValue = a.lastPrice;
-          bValue = b.lastPrice;
-          break;
-        case 'marketValue':
-          aValue = a.marketValue;
-          bValue = b.marketValue;
-          break;
-        case 'gainLoss':
-          aValue = a.gainLoss;
-          bValue = b.gainLoss;
-          break;
-        case 'dailyChangePercent':
-          aValue = a.dailyChangePercent;
-          bValue = b.dailyChangePercent;
-          break;
+        // case 'companyName':
+        //   aValue = a.companyName;
+        //   bValue = b.companyName;
+        //   break;
+        // case 'shares':
+        //   aValue = a.shares;
+        //   bValue = b.shares;
+        //   break;
+        // case 'averageCost':
+        //   aValue = a.averageCost;
+        //   bValue = b.averageCost;
+        //   break;
+        // case 'lastPrice':
+        //   aValue = a.lastPrice;
+        //   bValue = b.lastPrice;
+        //   break;
+        // case 'marketValue':
+        //   aValue = a.marketValue;
+        //   bValue = b.marketValue;
+        //   break;
+        // case 'gainLoss':
+        //   aValue = a.gainLoss;
+        //   bValue = b.gainLoss;
+        //   break;
+        // case 'dailyChangePercent':
+        //   aValue = a.dailyChangePercent;
+        //   bValue = b.dailyChangePercent;
+        //   break;
         default:
           return 0;
       }
