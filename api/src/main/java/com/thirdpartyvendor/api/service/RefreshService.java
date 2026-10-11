@@ -46,4 +46,11 @@ public class RefreshService {
 
         return null;
     }
+
+    public void revokeRefreshToken(String refreshToken) {
+        RefreshToken existingToken = refreshRepository.findByToken(refreshToken).orElse(null);
+        if (existingToken != null) {
+            refreshRepository.delete(existingToken);
+        }
+    }
 }

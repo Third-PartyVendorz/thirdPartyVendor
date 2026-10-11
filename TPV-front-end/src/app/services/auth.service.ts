@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { RegisterRequest } from '../dto/RegisterRequest';
 import { RegisterResponse } from '../dto/RegisterResponse';
 import { AuthenticationRequest } from '../dto/AuthenticationRequest';
@@ -12,12 +13,9 @@ import { UserContextService } from './user-context.service';
   providedIn: 'root'
 })
 export class AuthService {
-  private static readonly authenticatedSessionKey = 'authenticatedSession';
-  private authenticatedSession: boolean | null;
+  private authenticatedSession: boolean = false;
 
-  constructor(private http: HttpClient, private userContextService: UserContextService) {
-    this.authenticatedSession = this.readSessionState();
-  }
+  constructor(private http: HttpClient, private userContextService: UserContextService, private router: Router) {}
 
   register(registerRequest: RegisterRequest) {
     return this.http.post<RegisterResponse>(`${environment.apiBaseUrl}/auth/register`, registerRequest);
@@ -29,6 +27,16 @@ export class AuthService {
     }).pipe(
       tap(() => {
         this.markSessionAuthenticated();
+      }),
+    );
+  }
+
+  logout() {
+    return this.http.post<void>(`${environment.apiBaseUrl}/auth/logout`, {}, {
+      withCredentials: true,
+    }).pipe(
+      tap(() => {
+        this.markSessionExpired();
       }),
     );
   }
@@ -63,27 +71,12 @@ export class AuthService {
 
   markSessionAuthenticated() {
     this.authenticatedSession = true;
-    localStorage.setItem(AuthService.authenticatedSessionKey, 'true');
   }
 
   markSessionExpired() {
     this.authenticatedSession = false;
-    localStorage.setItem(AuthService.authenticatedSessionKey, 'false');
     this.userContextService.clearUserContext();
-  }
-
-  private readSessionState(): boolean | null {
-    const storedSessionState = localStorage.getItem(AuthService.authenticatedSessionKey);
-
-    if (storedSessionState === 'true') {
-      return true;
-    }
-
-    if (storedSessionState === 'false') {
-      return false;
-    }
-
-    return null;
+    this.router.navigateByUrl('/login');
   }
 
 }

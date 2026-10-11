@@ -27,6 +27,7 @@ export class HomePage {
         this.isTesting = false;
         this.testStatus = 'Protected request succeeded.';
         this.testResult = `Refresh-and-retry worked. The endpoint returned ${cashHoldings.length} cash holding record(s).`;
+        console.log(cashHoldings);
       },
       error: (error) => {
         this.isTesting = false;

@@ -111,6 +111,22 @@ public class AuthController {
 		return ResponseEntity.ok().build();
 	}
 
+	@PostMapping("/logout")
+	public ResponseEntity<Void> logout(
+			HttpServletRequest httpRequest,
+			HttpServletResponse response) {
+				// revoke refresh token by setting it to an empty value, first need to check if it exists (user relogging in while already logged in)
+		String refreshToken = getCookieValue(httpRequest, "refreshToken");
+		if (refreshToken != null) {
+			refreshService.revokeRefreshToken(refreshToken);
+		}
+
+		response.addHeader(HttpHeaders.SET_COOKIE, buildAuthCookie(httpRequest, "").toString());
+		response.addHeader(HttpHeaders.SET_COOKIE, buildRefreshCookie(httpRequest, "").toString());
+		
+		return ResponseEntity.ok().build();
+	}
+
 	private String getCookieValue(HttpServletRequest request, String cookieName) {
 		if (request.getCookies() == null) {
 			return null;
