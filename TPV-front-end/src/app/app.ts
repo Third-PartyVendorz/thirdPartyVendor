@@ -12,32 +12,12 @@ import { AuthService } from './services/auth.service';
   styleUrl: './app.scss',
   templateUrl: './app.html',
 })
-export class App implements OnDestroy{
+export class App{
 
-  private routerSubscription: Subscription;
   
-  constructor(public messageService: MessageService, private router: Router, private authService: AuthService) {
-    this.routerSubscription = this.router.events.subscribe( event => {
-      if (event instanceof NavigationStart) {
-        const isBrowserRefresh = ! this.router.navigated;
-
-        if (isBrowserRefresh) {
-          this.handleBrowserRefresh();
-        }
-      }
-    });
+  constructor(public messageService: MessageService) {
   }
 
   protected readonly title = signal('TPV-front-end');
 
-  ngOnDestroy(): void {
-    if (this.routerSubscription) {
-      this.routerSubscription.unsubscribe();
-    }
-  }
-
-  private handleBrowserRefresh() {
-    console.log('Handling browser refresh');
-    this.authService.checkSession();
-  }
 }

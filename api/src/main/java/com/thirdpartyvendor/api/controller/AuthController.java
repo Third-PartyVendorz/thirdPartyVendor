@@ -155,7 +155,7 @@ public class AuthController {
 		return ResponseCookie.from("refreshToken", value)
 			.httpOnly(true)
 			.secure(request.isSecure())
-			.path("/auth/refresh")
+			.path("/")
 			.maxAge(Duration.ofMillis(refreshExpirationMs))
 			.sameSite("Strict")
 			.build();

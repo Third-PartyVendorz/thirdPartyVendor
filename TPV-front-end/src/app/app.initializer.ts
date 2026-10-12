@@ -13,6 +13,12 @@ import { catchError, of } from 'rxjs';
 export function validateSessionOnStartup() {
   const authService = inject(AuthService);
 
+  const bypassedRoutes = ['/login'];
+
+  if (bypassedRoutes.includes(window.location.pathname)) {
+    return of(false);
+  }
+
   return authService.checkSession().pipe(
     catchError(() => {
       // Session validation failed, session remains unauthenticated
