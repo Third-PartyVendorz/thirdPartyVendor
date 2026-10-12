@@ -17,41 +17,19 @@ export const routes: Routes = [
   {
     path: '',
     component: HomePage,
-    canActivate: [authGuard],
+    pathMatch: 'full',
   },
   {
-    path: 'dashboard',
+    path: '',
     component: MainLayoutComponent,
     children: [
-      { path: '', component: DashboardPage },
+      { path: 'dashboard', component: DashboardPage, canActivate: [authGuard] },
+      { path: 'portfolio-history', component: HistoryPage, canActivate: [authGuard] },
+      { path: 'trade', component: TradePage, canActivate: [authGuard] },
+      { path: 'profile', component: ProfilePage, canActivate: [authGuard] },
+      { path: 'explore-assets', component: AssetsPage, canActivate: [authGuard] },
     ],
   },
-  {
-    path: 'portfolio-history',
-    component: MainLayoutComponent,
-    children: [
-      { path: '', component: HistoryPage },
-    ],
-  },
-  {
-    path: 'trade',
-    component: MainLayoutComponent,
-    children: [
-      { path: '', component: TradePage },
-    ],
-  },
-  {
-	path: 'profile',
-	component: MainLayoutComponent,
-	children: [
-	  { path: '', component: ProfilePage },
-	],
-  },
-  {
-		path: 'explore-assets',
-		component: AssetsPage,
-		canActivate: [authGuard],
-	},
   {
     path: '**',
     redirectTo: '',

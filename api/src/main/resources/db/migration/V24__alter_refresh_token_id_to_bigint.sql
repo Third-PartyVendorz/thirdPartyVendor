@@ -1,0 +1,4 @@
+ALTER TABLE refresh_token
+    ALTER COLUMN id TYPE BIGINT USING id::BIGINT;
+
+ALTER SEQUENCE refresh_token_id_seq AS BIGINT;
