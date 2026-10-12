@@ -103,6 +103,10 @@
     </button>
   </form>
 
+  <section *ngIf="timelineMode() === 'monthly' && analyticsResult()?.date as title" class="job-date-title">
+    <h2>{{ title }}</h2>
+  </section>
+
   <!-- Summary Cards -->
   <section class="summary-section" *ngIf="hasActiveData()">
     <div *ngFor="let card of summaryCards()" class="summary-card">

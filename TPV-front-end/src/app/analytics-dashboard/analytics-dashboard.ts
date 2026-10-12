@@ -120,7 +120,7 @@ export class AnalyticsDashboard implements OnInit {
     });
     this.analyticsService.performAnalytics({
       startDate: this.customStartDate(),
-      endDate: this.customEndDate()
+      endDate: this.customEndDate(),
     }).subscribe({
       next: (response) => {
         this.customAnalyticsResult.set(response);

@@ -1,4 +1,5 @@
 export interface AnalyticsResponse {
+  date?: string | null;
   buy_count: number;
   buy_volume: number;
   sell_count: number;
