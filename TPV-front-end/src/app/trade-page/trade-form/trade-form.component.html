@@ -1,33 +1,5 @@
 <div class="trade-form-wrapper" [class.summary-active]="showOrderSummaryPanel">
     <div class="trade-form-container" [class.disabled-form]="showOrderSummaryPanel">
-        <div *ngIf="assetDetails!" class="trade-header">
-            <div class="trade-header__top">
-                <p class="trade-eyebrow">Trade</p>
-                <div class="asset-hero__identity">
-                    <div class="asset-badge">{{ assetDetails.asset.symbol }}</div>
-                    <div>
-                        <p class="asset-kicker">{{ assetDetails.asset.exchange }} • {{ assetDetails.asset.currency }}</p>
-                        <h1>{{ assetDetails.asset.name }}</h1>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="trade-header__price">
-                <div class="price-display">
-                    <span class="price-value">{{ assetDetails.quote.price | currency:assetDetails.quote.currency:'symbol':'1.2-2' }}</span>
-                    <span class="price-change" [class.positive]="assetDetails.quote.change > 0" [class.negative]="assetDetails.quote.change < 0">
-                        {{ assetDetails.quote.change > 0 ? '+' : '' }}{{ assetDetails.quote.change | currency:assetDetails.quote.currency:'symbol':'1.2-2' }}
-                        <span class="change-percent">({{ assetDetails.quote.changePercent > 0 ? '+' : '' }}{{ assetDetails.quote.changePercent | number:'1.2-2' }}%)</span>
-                    </span>
-                </div>
-            </div>
-            <div class="buying-power-display">
-                <span>Buying power: {{ buyingPower | currency:assetDetails.quote.currency:'symbol':'1.2-2' }}</span>
-            </div>
-        </div>
-
-
-
         <app-custom-slider
           [leftValue]="TradeSide.BUY"
           [rightValue]="TradeSide.SELL"
@@ -142,7 +114,6 @@
     }
     </div>
 
-    <!-- Right Column: Order Summary -->
     @if (showOrderSummaryPanel) {
         <div class="order-summary-panel-side">
             <div class="panel-header-title">
@@ -258,7 +229,6 @@
         </div>
     }
 
-    <!-- Order Submission Modal Overlay -->
     @if (isSubmittingOrder || orderSubmitted || orderError) {
         <div class="order-modal-overlay">
             @if (isSubmittingOrder) {

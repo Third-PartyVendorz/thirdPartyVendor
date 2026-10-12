@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, inject, DestroyRef, ChangeDetectorRef, ViewChild, ElementRef, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, DestroyRef, ChangeDetectorRef, ViewChild, ElementRef, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule, getCurrencySymbol } from '@angular/common';
 import { Router } from '@angular/router';
 import { TradeSide } from '../../shared/trade-side';
@@ -24,7 +24,7 @@ enum UnitType {
   templateUrl: './trade-form.component.html',
   styleUrl: './trade-form.component.scss',
 })
-export class TradeFormComponent implements OnInit {
+export class TradeFormComponent implements OnInit, OnChanges {
 
   @Input() ticker = '';
   @Input() assetDetails: AssetTradeDetails | null = null;
@@ -69,6 +69,17 @@ export class TradeFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.initializeCurrencyAndHoldings();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['assetDetails'] && !changes['assetDetails'].firstChange) {
+      this.showOrderSummaryPanel = false;
+      this.initializeCurrencyAndHoldings();
+    }
+  }
+
+  private initializeCurrencyAndHoldings(): void {
     if (!this.assetDetails?.quote?.currency) {
       console.warn('AssetDetails or currency not available in trade form - defaulting to USD');
     }

@@ -1,0 +1,50 @@
+<section class="trade-page">
+	<header class="trade-search-panel">
+		<div>
+			<p class="trade-eyebrow">Trading</p>
+			<h1>Search for a stock</h1>
+			<p class="trade-lead">Look up a ticker and trade an asset.</p>
+		</div>
+
+		<form class="trade-search-form" (ngSubmit)="submitSearch()">
+			<label class="sr-only" for="trade-ticker-input">Ticker symbol</label>
+			<input id="trade-ticker-input" name="ticker" [(ngModel)]="searchTicker" type="text" placeholder="Enter ticker symbol" autocomplete="off" />
+			<button type="submit">Search</button>
+		</form>
+
+		<p *ngIf="searchError" class="trade-search-error">{{ searchError }}</p>
+	</header>
+
+	<app-asset-result class="hidden" [ticker]="activeTicker" [autoOpenTrade]="autoOpenTrade" (tradeButtonClicked)="onAssetLoaded($event)"></app-asset-result>
+
+	<ng-container *ngIf="!activeTicker; else loadedTicker">
+		<article class="trade-card trade-empty-state">
+			<h2>Ready when you are</h2>
+			<p>Search for a ticker above to get started trading.</p>
+		</article>
+	</ng-container>
+
+	<ng-template #loadedTicker>
+		<ng-container *ngIf="assetDetails() as details">
+			<div class="unified-trade-container">
+				<div class="stock-info-compact">
+					<div class="info-badge">{{ details.symbol }}</div>
+					<h2 class="info-company">{{ details.asset.name }}</h2>
+					<p class="info-exchange">{{ details.asset.exchange }} • {{ details.quote.currency }}</p>
+					
+					<div class="info-price-section">
+						<div class="info-price">{{ details.quote.price | currency:details.quote.currency:'symbol':'1.2-2' }}</div>
+						<div class="info-change" [class.positive]="details.quote.change > 0" [class.negative]="details.quote.change < 0">
+							{{ details.quote.change > 0 ? '+' : '' }}{{ details.quote.change | currency:details.quote.currency:'symbol':'1.2-2' }}
+							<span>({{ details.quote.changePercent > 0 ? '+' : '' }}{{ details.quote.changePercent | number:'1.2-2' }}%)</span>
+						</div>
+					</div>
+				</div>
+
+				<div class="trade-form-wrapper">
+					<app-trade-form-selector [ticker]="details.symbol" [assetDetails]="details"></app-trade-form-selector>
+				</div>
+			</div>
+		</ng-container>
+	</ng-template>
+</section>

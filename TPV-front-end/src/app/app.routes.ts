@@ -7,6 +7,7 @@ import { HistoryPage } from './history-page/history-page';
 import { MainLayoutComponent } from './layouts/main-layout';
 import { AssetsPage } from './assets-page/assets-page';
 import { ProfilePage } from './profile-page/profile-page';
+import { TradePage } from './trade-page/trade-page.component';
 
 export const routes: Routes = [
   {
@@ -32,13 +33,14 @@ export const routes: Routes = [
       { path: '', component: HistoryPage },
     ],
   },
-  // {
-  //   path: 'trade',
-  //   component: MainLayoutComponent,
-  //   children: [
-  //     { path: '', component: TradePage },
-  //   ],
-  // },
+  {
+    path: 'trade',
+    component: MainLayoutComponent,
+    canActivate: [authGuard],
+    children: [
+      { path: '', component: TradePage },
+    ],
+  },
   {
 	path: 'profile',
 	component: MainLayoutComponent,

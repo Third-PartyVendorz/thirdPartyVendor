@@ -72,6 +72,8 @@ export class AssetResultComponent implements OnInit {
 		}
 	}
 
+	@Input() autoOpenTrade = false;
+
 	@Output() tradeButtonClicked = new EventEmitter<AssetTradeDetails>();
 
 	constructor(
@@ -113,6 +115,11 @@ export class AssetResultComponent implements OnInit {
 
 				this.loading.set(false);
 				this.historicalLoading.set(false);
+
+				// Auto-open trade modal if requested
+				if (this.autoOpenTrade && quote && asset) {
+					this.onTradeButtonClick(ticker);
+				}
 			}),
 		);
 	}
