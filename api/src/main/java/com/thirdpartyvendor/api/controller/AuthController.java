@@ -69,8 +69,8 @@ public class AuthController {
 		AuthenticationJwtModel authJwtModel = authenticationService.authenticate(request);
 		RefreshToken refreshToken = refreshService.createRefreshToken(authJwtModel.userId());
 
-		response.addHeader(HttpHeaders.SET_COOKIE, buildAuthCookie(httpRequest, authJwtModel.jwtToken()).toString());
-		response.addHeader(HttpHeaders.SET_COOKIE, buildRefreshCookie(httpRequest, refreshToken.getToken()).toString());
+		response.addHeader(HttpHeaders.SET_COOKIE, buildAuthCookie(httpRequest, authJwtModel.jwtToken(), jwtExpirationMs).toString());
+		response.addHeader(HttpHeaders.SET_COOKIE, buildRefreshCookie(httpRequest, refreshToken.getToken(), refreshExpirationMs).toString());
 
 		AuthenticationResponse authResponse = new AuthenticationResponse(
 			authJwtModel.firstName(),
@@ -105,8 +105,8 @@ public class AuthController {
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Please login again");
 		}
 
-		response.addHeader(HttpHeaders.SET_COOKIE, buildRefreshCookie(httpRequest, rotatedRefreshToken.getToken()).toString());
-		response.addHeader(HttpHeaders.SET_COOKIE, buildAuthCookie(httpRequest, jwtService.generateToken(rotatedRefreshToken.getUser())).toString());
+		response.addHeader(HttpHeaders.SET_COOKIE, buildRefreshCookie(httpRequest, rotatedRefreshToken.getToken(), refreshExpirationMs).toString());
+		response.addHeader(HttpHeaders.SET_COOKIE, buildAuthCookie(httpRequest, jwtService.generateToken(rotatedRefreshToken.getUser()), jwtExpirationMs).toString());
 
 		return ResponseEntity.ok().build();
 	}
@@ -115,14 +115,13 @@ public class AuthController {
 	public ResponseEntity<Void> logout(
 			HttpServletRequest httpRequest,
 			HttpServletResponse response) {
-				// revoke refresh token by setting it to an empty value, first need to check if it exists (user relogging in while already logged in)
 		String refreshToken = getCookieValue(httpRequest, "refreshToken");
 		if (refreshToken != null) {
 			refreshService.revokeRefreshToken(refreshToken);
 		}
 
-		response.addHeader(HttpHeaders.SET_COOKIE, buildAuthCookie(httpRequest, "").toString());
-		response.addHeader(HttpHeaders.SET_COOKIE, buildRefreshCookie(httpRequest, "").toString());
+		response.addHeader(HttpHeaders.SET_COOKIE, buildAuthCookie(httpRequest, "", 0).toString());
+		response.addHeader(HttpHeaders.SET_COOKIE, buildRefreshCookie(httpRequest, "", 0).toString());
 		
 		return ResponseEntity.ok().build();
 	}
@@ -141,7 +140,7 @@ public class AuthController {
 		return null;
 	}
 
-	private ResponseCookie buildAuthCookie(HttpServletRequest request, String value) {
+	private ResponseCookie buildAuthCookie(HttpServletRequest request, String value, long jwtExpirationMs) {
 		return ResponseCookie.from("authToken", value)
 			.httpOnly(true)
 			.secure(request.isSecure())
@@ -151,7 +150,7 @@ public class AuthController {
 			.build();
 	}
 
-	private ResponseCookie buildRefreshCookie(HttpServletRequest request, String value) {
+	private ResponseCookie buildRefreshCookie(HttpServletRequest request, String value, long refreshExpirationMs) {
 		return ResponseCookie.from("refreshToken", value)
 			.httpOnly(true)
 			.secure(request.isSecure())

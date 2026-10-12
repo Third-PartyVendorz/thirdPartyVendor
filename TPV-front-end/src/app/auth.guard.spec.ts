@@ -53,7 +53,6 @@ describe('authGuard', () => {
 
     const result = TestBed.runInInjectionContext(() => authGuard({} as never, {} as never));
 
-    expect(authService.markSessionExpired).toHaveBeenCalledTimes(1);
     expect(messageService.message()).toEqual({
       type: 'error',
       text: 'You must be signed in to access that page.',

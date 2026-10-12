@@ -26,7 +26,6 @@ export const authGuard: CanActivateFn = () => {
   }
 
   // Session not authenticated, redirect to login
-  authService.markSessionExpired();
   messageService.setErrorMessage('You must be signed in to access that page.');
   return router.parseUrl('/login');
 };
