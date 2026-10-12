@@ -4,6 +4,21 @@ import analytics_functions as af
 
 import pandas as pd
 
+date_map = {
+    "01": "January",
+    "02": "February",
+    "03": "March",
+    "04": "April",
+    "05": "May",
+    "06": "June",
+    "07": "July",
+    "08": "August",
+    "09": "September",
+    "10": "October",
+    "11": "November",
+    "12": "December"
+}
+
 def run_analytics_job():
     query = msc.get_current_month_trades_query()
     conn = db.open_db_connection()
@@ -14,6 +29,8 @@ def run_analytics_job():
     df = pd.DataFrame(results)
 
     analytics_payload = af.perform_analytics(df)
+    
+    analytics_payload["date"] = f"{date_map[f'{month:02d}']} {year}"
 
     db.close_db_connection(conn)
 

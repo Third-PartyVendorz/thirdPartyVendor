@@ -31,16 +31,21 @@ Plan:
  - Implement non-blocking strategy with frontend - done
  - Clean up 2:
       - Cleaning up queries
-          - Not all columns needed
-          - Correct joins with trade and orders tables --> data leakage
+          - Not all columns needed - done
+          - Correct joins with trade and orders tables --> data leakage - done
       - Clean up frontend
           - Small details like order vs trade - done
-          - Display current month on default analytics job
+          - Display current month on default analytics job - done
  - Dockerize analytics service
 
+ - ********Verify Valid Auth flow*********
+    - Rather than directly adding auth to python Auth will go through spring
+    - frontend calls to spring controller which implements auth then call to python API 
+        - python endpoint still exposed? --> only accepts requests that match the spring domain?
 
 
+- Add pricing to the analytics --> This will come after during clean up week 
+    - First implement with sheer volume then integrate
+- Add side metric to top k --> Buy and sell
 
-
- - ********Verify Valid Auth flow********* --> This shit boutta be hard
 
