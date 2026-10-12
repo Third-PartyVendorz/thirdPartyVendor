@@ -5,7 +5,7 @@ import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { authInterceptor } from './AuthInterceptor';
 import { MessageService } from './services/message.service';
-import { environment } from '../../environments/environment.local';
+import { environment } from '../environments/environment.local';
 
 describe('authInterceptor', () => {
   let httpClient: HttpClient;
