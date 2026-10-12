@@ -1,11 +1,30 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from analytics_driver import run_analytics_job, run_custom_analytics_job
+from datetime import timedelta
+
+from dotenv import load_dotenv
+import os
+
+from flask_jwt_extended import JWTManager, jwt_required
+
+
+load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
 
+
+app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(milliseconds=int(os.getenv("JWT_ACCESS_TOKEN_EXPIRES", 86400000)))
+app.config["JWT_ALGORITHM"] = os.getenv("JWT_ALGORITHM", "HS512")
+app.config["JWT_DECODE_ALGORITHMS"] = [os.getenv("JWT_DECODE_ALGORITHMS", "HS512")]
+
+
+jwt = JWTManager(app)
+
 @app.route('/analytics', methods=['GET'])
+@jwt_required()
 def analytics():
     
     analytics_payload = None
