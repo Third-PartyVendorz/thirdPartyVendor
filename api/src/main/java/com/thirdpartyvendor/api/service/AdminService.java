@@ -72,8 +72,6 @@ public class AdminService {
         return mapToResponse(user);
     }
 
-    // This looks so ugly becuase we Trade doesn't have a ticker value, 
-    // so in every lookup we have to reference the orderId to get the ticker.
     public List<TradeResponse> getUserTrades(Long userId, AppUser currentUser) {
         AuthorizationUtil.requireAdmin(currentUser);
 
@@ -83,12 +81,10 @@ public class AdminService {
         return tradeRepository.findAll().stream()
             .filter(trade -> orderIds.contains(trade.getOrderId()))
             .map(trade -> {
-                Order order = orderRepository.findById(trade.getOrderId()).orElse(null);
-                String ticker = order != null ? order.getTicker() : "UNKNOWN";
                 return new TradeResponse(
                     trade.getTradeId(),
                     trade.getOrderId(),
-                    ticker,
+                    trade.getTicker(),
                     trade.getExecutionPrice(),
                     trade.getExecutionQuantity(),
                     trade.getTradeTimestamp(),

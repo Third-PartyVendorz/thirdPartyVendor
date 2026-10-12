@@ -40,16 +40,10 @@ public class TradeService {
     }
 
     private TradeResponse mapToResponse(Trade trade) {
-
-        Order order = orderRepository.findById(trade.getOrderId())
-            .orElse(null);
-        
-        String ticker = order != null ? order.getTicker() : "UNKOWN TICKER";
-
         return new TradeResponse(
             trade.getTradeId(),
             trade.getOrderId(),
-            ticker,
+            trade.getTicker(),
             trade.getExecutionPrice(),
             trade.getExecutionQuantity(),
             trade.getTradeTimestamp(),
