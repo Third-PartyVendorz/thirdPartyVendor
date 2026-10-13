@@ -127,7 +127,13 @@ public class OrderExecutionService {
             throw new OrderExecutionException("Insufficient shares to execute sell order");
         }
 
-        holding.setNumShares(currentShares.subtract(executionQuantity).setScale(4, RoundingMode.HALF_UP));
+        BigDecimal remainingShares = currentShares.subtract(executionQuantity).setScale(4, RoundingMode.HALF_UP);
+        if (remainingShares.compareTo(BigDecimal.ZERO) == 0) {
+            holdingRepository.delete(holding);
+            return;
+        }
+
+        holding.setNumShares(remainingShares);
         holdingRepository.save(holding);
     }
 

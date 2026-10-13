@@ -163,6 +163,27 @@ export class TradeFormComponent implements OnInit, OnChanges {
     return this.calculatedShares * price;
   }
 
+  get tradeActionLabel(): string {
+    return this.currentSide === TradeSide.BUY ? 'Buy' : 'Sell';
+  }
+
+  get executedTotal(): number {
+    const response = this.submittedOrderResponse;
+    if (!response?.executionPrice || !response.executionQuantity) {
+      return 0;
+    }
+
+    return response.executionPrice * response.executionQuantity;
+  }
+
+  get executedPrice(): number {
+    return this.submittedOrderResponse?.executionPrice ?? 0;
+  }
+
+  get executedQuantity(): number {
+    return this.submittedOrderResponse?.executionQuantity ?? 0;
+  }
+
   clearValueInput = () => this.form.get('inputValue')?.setValue(null);
 
   getInputValue = () => this.form.get('inputValue')?.value;
@@ -318,9 +339,9 @@ export class TradeFormComponent implements OnInit, OnChanges {
       orderCurrency: this.currency,
     };
 
-    this.currentUnit === UnitType.SHARES ? 
-      orderRequest.quantity = this.calculatedShares : 
-      orderRequest.orderPrice = this.assetDetails?.quote?.price || 0;
+    this.currentUnit === UnitType.SHARES ?
+      orderRequest.quantity = this.calculatedShares :
+      orderRequest.orderPrice = parseFormattedNumber(this.form.get('inputValue')?.value);
 
     this.showOrderSummaryPanel = false;
 
@@ -342,7 +363,7 @@ export class TradeFormComponent implements OnInit, OnChanges {
         error: (error) => {
           this.isSubmittingOrder = false;
           this.orderError = true;
-          this.orderErrorMessage = error.message || 'Order submission failed. Please try again.';
+          this.orderErrorMessage = error?.error?.message || error?.message || 'We could not complete this trade. Please try again.';
           this.cdr.markForCheck();
         }
       });
