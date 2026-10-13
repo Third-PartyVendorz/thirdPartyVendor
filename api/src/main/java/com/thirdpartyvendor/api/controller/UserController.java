@@ -1,9 +1,8 @@
 package com.thirdpartyvendor.api.controller;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,7 +14,7 @@ import com.thirdpartyvendor.api.entity.AppUser;
 import com.thirdpartyvendor.api.service.UserService;
 
 @RestController
-@RequestMapping("/users/{userId}")
+@RequestMapping("/users")
 public class UserController {
 
 	private final UserService userService;
@@ -24,37 +23,29 @@ public class UserController {
 		this.userService = userService;
 	}
 
-	private AppUser getCurrentUser() {
-		return (AppUser) SecurityContextHolder.getContext()
-			.getAuthentication().getPrincipal();
-	}
-
 	@PutMapping("/edit")
 	public ResponseEntity<?> editAccount(
-		@PathVariable Long userId,
+		@AuthenticationPrincipal AppUser currentUser,
 		@RequestBody EditAccountRequest editAccountRequest
 	) {
-		AppUser currentUser = getCurrentUser();
-		userService.editUser(userId, editAccountRequest, currentUser);
+		userService.editUser(editAccountRequest, currentUser);
 		return ResponseEntity.ok("Account updated successfully");
 	}
 
 	@PutMapping("/changePassword")
 	public ResponseEntity<?> changePassword(
-		@PathVariable Long userId,
+		@AuthenticationPrincipal AppUser currentUser,
 		@RequestBody ChangePasswordRequest passwordRequest
 	) {
-		AppUser currentUser = getCurrentUser();
-		userService.changePassword(userId, passwordRequest, currentUser);
+		userService.changePassword(passwordRequest, currentUser);
 		return ResponseEntity.ok("Password changed successfully");
 	}
 
 	@DeleteMapping("/delete") 
 	public ResponseEntity<?> deleteUser(
-		@PathVariable Long userId
+		@AuthenticationPrincipal AppUser currentUser
 	) {
-		AppUser currentUser = getCurrentUser();
-		userService.softDeleteUser(userId, currentUser);
+		userService.softDeleteUser(currentUser);
 		return ResponseEntity.ok("Account updated successfully");
 	}
 }
