@@ -17,11 +17,19 @@ export class UserContextService {
     try {
       const parsedUserContext = JSON.parse(storedUserContext) as Partial<UserContext>;
 
-      if (!parsedUserContext.firstName || !parsedUserContext.lastName || !parsedUserContext.phoneNumber || !parsedUserContext.email || !parsedUserContext.dateOfBirth) {
+      if (
+        !parsedUserContext.userId ||
+        !parsedUserContext.firstName ||
+        !parsedUserContext.lastName ||
+        !parsedUserContext.phoneNumber ||
+        !parsedUserContext.email ||
+        !parsedUserContext.dateOfBirth
+      ) {
         return null;
       }
 
       return {
+        userId: parsedUserContext.userId,
         firstName: parsedUserContext.firstName,
         lastName: parsedUserContext.lastName,
         phoneNumber: parsedUserContext.phoneNumber,
