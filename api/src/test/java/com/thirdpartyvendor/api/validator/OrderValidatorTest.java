@@ -24,25 +24,9 @@ class OrderValidatorTest {
     }
 
     @Test
-    void rejectsMissingAssetIdWith422() {
-        BadOrderException exception = assertThrows(BadOrderException.class,
-            () -> orderValidator.validateCreateOrder(new CreateOrderRequest(
-                null,
-                "AAPL",
-                OrderIntent.BUY,
-                new BigDecimal("10"),
-                null,
-                "USD"
-            ), 1L));
-
-        assertEquals("Asset id is required", exception.getMessage());
-    }
-
-    @Test
     void rejectsMissingTickerWith422() {
         BadOrderException exception = assertThrows(BadOrderException.class,
             () -> orderValidator.validateCreateOrder(new CreateOrderRequest(
-                1L,
                 null,
                 OrderIntent.BUY,
                 new BigDecimal("10"),
@@ -57,7 +41,6 @@ class OrderValidatorTest {
     void rejectsMissingOrderIntentWith422() {
         BadOrderException exception = assertThrows(BadOrderException.class,
             () -> orderValidator.validateCreateOrder(new CreateOrderRequest(
-                1L,
                 "AAPL",
                 null,
                 new BigDecimal("10"),
@@ -72,7 +55,6 @@ class OrderValidatorTest {
     void rejectsProvidingBothQuantityAndOrderPriceWith422() {
         BadOrderException exception = assertThrows(BadOrderException.class,
             () -> orderValidator.validateCreateOrder(new CreateOrderRequest(
-                1L,
                 "AAPL",
                 OrderIntent.BUY,
                 new BigDecimal("10"),
@@ -87,7 +69,6 @@ class OrderValidatorTest {
     void rejectsNonPositiveQuantityWith422() {
         BadOrderException exception = assertThrows(BadOrderException.class,
             () -> orderValidator.validateCreateOrder(new CreateOrderRequest(
-                1L,
                 "AAPL",
                 OrderIntent.BUY,
                 BigDecimal.ZERO,
@@ -102,7 +83,6 @@ class OrderValidatorTest {
     void rejectsNonPositiveOrderPriceWith422() {
         BadOrderException exception = assertThrows(BadOrderException.class,
             () -> orderValidator.validateCreateOrder(new CreateOrderRequest(
-                1L,
                 "AAPL",
                 OrderIntent.BUY,
                 null,
@@ -117,7 +97,6 @@ class OrderValidatorTest {
     void rejectsMissingCurrencyWith422() {
         BadOrderException exception = assertThrows(BadOrderException.class,
             () -> orderValidator.validateCreateOrder(new CreateOrderRequest(
-                1L,
                 "AAPL",
                 OrderIntent.BUY,
                 new BigDecimal("10"),

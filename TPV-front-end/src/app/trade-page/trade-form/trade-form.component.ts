@@ -313,12 +313,14 @@ export class TradeFormComponent implements OnInit, OnChanges {
 
   submitOrder = (): void => {
     const orderRequest: OrderRequest = {
-      symbol: this.ticker,
-      side: this.currentSide,
-      quantity: this.calculatedShares,
-      price: this.assetDetails?.quote?.price || 0,
-      currency: this.currency
+      ticker: this.ticker,
+      orderIntent: this.currentSide,
+      orderCurrency: this.currency,
     };
+
+    this.currentUnit === UnitType.SHARES ? 
+      orderRequest.quantity = this.calculatedShares : 
+      orderRequest.orderPrice = this.assetDetails?.quote?.price || 0;
 
     this.showOrderSummaryPanel = false;
 

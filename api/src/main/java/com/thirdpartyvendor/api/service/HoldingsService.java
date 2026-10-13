@@ -19,7 +19,6 @@ public class HoldingsService {
     public List<HoldingResponse> getHoldings(Long userId) {
         return holdingsRepository.findByUserId(userId).stream()
             .map(holding -> new HoldingResponse(
-                holding.getAssetId(),
                 holding.getUserId(),
                 holding.getSecurity(),
                 holding.getTicker(),
@@ -32,7 +31,6 @@ public class HoldingsService {
     public HoldingResponse getHoldingByTicker(Long userId, String ticker) {
     return holdingsRepository.findByUserIdAndTicker(userId, ticker)
         .map(holding -> new HoldingResponse(
-            holding.getAssetId(),
             holding.getUserId(),
             holding.getSecurity(),
             holding.getTicker(),
@@ -40,7 +38,6 @@ public class HoldingsService {
             holding.getNumShares()
         ))
         .orElseGet(() -> new HoldingResponse(
-            null,
             userId,
             null,
             ticker,

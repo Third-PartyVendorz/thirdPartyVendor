@@ -12,6 +12,7 @@ import static org.mockito.Mockito.when;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -26,6 +27,7 @@ import com.thirdpartyvendor.api.entity.Order;
 import com.thirdpartyvendor.api.error.OrderExceptions.BadOrderException;
 import com.thirdpartyvendor.api.repository.HoldingRepository;
 import com.thirdpartyvendor.api.repository.OrderRepository;
+import com.thirdpartyvendor.api.repository.TradeRepository;
 import com.thirdpartyvendor.api.validator.OrderValidator;
 
 class OrderServiceTest {
@@ -36,6 +38,7 @@ class OrderServiceTest {
     private CashHoldingsService cashHoldingsService;
     private MarketDataAPIClient marketDataAPIClient;
     private OrderExecutionService orderExecutionService;
+    private TradeRepository tradeRepository;
 
     @BeforeEach
     void setUp() {
@@ -44,8 +47,9 @@ class OrderServiceTest {
         cashHoldingsService = mock(CashHoldingsService.class);
         marketDataAPIClient = mock(MarketDataAPIClient.class);
         orderExecutionService = mock(OrderExecutionService.class);
+        tradeRepository = mock(TradeRepository.class);
         OrderValidator orderValidator = new OrderValidator();
-        orderService = new OrderService(orderRepository, orderValidator, holdingRepository, cashHoldingsService, marketDataAPIClient, orderExecutionService);
+        orderService = new OrderService(orderRepository, orderValidator, holdingRepository, cashHoldingsService, marketDataAPIClient, orderExecutionService, tradeRepository);
     }
 
     @Test
@@ -55,7 +59,6 @@ class OrderServiceTest {
         Order order1 = new Order();
         order1.setId(1L);
         order1.setUserId(userId);
-        order1.setAssetId(100L);
         order1.setTicker("AAPL");
         order1.setOrderIntent(Order.OrderIntent.BUY);
         order1.setQuantity(BigDecimal.valueOf(10.0));
@@ -64,7 +67,6 @@ class OrderServiceTest {
         Order order2 = new Order();
         order2.setId(2L);
         order2.setUserId(userId);
-        order2.setAssetId(101L);
         order2.setTicker("TSLA");
         order2.setOrderIntent(Order.OrderIntent.SELL);
         order2.setOrderPrice(BigDecimal.valueOf(500.0));
@@ -115,7 +117,6 @@ class OrderServiceTest {
             )
         );
         CreateOrderRequest request = new CreateOrderRequest(
-            100L,
             "AAPL",
             Order.OrderIntent.BUY,
             BigDecimal.valueOf(10.0),
@@ -127,7 +128,6 @@ class OrderServiceTest {
         Order newOrder = new Order();
         newOrder.setId(1L);
         newOrder.setUserId(userId);
-        newOrder.setAssetId(request.assetId());
         newOrder.setTicker(request.ticker());
         newOrder.setOrderIntent(request.orderIntent());
         newOrder.setQuantity(request.quantity());
@@ -135,6 +135,7 @@ class OrderServiceTest {
         newOrder.setOrderCurrency(request.orderCurrency());
 
         when(orderRepository.save(any(Order.class))).thenReturn(newOrder);
+        when(orderRepository.findById(newOrder.getId())).thenReturn(Optional.of(newOrder));
 
         OrderResponse result = orderService.createOrder(request, userId);
 
@@ -147,7 +148,6 @@ class OrderServiceTest {
     @DisplayName("Test createOrder successfully with orderPrice")
     void testCreateOrderSuccessfullyWithOrderPrice() {
         CreateOrderRequest request = new CreateOrderRequest(
-            100L,
             "AAPL",
             Order.OrderIntent.BUY,
             null,
@@ -178,7 +178,6 @@ class OrderServiceTest {
         Long userId = 1L;
         newOrder.setId(1L);
         newOrder.setUserId(userId);
-        newOrder.setAssetId(request.assetId());
         newOrder.setTicker(request.ticker());
         newOrder.setOrderIntent(request.orderIntent());
         newOrder.setQuantity(request.quantity());
@@ -186,6 +185,7 @@ class OrderServiceTest {
         newOrder.setOrderCurrency(request.orderCurrency());
 
         when(orderRepository.save(any(Order.class))).thenReturn(newOrder);
+        when(orderRepository.findById(newOrder.getId())).thenReturn(Optional.of(newOrder));
 
         OrderResponse result = orderService.createOrder(request, userId);
 
@@ -197,7 +197,6 @@ class OrderServiceTest {
     @DisplayName("Test createOrder with missing fields")
     void testCreateOrderWithMissingFields() {
         CreateOrderRequest createOrderRequest = new CreateOrderRequest(
-            100L,
             "AAPL",
             Order.OrderIntent.BUY,
             BigDecimal.valueOf(10.0),

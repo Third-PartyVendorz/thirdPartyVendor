@@ -1,7 +1,9 @@
+import { TradeSide } from "../shared/trade-side";
+
 export interface OrderRequest {
-    symbol: string;
-    side: string;
-    quantity: number;
-    price: number;
-    currency: string;
+    ticker: string;
+    orderIntent: TradeSide;
+    quantity?: number;
+    orderPrice?: number;
+    orderCurrency: string;
 }

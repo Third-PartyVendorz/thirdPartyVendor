@@ -1,15 +1,21 @@
 <div class="trade-form-wrapper" [class.summary-active]="showOrderSummaryPanel">
     <div class="trade-form-container" [class.disabled-form]="showOrderSummaryPanel">
-        <app-custom-slider
-          [leftValue]="TradeSide.BUY"
-          [rightValue]="TradeSide.SELL"
-          leftLabel="Buy"
-          rightLabel="Sell"
-          leftColor="#10b981"  
-          rightColor="#ef4444" 
-          [(value)]="currentSide"
-          style="justify-self: center;"
-        ></app-custom-slider>
+        <div class="buying-power-display">
+                <app-custom-slider
+            [leftValue]="TradeSide.BUY"
+            [rightValue]="TradeSide.SELL"
+            leftLabel="Buy"
+            rightLabel="Sell"
+            leftColor="#10b981"  
+            rightColor="#ef4444" 
+            [(value)]="currentSide"
+            style="justify-self: center;"
+            ></app-custom-slider>
+            <span style="justify-self: right;">
+                Buying Power: {{ buyingPower | currency:currency:'symbol':'1.2-2' }}
+            </span>
+        </div>
+        
 
                 @if (hasCurrency === false && currentSide === TradeSide.BUY) {
             <div class="currency-required-banner">
@@ -244,10 +250,11 @@
                     <div class="success-content">
                         <p class="success-title">Order Submitted Successfully</p>
                         <div class="order-confirmation">
-                            <p><strong>Asset:</strong> {{ submittedOrderResponse.symbol }}</p>
+                            <p><strong>Asset:</strong> {{ submittedOrderResponse.ticker }}</p>
                             <p><strong>Status:</strong> {{ submittedOrderResponse.status }}</p>
-                            <p><strong>Quantity:</strong> {{ submittedOrderResponse.quantity }} shares</p>
-                            <p><strong>Price:</strong> {{ submittedOrderResponse.price | currency:submittedOrderResponse.currency:'symbol':'1.2-2' }}/share</p>
+                            <p><strong>Quantity:</strong> {{ submittedOrderResponse.executionQuantity }} shares</p>
+                            <p><strong>Price:</strong> {{ submittedOrderResponse.executionPrice * submittedOrderResponse.executionQuantity | currency:submittedOrderResponse.orderCurrency:'symbol':'1.2-2' }}</p>
+                            <p><strong>Price per share:</strong> {{ submittedOrderResponse.executionPrice | currency:submittedOrderResponse.orderCurrency:'symbol':'1.2-2' }}</p>
                         </div>
                         <button (click)="navigateToDashboard()" class="dashboard-button">
                             Go to Dashboard

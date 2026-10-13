@@ -1,7 +1,6 @@
 export interface Holding {
     ticker: string;
     numShares: number;
-    asset_id: number;
     userId: number;
     security: string;
     assetType: string;

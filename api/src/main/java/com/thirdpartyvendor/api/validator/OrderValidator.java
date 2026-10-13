@@ -21,10 +21,6 @@ public class OrderValidator {
             throw new BadOrderException("Order request is required");
         }
 
-        if (request.assetId() == null) {
-            throw new BadOrderException("Asset id is required");
-        }
-
         if (request.ticker() == null || request.ticker().trim().isBlank()) {
             throw new BadOrderException("Ticker is required");
         }

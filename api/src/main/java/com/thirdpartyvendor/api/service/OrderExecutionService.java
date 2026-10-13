@@ -88,7 +88,6 @@ public class OrderExecutionService {
                 }
 
                 Holding newHolding = new Holding();
-                newHolding.setAssetId(order.getAssetId());
                 newHolding.setUserId(userId);
                 newHolding.setSecurity(order.getTicker());
                 newHolding.setTicker(order.getTicker());

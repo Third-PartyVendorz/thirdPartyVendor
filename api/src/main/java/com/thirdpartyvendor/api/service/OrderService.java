@@ -15,10 +15,12 @@ import com.thirdpartyvendor.api.dto.OrderResponse;
 import com.thirdpartyvendor.api.entity.Holding;
 import com.thirdpartyvendor.api.entity.Order;
 import com.thirdpartyvendor.api.entity.Order.OrderStatus;
+import com.thirdpartyvendor.api.entity.Trade;
 import com.thirdpartyvendor.api.error.CashExceptions.InsufficientCashException;
 import com.thirdpartyvendor.api.error.OrderExceptions.OrderNotFoundException;
 import com.thirdpartyvendor.api.repository.HoldingRepository;
 import com.thirdpartyvendor.api.repository.OrderRepository;
+import com.thirdpartyvendor.api.repository.TradeRepository;
 import com.thirdpartyvendor.api.validator.OrderValidator;
 
 @Service
@@ -30,6 +32,7 @@ public class OrderService {
     private final CashHoldingsService cashHoldingsService;
     private final MarketDataAPIClient marketDataAPIClient;
     private final OrderExecutionService orderExecutionService;
+    private final TradeRepository tradeRepository;
 
     public OrderService(
         OrderRepository orderRepository,
@@ -37,7 +40,8 @@ public class OrderService {
         HoldingRepository holdingRepository,
         CashHoldingsService cashHoldingsService,
         MarketDataAPIClient marketDataAPIClient,
-        OrderExecutionService orderExecutionService
+        OrderExecutionService orderExecutionService,
+        TradeRepository tradeRepository
     ) {
         this.orderRepository = orderRepository;
         this.orderValidator = orderValidator;
@@ -45,6 +49,7 @@ public class OrderService {
         this.cashHoldingsService = cashHoldingsService;
         this.marketDataAPIClient = marketDataAPIClient;
         this.orderExecutionService = orderExecutionService;
+        this.tradeRepository = tradeRepository;
     }
 
     public OrderResponse createOrder(CreateOrderRequest createOrderRequest, Long userId) {
@@ -53,7 +58,6 @@ public class OrderService {
 
         Order newOrder = new Order();
         newOrder.setUserId(userId);
-        newOrder.setAssetId(createOrderRequest.assetId());
         newOrder.setTicker(normalizeTicker(createOrderRequest.ticker()));
         newOrder.setOrderIntent(createOrderRequest.orderIntent());
         newOrder.setQuantity(createOrderRequest.quantity());
@@ -67,16 +71,20 @@ public class OrderService {
 
         Order executedOrder = orderRepository.findById(savedOrder.getId())
             .orElseThrow(() -> new OrderNotFoundException("Order not found"));
+        Trade execution = tradeRepository.findByOrderId(executedOrder.getId()).stream()
+            .findFirst()
+            .orElse(null);
         
 
         return new OrderResponse(
             executedOrder.getId(),
             executedOrder.getUserId(),
-            executedOrder.getAssetId(),
             executedOrder.getTicker(),
             executedOrder.getOrderIntent(),
             executedOrder.getQuantity(),
             executedOrder.getOrderPrice(),
+            execution != null ? execution.getExecutionPrice() : null,
+            execution != null ? execution.getExecutionQuantity() : null,
             executedOrder.getStatus(),
             executedOrder.getCreatedAt(),
             executedOrder.getOrderCurrency()
@@ -131,11 +139,12 @@ public class OrderService {
             .map(order -> new OrderResponse(
                 order.getId(),
                 order.getUserId(),
-                order.getAssetId(),
                 order.getTicker(),
                 order.getOrderIntent(),
                 order.getQuantity(),
                 order.getOrderPrice(),
+                null,
+                null,
                 order.getStatus(),
                 order.getCreatedAt(),
                 order.getOrderCurrency()
@@ -153,11 +162,12 @@ public class OrderService {
         return new OrderResponse(
             order.getId(),
             order.getUserId(),
-            order.getAssetId(),
             order.getTicker(),
             order.getOrderIntent(),
             order.getQuantity(),
             order.getOrderPrice(),
+            null,
+            null,
             order.getStatus(),
             order.getCreatedAt(),
             order.getOrderCurrency()

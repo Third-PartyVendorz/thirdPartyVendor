@@ -1,10 +1,12 @@
 export interface OrderResponse {
     orderId: string;
-    symbol: string;
-    side: string;
+    ticker: string;
+    orderIntent: string;
     quantity: number;
-    price: number;
+    orderPrice: number;
+    executionPrice: number;
+    executionQuantity: number;
     status: string;
-    timestamp: string;
-    currency: string;
+    createdAt: string;
+    orderCurrency: string;
 }
