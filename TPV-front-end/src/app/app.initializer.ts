@@ -13,7 +13,7 @@ import { catchError, of } from 'rxjs';
 export function validateSessionOnStartup() {
   const authService = inject(AuthService);
 
-  const bypassedRoutes = ['/login'];
+  const bypassedRoutes = ['/login', '/'];
 
   if (bypassedRoutes.includes(window.location.pathname)) {
     return of(false);

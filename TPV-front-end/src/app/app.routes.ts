@@ -16,7 +16,7 @@ export const routes: Routes = [
   },
   {
     path: '',
-    component: HomePage,
+    component: AuthPage,
     pathMatch: 'full',
   },
   {
