@@ -65,7 +65,7 @@ export class ProfilePage implements OnInit {
 		}
 
 		this.isSavingProfile = true;
-		this.userProfileService.editAccount(this.userContext.userId, this.profileDraft)
+		this.userProfileService.editAccount(this.profileDraft)
 			.pipe(finalize(() => {
 				this.isSavingProfile = false;
 			}))
@@ -115,7 +115,7 @@ export class ProfilePage implements OnInit {
 		}
 
 		this.isSavingPassword = true;
-		this.userProfileService.changePassword(this.userContext.userId, this.passwordDraft)
+		this.userProfileService.changePassword(this.passwordDraft)
 			.pipe(finalize(() => {
 				this.isSavingPassword = false;
 			}))
@@ -144,7 +144,7 @@ export class ProfilePage implements OnInit {
 		}
 
 		this.isDeletingAccount = true;
-		this.userProfileService.deleteAccount(this.userContext.userId)
+		this.userProfileService.deleteAccount()
 			.pipe(finalize(() => {
 				this.isDeletingAccount = false;
 			}))

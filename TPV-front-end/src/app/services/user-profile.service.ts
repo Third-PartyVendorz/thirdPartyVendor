@@ -11,20 +11,20 @@ import { EditAccountRequest } from '../dto/EditAccountRequest';
 export class UserProfileService {
   constructor(private http: HttpClient) {}
 
-  editAccount(userId: number, request: EditAccountRequest): Observable<string> {
-    return this.http.put(`${environment.apiBaseUrl}/users/${userId}/edit`, request, {
+  editAccount(request: EditAccountRequest): Observable<string> {
+    return this.http.put(`${environment.apiBaseUrl}/users/edit`, request, {
       responseType: 'text' as const,
     });
   }
 
-  changePassword(userId: number, request: ChangePasswordRequest): Observable<string> {
-    return this.http.put(`${environment.apiBaseUrl}/users/${userId}/changePassword`, request, {
+  changePassword(request: ChangePasswordRequest): Observable<string> {
+    return this.http.put(`${environment.apiBaseUrl}/users/changePassword`, request, {
       responseType: 'text' as const,
     });
   }
 
-  deleteAccount(userId: number): Observable<string> {
-    return this.http.delete(`${environment.apiBaseUrl}/users/${userId}/delete`, {
+  deleteAccount(): Observable<string> {
+    return this.http.delete(`${environment.apiBaseUrl}/users/delete`, {
       responseType: 'text' as const,
     });
   }
