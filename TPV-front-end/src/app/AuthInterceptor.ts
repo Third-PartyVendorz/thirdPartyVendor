@@ -22,7 +22,7 @@ export function authInterceptor(
 	const messageService = inject(MessageService);
 	const router = inject(Router);
 	const shouldUseCredentials = req.url.startsWith(environment.apiBaseUrl);
-	const isAuthEndpoint = req.url.includes('/auth/register') || req.url.includes('/auth/authenticate') || req.url.includes('/auth/refresh');
+	const isAuthEndpoint = req.url.includes('/auth/register') || req.url.includes('/auth/authenticate') || req.url.includes('/auth/refresh') || req.url.includes('/auth/me');
 	const interceptedRequest = shouldUseCredentials
 		? req.clone({ withCredentials: true })
 		: req;
@@ -62,6 +62,5 @@ export function authInterceptor(
 		}),
 	);
 }
-
 
 

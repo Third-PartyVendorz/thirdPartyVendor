@@ -29,3 +29,12 @@ export const authGuard: CanActivateFn = () => {
   messageService.setErrorMessage('You must be signed in to access that page.');
   return router.parseUrl('/login');
 };
+
+export const landingGuard: CanActivateFn = () => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
+
+  return authService.getSessionState() === true
+    ? router.parseUrl('/dashboard')
+    : router.parseUrl('/login');
+};
