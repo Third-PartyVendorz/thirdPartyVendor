@@ -2,12 +2,11 @@ import { CommonModule } from '@angular/common';
 import { Component, signal, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Navbar } from '../navbar/navbar';
 import { AssetResultComponent, AssetTradeDetails } from '../asset-result/asset-result';
 
 @Component({
 	standalone: true,
-	imports: [CommonModule, FormsModule, Navbar, AssetResultComponent],
+	imports: [CommonModule, FormsModule, AssetResultComponent],
 	selector: 'app-assets-page',
 	styleUrl: './assets-page.scss',
 	templateUrl: './assets-page.html',

@@ -1,6 +1,8 @@
 package com.thirdpartyvendor.api.service;
 
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 import com.thirdpartyvendor.api.repository.HoldingsRepository;
@@ -26,4 +28,25 @@ public class HoldingsService {
             ))
             .collect(Collectors.toList());
     }
+
+    public HoldingResponse getHoldingByTicker(Long userId, String ticker) {
+    return holdingsRepository.findByUserIdAndTicker(userId, ticker)
+        .map(holding -> new HoldingResponse(
+            holding.getAssetId(),
+            holding.getUserId(),
+            holding.getSecurity(),
+            holding.getTicker(),
+            holding.getAssetType(),
+            holding.getNumShares()
+        ))
+        .orElseGet(() -> new HoldingResponse(
+            null,
+            userId,
+            null,
+            ticker,
+            null,
+            BigDecimal.ZERO
+        ));
+    }
+
 }
