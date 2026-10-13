@@ -10,6 +10,8 @@ mvn spring-boot:run
 
 3. 
 
+From root: 
+
 source ./.env
 
 docker exec -it tpv-replica psql -U ${REPLICA_POSTGRES_USER} -d ${REPLICA_POSTGRES_DB} -c "CREATE SUBSCRIPTION sub_tpvreplica

@@ -23,6 +23,22 @@ app.config["JWT_DECODE_ALGORITHMS"] = [os.getenv("JWT_DECODE_ALGORITHMS", "HS512
 
 jwt = JWTManager(app)
 
+
+@jwt.invalid_token_loader
+def invalid_token_callback(error):
+    return jsonify(msg=error), 401
+
+
+@jwt.expired_token_loader
+def expired_token_callback(jwt_header, jwt_payload):
+    return jsonify(msg="Token has expired"), 401
+
+
+@jwt.unauthorized_loader
+def missing_token_callback(error):
+    return jsonify(msg=error), 401
+
+
 @app.route('/analytics', methods=['GET'])
 @jwt_required()
 def analytics():
