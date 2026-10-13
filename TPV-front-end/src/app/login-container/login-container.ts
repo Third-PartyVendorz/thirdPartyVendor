@@ -4,11 +4,11 @@ import { RegisterRequest } from '../dto/RegisterRequest';
 import { RegisterResponse } from '../dto/RegisterResponse';
 import { CommonModule } from '@angular/common';
 import { AuthenticationRequest } from '../dto/AuthenticationRequest';
-import { AuthenticationResponse } from '../dto/AuthenticationResponse';
 import { Router } from '@angular/router';
 import { MessageService } from '../services/message.service';
 import { UserContextService } from '../services/user-context.service';
 import { UserContext } from '../dto/UserContext';
+import { AuthenticationResponse } from '../dto/AuthenticationResponse';
 
 @Component({
   standalone: true,
@@ -25,7 +25,7 @@ export class LoginContainer {
     private router: Router,
   ) {}
 
-  activeTab: 'login' | 'register' = 'register';
+  activeTab: 'login' | 'register' = 'login';
 
   showLogin() {
     this.activeTab = 'login';
@@ -73,6 +73,7 @@ export class LoginContainer {
     this.authService.register(request).subscribe({
       next: (response: RegisterResponse) => {
         this.messageService.setSuccessMessage('Registration successful. You can now log in.');
+        this.showLogin();
       },
       error: (error) => {
         this.messageService.setErrorMessage('Registration failed: ' + error.error.message);
@@ -84,8 +85,7 @@ export class LoginContainer {
     this.authService.authenticate(request).subscribe({
       next: (response: AuthenticationResponse) => {
         this.messageService.setSuccessMessage('Login successful.');
-        this.authService.setAuthToken(response.jwtToken);
-        const userContext: UserContext = {
+          const userContext: UserContext = {
           firstName: response.firstName,
           lastName: response.lastName,
           phoneNumber: response.phoneNumber,
