@@ -94,7 +94,7 @@ export class LoginContainer {
           email: response.email
         };
         this.userContextService.setUserContext(userContext);
-        this.router.navigateByUrl('/');
+        this.router.navigateByUrl('/dashboard');
       },
       error: (error) => {
         this.messageService.setErrorMessage('Login failed: ' + error.error.message);
