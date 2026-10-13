@@ -73,6 +73,7 @@ public class AuthController {
 		response.addHeader(HttpHeaders.SET_COOKIE, buildRefreshCookie(httpRequest, refreshToken.getToken(), refreshExpirationMs).toString());
 
 		AuthenticationResponse authResponse = new AuthenticationResponse(
+			authJwtModel.userId(),
 			authJwtModel.firstName(),
 			authJwtModel.lastName(),
 			authJwtModel.phoneNumber(),

@@ -4,27 +4,32 @@
     </div>
     <nav class="desktop-nav">
         <ul>
-            <li><a routerLink="/dashboard">Portfolio</a></li>
-            <li><a routerLink="/portfolio-history">Portfolio History</a></li>
-            <li><a routerLink="/trade">Trade</a></li>
-            <li><a routerLink="/explore-assets">Explore Assets</a></li>
-            <li><a routerLink="/profile">Profile</a></li>
+            <li routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }"><a class="nav-link" routerLink="/dashboard">Portfolio</a></li>
+            <li routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }"><a class="nav-link" routerLink="/portfolio-history">Portfolio History</a></li>
+            <li routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }"><a class="nav-link" routerLink="/trade">Execute Trade</a></li>
+            <li routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }"><a class="nav-link" routerLink="/explore-assets">Explore Assets</a></li>
         </ul>
     </nav>
 
-    <a class="profile-button" routerLink="/profile" aria-label="Open profile page">
+    <div class="profile-menu">
+        <button class="profile-button" type="button" (click)="toggleProfileMenu($event)" [attr.aria-expanded]="isProfileMenuOpen" aria-haspopup="menu" aria-label="Open profile menu">
         <img src="/profile-icon.jpg" alt="Profile Icon">
-    </a>
+        </button>
+        <div class="profile-dropdown" *ngIf="isProfileMenuOpen" role="menu">
+            <a routerLink="/profile" role="menuitem" (click)="isProfileMenuOpen = false">View profile</a>
+            <button type="button" role="menuitem" (click)="logout()">Logout</button>
+        </div>
+    </div>
 
     <button class="mobile-menu-button" (click)="isMenuOpen = !isMenuOpen">
         ☰
     </button>
 </div>
 
-<div class="mobile-nav" *ngIf="isMenuOpen" (click)="closeMenu()">
-    <a routerLink="/dashboard">Portfolio</a>
-    <a routerLink="/portfolio-history">Portfolio History</a>
-    <a routerLink="/trade">Trade</a>
-    <a routerLink="/explore-assets">Explore Assets</a>
-    <a routerLink="/profile">Profile</a>
+<div class="mobile-nav" *ngIf="isMenuOpen" (click)="$event.stopPropagation()">
+    <a class="nav-link" routerLink="/dashboard" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">Portfolio</a>
+    <a class="nav-link" routerLink="/portfolio-history" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">Portfolio History</a>
+    <a class="nav-link" routerLink="/trade" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">Execute Trade</a>
+    <a class="nav-link" routerLink="/explore-assets" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">Explore Assets</a>
+    <a class="nav-link" routerLink="/profile" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">Profile</a>
 </div>

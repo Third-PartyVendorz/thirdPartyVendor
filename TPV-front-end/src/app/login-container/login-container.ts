@@ -85,19 +85,20 @@ export class LoginContainer {
     this.authService.authenticate(request).subscribe({
       next: (response: AuthenticationResponse) => {
         this.messageService.setSuccessMessage('Login successful.');
-          const userContext: UserContext = {
+        const userContext: UserContext = {
+          userId: response.userId,
           firstName: response.firstName,
           lastName: response.lastName,
           phoneNumber: response.phoneNumber,
           dateOfBirth: response.dateOfBirth,
           email: response.email
-        }
+        };
         this.userContextService.setUserContext(userContext);
-        this.router.navigateByUrl('/');
+        this.router.navigateByUrl('/dashboard');
       },
       error: (error) => {
         this.messageService.setErrorMessage('Login failed: ' + error.error.message);
       }
-    })
+    });
   }
 }

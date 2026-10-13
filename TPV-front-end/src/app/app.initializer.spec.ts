@@ -35,6 +35,20 @@ describe('validateSessionOnStartup', () => {
     expect(authService.checkSession).not.toHaveBeenCalled();
   });
 
+  it('validates the session on the root route', () => {
+    authService.checkSession.mockReturnValue(of(false));
+
+    const result$ = TestBed.runInInjectionContext(() => validateSessionOnStartup());
+    let emittedValue: boolean | undefined;
+
+    result$.subscribe((value) => {
+      emittedValue = value;
+    });
+
+    expect(emittedValue).toBe(false);
+    expect(authService.checkSession).toHaveBeenCalledTimes(1);
+  });
+
   it('validates the session on non-login routes', () => {
     authService.checkSession.mockReturnValue(of(true));
 

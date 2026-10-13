@@ -2,7 +2,7 @@
 	<header class="profile-hero card-shell">
 		<div class="profile-identity">
 			<div class="avatar-wrap" aria-hidden="true">
-				<img src="/profile-icon.jpg" alt="" />
+				<img src="/frobert.jpg" alt="" />
 			</div>
 
 			<div class="identity-copy">
@@ -14,8 +14,27 @@
 		</div>
 
 		<div class="hero-actions">
-			<button class="secondary-action" type="button">Edit profile</button>
-			<button class="primary-action" type="button">Delete / Pause Account</button>
+			<button class="secondary-action" type="button" (click)="toggleProfileEdit()">
+				{{ isEditingProfile ? 'Cancel edits' : 'Edit profile' }}
+			</button>
+			<button
+				*ngIf="!isEditingProfile"
+				class="primary-action"
+				type="button"
+				(click)="deleteAccount()"
+				[disabled]="isDeletingAccount"
+			>
+				Delete
+			</button>
+			<button
+				*ngIf="isEditingProfile"
+				class="primary-action"
+				type="button"
+				(click)="saveProfile()"
+				[disabled]="isSavingProfile"
+			>
+				Save changes
+			</button>
 		</div>
 	</header>
 
@@ -31,14 +50,31 @@
 
 				<div class="details-list">
 					<div class="detail-row">
-						<span class="label">Username</span>
-						<span class="value-pill">{{ userContext?.firstName || 'currentUsrName' }}</span>
-						<span class="muted-action">NewUsrName</span>
+						<span class="label">First Name</span>
+						<ng-container *ngIf="isEditingProfile; else firstNameValue">
+							<input type="text" [(ngModel)]="profileDraft.firstName" />
+						</ng-container>
+						<ng-template #firstNameValue>
+							<span class="value-pill">{{ userContext?.firstName || 'Not available' }}</span>
+						</ng-template>
 					</div>
 					<div class="detail-row">
-						<span class="label">Password</span>
-						<span class="value-pill">************</span>
-						<span class="muted-action">Update</span>
+						<span class="label">Last Name</span>
+						<ng-container *ngIf="isEditingProfile; else lastNameValue">
+							<input type="text" [(ngModel)]="profileDraft.lastName" />
+						</ng-container>
+						<ng-template #lastNameValue>
+							<span class="value-pill">{{ userContext?.lastName || 'Not available' }}</span>
+						</ng-template>
+					</div>
+					<div class="detail-row">
+						<span class="label">Date of Birth</span>
+						<ng-container *ngIf="isEditingProfile; else dobValue">
+							<input type="date" [(ngModel)]="profileDraft.dateOfBirth" />
+						</ng-container>
+						<ng-template #dobValue>
+							<span class="value-pill">{{ userContext?.dateOfBirth ? (userContext.dateOfBirth | date:'mediumDate') : 'Not available' }}</span>
+						</ng-template>
 					</div>
 				</div>
 			</section>
@@ -54,15 +90,63 @@
 				<div class="contact-grid">
 					<div class="contact-item">
 						<span class="label">Email</span>
-						<span class="value-pill">{{ userContext?.email || 'Not available' }}</span>
+						<ng-container *ngIf="isEditingProfile; else emailValue">
+							<input type="email" [(ngModel)]="profileDraft.email" />
+						</ng-container>
+						<ng-template #emailValue>
+							<span class="value-pill">{{ userContext?.email || 'Not available' }}</span>
+						</ng-template>
 					</div>
 					<div class="contact-item">
 						<span class="label">Phone Number</span>
-						<span class="value-pill">{{ userContext?.phoneNumber || 'Not available' }}</span>
+						<ng-container *ngIf="isEditingProfile; else phoneValue">
+							<input type="tel" [(ngModel)]="profileDraft.phoneNumber" />
+						</ng-container>
+						<ng-template #phoneValue>
+							<span class="value-pill">{{ userContext?.phoneNumber || 'Not available' }}</span>
+						</ng-template>
+					</div>
+				</div>
+			</section>
+
+			<section class="details-card card-shell">
+				<div class="section-heading">
+					<div>
+						<p class="eyebrow">Security</p>
+						<h2>Password</h2>
+					</div>
+				</div>
+
+				<div class="details-list">
+					<div class="detail-row">
+						<span class="label">Password</span>
+						<span class="value-pill">************</span>
+						<button class="muted-action" type="button" (click)="togglePasswordForm()">
+							{{ isChangingPassword ? 'Cancel' : 'Update' }}
+						</button>
+					</div>
+
+					<div *ngIf="isChangingPassword" class="details-list">
+						<div class="detail-row">
+							<span class="label">Current Password</span>
+							<input type="password" [(ngModel)]="passwordDraft.currentPassword" />
+						</div>
+						<div class="detail-row">
+							<span class="label">New Password</span>
+							<input type="password" [(ngModel)]="passwordDraft.newPassword" />
+						</div>
+						<div class="detail-row">
+							<span class="label">Confirm Password</span>
+							<input type="password" [(ngModel)]="passwordDraft.confirmNewPassword" />
+						</div>
+						<div class="hero-actions">
+							<button class="primary-action" type="button" (click)="changePassword()" [disabled]="isSavingPassword">
+								Save password
+							</button>
+						</div>
 					</div>
 				</div>
 			</section>
 		</div>
-
 	</div>
 </section>

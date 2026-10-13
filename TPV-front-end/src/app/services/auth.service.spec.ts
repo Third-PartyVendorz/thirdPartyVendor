@@ -50,6 +50,7 @@ describe('AuthService', () => {
     expect(request.request.withCredentials).toBe(true);
 
     request.flush({
+      userId: 42,
       firstName: 'Jane',
       lastName: 'Doe',
       phoneNumber: '555-0102',

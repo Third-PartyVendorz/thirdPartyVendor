@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { HomePage } from './home-page/home-page';
 import { AuthPage } from './auth-page/auth-page';
-import { authGuard } from './auth.guard';
+import { authGuard, landingGuard } from './auth.guard';
 import { DashboardPage } from './dashboard/dashboard-page/dashboard-page';
 import { HistoryPage } from './history-page/history-page';
 import { MainLayoutComponent } from './layouts/main-layout';
@@ -11,13 +11,14 @@ import { TradePage } from './trade-page/trade-page.component';
 
 export const routes: Routes = [
   {
-    path: 'login',
-    component: AuthPage,
+    path: '',
+    pathMatch: 'full',
+    component: MainLayoutComponent,
+    canActivate: [landingGuard],
   },
   {
-    path: '',
-    component: HomePage,
-    pathMatch: 'full',
+    path: 'login',
+    component: AuthPage,
   },
   {
     path: '',
@@ -32,6 +33,6 @@ export const routes: Routes = [
   },
   {
     path: '**',
-    redirectTo: '',
+    redirectTo: '/login',
   },
 ];
