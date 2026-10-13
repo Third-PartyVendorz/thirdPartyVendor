@@ -15,6 +15,7 @@ import com.thirdpartyvendor.api.dto.OrderResponse;
 import com.thirdpartyvendor.api.entity.Holding;
 import com.thirdpartyvendor.api.entity.Order;
 import com.thirdpartyvendor.api.entity.Order.OrderStatus;
+import com.thirdpartyvendor.api.error.AuthExceptions.ForbiddenException;
 import com.thirdpartyvendor.api.error.CashExceptions.InsufficientCashException;
 import com.thirdpartyvendor.api.error.OrderExceptions.OrderNotFoundException;
 import com.thirdpartyvendor.api.repository.HoldingRepository;
@@ -68,7 +69,6 @@ public class OrderService {
         Order executedOrder = orderRepository.findById(savedOrder.getId())
             .orElseThrow(() -> new OrderNotFoundException("Order not found"));
         
-
         return new OrderResponse(
             executedOrder.getId(),
             executedOrder.getUserId(),
@@ -146,6 +146,10 @@ public class OrderService {
     public OrderResponse cancelOrder(Long orderId, Long userId) {
         Order order = orderRepository.findById(orderId)
             .orElseThrow(() -> new OrderNotFoundException("Order not found"));
+
+        if (!order.getUserId().equals(userId)) {
+            throw new ForbiddenException("Only the associated user can modify this order.");
+        }
 
         order.setStatus(OrderStatus.CANCELLED);
         orderRepository.save(order);
