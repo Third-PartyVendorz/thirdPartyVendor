@@ -11,9 +11,15 @@
         </ul>
     </nav>
 
-    <a class="profile-button" routerLink="/profile" aria-label="Open profile page">
+    <div class="profile-menu">
+        <button class="profile-button" type="button" (click)="toggleProfileMenu($event)" [attr.aria-expanded]="isProfileMenuOpen" aria-haspopup="menu" aria-label="Open profile menu">
         <img src="/profile-icon.jpg" alt="Profile Icon">
-    </a>
+        </button>
+        <div class="profile-dropdown" *ngIf="isProfileMenuOpen" role="menu">
+            <a routerLink="/profile" role="menuitem" (click)="isProfileMenuOpen = false">View profile</a>
+            <button type="button" role="menuitem" (click)="logout()">Logout</button>
+        </div>
+    </div>
 
     <button class="mobile-menu-button" (click)="isMenuOpen = !isMenuOpen">
         ☰
