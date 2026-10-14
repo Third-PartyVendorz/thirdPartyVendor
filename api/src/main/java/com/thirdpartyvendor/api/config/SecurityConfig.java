@@ -42,6 +42,7 @@ public class SecurityConfig {
 				.requestMatchers(HttpMethod.POST, "/auth/refresh").permitAll()
 				.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 				.requestMatchers("/error").permitAll()
+				.requestMatchers("/admin/**").hasRole("ADMIN")
 				.anyRequest().authenticated());
 
 		return http.build();

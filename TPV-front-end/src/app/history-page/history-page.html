@@ -7,8 +7,17 @@
 		</div>
 
 		<div class="history-actions">
-			<button type="button" class="ghost-button">Download CSV</button>
-			<button type="button" class="primary-button">New order</button>
+			<button 
+				type="button"
+				class="ghost-button refresh-button"
+				(click)="loadOrders()"
+				[disabled]="isLoadingOrders"
+				aria-label="Refresh order history"
+			>
+				↻ Refresh
+			</button>
+			<button type="button" class="ghost-button" (click)="downloadCsv()">Download CSV</button>
+			<button type="button" class="primary-button" (click)="openNewOrder()">New order</button>
 		</div>
 	</header>
 
@@ -86,8 +95,15 @@
 
 	<section class="history-toolbar">
 		<div class="filter-group" aria-label="Order history filters">
-			<button type="button" class="filter-pill active">All orders</button>
-			<button type="button" class="filter-pill" *ngFor="let filter of quickFilters.slice(1)">{{ filter }}</button>
+			<button
+				type="button"
+				class="filter-pill"
+				*ngFor="let filter of quickFilters"
+				[class.active]="selectedFilter === filter"
+				(click)="selectFilter(filter)"
+			>
+				{{ filter }}
+			</button>
 		</div>
 
 		<div class="range-pill">Last 30 days</div>
@@ -130,10 +146,10 @@
 								<span class="side-badge" [class.sell]="entry.side === 'Sell'">{{ entry.side }}</span>
 							</td>
 							<td>{{ entry.quantity }}</td>
-							<td>{{ entry.price | currency:'USD':'symbol':'1.2-2' }}</td>
-							<td>{{ entry.total | currency:'USD':'symbol':'1.2-2' }}</td>
+							<td>{{ entry.price }}</td>
+							<td>{{ entry.total }}</td>
 							<td>
-								<span [ngClass]="['status-badge', getStatusClass(entry.status)]">{{ entry.status }}</span>
+								<span [ngClass]="['status-badge', entry.statusClass]">{{ entry.status }}</span>
 							</td>
 							<td>{{ entry.venue }}</td>
 						</tr>

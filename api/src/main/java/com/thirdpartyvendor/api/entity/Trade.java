@@ -40,6 +40,9 @@ public class Trade {
     @Column(name = "trade_currency")
     private String tradeCurrency;
 
+    @Column(name = "ticker", nullable = false)
+    private String ticker;
+
     @PrePersist
     void onCreate() {
         tradeTimestamp = LocalDateTime.now();

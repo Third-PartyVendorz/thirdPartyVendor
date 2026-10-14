@@ -378,6 +378,11 @@ polygon {
 	color: #b45309;
 }
 
+.status-badge.pending {
+	background: rgba(245, 158, 11, 0.14);
+	color: #b45309;
+}
+
 .status-badge.cancelled {
 	background: rgba(148, 163, 184, 0.18);
 	color: #475569;
@@ -481,4 +486,8 @@ polygon {
 		width: 100%;
 		justify-content: center;
 	}
+}
+
+.refresh-button {
+	padding: 0.65rem 0.85rem;
 }
