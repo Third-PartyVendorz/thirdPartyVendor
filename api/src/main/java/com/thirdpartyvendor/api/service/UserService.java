@@ -124,4 +124,15 @@ public class UserService {
 		userRepository.save(user);
 	}
 
+	public void softDeleteUser(Long userId, AppUser currentUser) {
+		AuthorizationUtil.requireAdmin(currentUser);
+
+		AppUser user = userRepository.findById(userId)
+			.orElseThrow(() -> new UserNotFoundException("User not found"));
+
+		user.setActive(false);
+
+		userRepository.save(user);
+	}
+
 }
