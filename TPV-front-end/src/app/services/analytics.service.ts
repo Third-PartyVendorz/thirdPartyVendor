@@ -17,7 +17,7 @@ export class AnalyticsService {
     if (options?.endDate) {
       params.endDate = options.endDate;
     }
-    return this.http.get<AnalyticsResponse>(`${environment.analyticsBaseUrl}/analytics`, { params });
+    return this.http.get<AnalyticsResponse>(`${environment.analyticsBaseUrl}/analytics`, { params, withCredentials: true });
   }
 
 }
