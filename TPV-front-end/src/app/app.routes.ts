@@ -4,10 +4,10 @@ import { AuthPage } from './auth-page/auth-page';
 import { authGuard, landingGuard } from './auth.guard';
 import { DashboardPage } from './dashboard/dashboard-page/dashboard-page';
 import { HistoryPage } from './history-page/history-page';
-import { TradePage } from './trade-page/trade-page';
 import { MainLayoutComponent } from './layouts/main-layout';
 import { AssetsPage } from './assets-page/assets-page';
 import { ProfilePage } from './profile-page/profile-page';
+import { TradePage } from './trade-page/trade-page.component';
 
 export const routes: Routes = [
   {

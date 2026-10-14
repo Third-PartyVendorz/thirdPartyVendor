@@ -24,10 +24,12 @@ import com.thirdpartyvendor.api.dto.CreateOrderRequest;
 import com.thirdpartyvendor.api.dto.MarketQuoteAPIResponse;
 import com.thirdpartyvendor.api.dto.OrderResponse;
 import com.thirdpartyvendor.api.entity.Order;
+import com.thirdpartyvendor.api.entity.Trade;
 import com.thirdpartyvendor.api.error.AuthExceptions.ForbiddenException;
 import com.thirdpartyvendor.api.error.OrderExceptions.BadOrderException;
 import com.thirdpartyvendor.api.repository.HoldingRepository;
 import com.thirdpartyvendor.api.repository.OrderRepository;
+import com.thirdpartyvendor.api.repository.TradeRepository;
 import com.thirdpartyvendor.api.validator.OrderValidator;
 
 class OrderServiceTest {
@@ -38,6 +40,7 @@ class OrderServiceTest {
     private CashHoldingsService cashHoldingsService;
     private MarketDataAPIClient marketDataAPIClient;
     private OrderExecutionService orderExecutionService;
+    private TradeRepository tradeRepository;
 
     @BeforeEach
     void setUp() {
@@ -46,8 +49,9 @@ class OrderServiceTest {
         cashHoldingsService = mock(CashHoldingsService.class);
         marketDataAPIClient = mock(MarketDataAPIClient.class);
         orderExecutionService = mock(OrderExecutionService.class);
+        tradeRepository = mock(TradeRepository.class);
         OrderValidator orderValidator = new OrderValidator();
-        orderService = new OrderService(orderRepository, orderValidator, holdingRepository, cashHoldingsService, marketDataAPIClient, orderExecutionService);
+        orderService = new OrderService(orderRepository, orderValidator, holdingRepository, cashHoldingsService, marketDataAPIClient, orderExecutionService, tradeRepository);
     }
 
     @Test
@@ -57,7 +61,6 @@ class OrderServiceTest {
         Order order1 = new Order();
         order1.setId(1L);
         order1.setUserId(userId);
-        order1.setAssetId(100L);
         order1.setTicker("AAPL");
         order1.setOrderIntent(Order.OrderIntent.BUY);
         order1.setQuantity(BigDecimal.valueOf(10.0));
@@ -66,21 +69,32 @@ class OrderServiceTest {
         Order order2 = new Order();
         order2.setId(2L);
         order2.setUserId(userId);
-        order2.setAssetId(101L);
         order2.setTicker("TSLA");
         order2.setOrderIntent(Order.OrderIntent.SELL);
         order2.setOrderPrice(BigDecimal.valueOf(500.0));
         order2.setStatus(Order.OrderStatus.EXECUTED);
         order2.setOrderCurrency("USD");
 
+        Trade trade = new Trade();
+        trade.setOrderId(order2.getId());
+        trade.setExecutionPrice(new BigDecimal("510.25"));
+        trade.setExecutionQuantity(new BigDecimal("2.5"));
+
         when(orderRepository.findByUserId(userId)).thenReturn(Arrays.asList(order1, order2));
+        when(tradeRepository.findByOrderId(order2.getId())).thenReturn(List.of(trade));
 
         List<OrderResponse> result = orderService.getOrders(userId);
 
         assertEquals(2, result.size());
         assertEquals(order1.getId(), result.get(0).orderId());
         assertEquals(order2.getId(), result.get(1).orderId());
+        assertEquals(trade.getExecutionPrice(), result.get(1).executionPrice());
+        assertEquals(trade.getExecutionQuantity(), result.get(1).executionQuantity());
+        assertEquals(null, result.get(0).executionPrice());
+        assertEquals(null, result.get(0).executionQuantity());
         verify(orderRepository).findByUserId(userId);
+        verify(tradeRepository).findByOrderId(order1.getId());
+        verify(tradeRepository).findByOrderId(order2.getId());
     }
 
     @Test
@@ -117,7 +131,6 @@ class OrderServiceTest {
             )
         );
         CreateOrderRequest request = new CreateOrderRequest(
-            100L,
             "AAPL",
             Order.OrderIntent.BUY,
             BigDecimal.valueOf(10.0),
@@ -129,7 +142,6 @@ class OrderServiceTest {
         Order newOrder = new Order();
         newOrder.setId(1L);
         newOrder.setUserId(userId);
-        newOrder.setAssetId(request.assetId());
         newOrder.setTicker(request.ticker());
         newOrder.setOrderIntent(request.orderIntent());
         newOrder.setQuantity(request.quantity());
@@ -137,6 +149,7 @@ class OrderServiceTest {
         newOrder.setOrderCurrency(request.orderCurrency());
 
         when(orderRepository.save(any(Order.class))).thenReturn(newOrder);
+        when(orderRepository.findById(newOrder.getId())).thenReturn(Optional.of(newOrder));
 
         OrderResponse result = orderService.createOrder(request, userId);
 
@@ -149,7 +162,6 @@ class OrderServiceTest {
     @DisplayName("Test createOrder successfully with orderPrice")
     void testCreateOrderSuccessfullyWithOrderPrice() {
         CreateOrderRequest request = new CreateOrderRequest(
-            100L,
             "AAPL",
             Order.OrderIntent.BUY,
             null,
@@ -180,7 +192,6 @@ class OrderServiceTest {
         Long userId = 1L;
         newOrder.setId(1L);
         newOrder.setUserId(userId);
-        newOrder.setAssetId(request.assetId());
         newOrder.setTicker(request.ticker());
         newOrder.setOrderIntent(request.orderIntent());
         newOrder.setQuantity(request.quantity());
@@ -188,6 +199,7 @@ class OrderServiceTest {
         newOrder.setOrderCurrency(request.orderCurrency());
 
         when(orderRepository.save(any(Order.class))).thenReturn(newOrder);
+        when(orderRepository.findById(newOrder.getId())).thenReturn(Optional.of(newOrder));
 
         OrderResponse result = orderService.createOrder(request, userId);
 
@@ -199,7 +211,6 @@ class OrderServiceTest {
     @DisplayName("Test createOrder with missing fields")
     void testCreateOrderWithMissingFields() {
         CreateOrderRequest createOrderRequest = new CreateOrderRequest(
-            100L,
             "AAPL",
             Order.OrderIntent.BUY,
             BigDecimal.valueOf(10.0),

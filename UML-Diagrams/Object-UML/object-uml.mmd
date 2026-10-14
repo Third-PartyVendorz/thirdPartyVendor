@@ -24,7 +24,7 @@ classDiagram
     class Trade {
         -tradeId UUID
         -orderId UUID
-        -assetId UUID
+        -ticker String
         -executionPrice double
         -time DateTime
         -status String
@@ -48,7 +48,7 @@ classDiagram
     class Order {
         -orderId UUID
         -userId UUID
-        -assetId UUID
+        -ticker String
         -quantity double
         -intentPrice double
         -status String
@@ -90,7 +90,7 @@ classDiagram
 
     class MarketData {
         -dataId UUID
-        -assetId UUID
+        -ticker String
         -timestamp DateTime
         -lastPrice double
         -bidPrice double
@@ -127,7 +127,7 @@ classDiagram
     }
 
     class Asset {
-        -assetId UUID
+        -ticker String
         -userId UUID
         -name String
         -ticker String

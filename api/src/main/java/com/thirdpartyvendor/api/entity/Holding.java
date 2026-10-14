@@ -19,19 +19,16 @@ import lombok.Setter;
 @Table(name = "holdings")
 @IdClass(HoldingId.class)
 public class Holding {
-    @Id 
-    @Column(name = "asset_id", nullable = false)
-    private Long assetId;
-
-    @Id 
+    @Id
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    @Column(name = "security", nullable = false)
-    private String security;
-
+    @Id
     @Column(name = "ticker", nullable = false)
     private String ticker;
+
+    @Column(name = "security", nullable = false)
+    private String security;
 
     @Column(name = "asset_type", nullable = false)
     private String assetType;

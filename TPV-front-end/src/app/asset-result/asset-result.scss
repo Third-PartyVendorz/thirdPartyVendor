@@ -38,6 +38,44 @@
 	letter-spacing: 0.08em;
 }
 
+.trade-button {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	margin-left: 1.75rem;
+	padding: 0.75rem 1.75rem;
+	background: linear-gradient(135deg, #e9a629, #f0b740);
+	color: #fff;
+	font-size: 0.95rem;
+	font-weight: 700;
+	letter-spacing: 0.05em;
+	border: none;
+	border-radius: 12px;
+	cursor: pointer;
+	transition: filter 0.2s ease, box-shadow 0.2s ease;
+	box-shadow: 0 4px 12px rgba(233, 166, 41, 0.25);
+	filter: brightness(1);
+}
+
+.trade-button__icon {
+	font-size: 1.1rem;
+	line-height: 1;
+}
+
+.trade-button:hover {
+	filter: brightness(0.88);
+	box-shadow: 0 6px 20px rgba(233, 166, 41, 0.35);
+}
+
+.trade-button:active {
+	box-shadow: 0 2px 8px rgba(233, 166, 41, 0.25);
+}
+
+.trade-button:focus-visible {
+	outline: 2px solid #0b5ca5;
+	outline-offset: 2px;
+}
+
 .asset-kicker,
 .card-eyebrow,
 .asset-updated,

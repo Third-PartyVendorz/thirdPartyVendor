@@ -14,20 +14,18 @@ CREATE TABLE users (
 );
 
 CREATE TABLE holdings (
-    asset_id BIGINT,
     security VARCHAR(255) NOT NULL,
     ticker VARCHAR(10) NOT NULL,
     asset_type VARCHAR(50) NOT NULL,
     num_shares NUMERIC(15, 4) NOT NULL,
     user_id INT NOT NULL,
-    PRIMARY KEY (asset_id, user_id),
+    PRIMARY KEY (ticker, user_id),
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
 CREATE TABLE orders (
     order_id BIGINT PRIMARY KEY,
     user_id INT NOT NULL,
-    asset_id BIGINT NOT NULL,
     ticker VARCHAR(10) NOT NULL,
     order_intent VARCHAR(10) NOT NULL,
     quantity NUMERIC(15, 4),

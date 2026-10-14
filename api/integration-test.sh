@@ -111,7 +111,7 @@ curl -X POST http://localhost:$SERVICE_PORT/orders \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d '{
-    "assetId": 10,
+    "ticker": "AAPL",
     "orderIntent": "BUY",
     "quantity": 100,
     "orderPrice": null,

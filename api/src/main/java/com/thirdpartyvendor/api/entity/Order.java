@@ -42,9 +42,6 @@ public class Order {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    @Column(name = "asset_id", nullable = false)
-    private Long assetId;
-
     @Column(name = "ticker", nullable = false)
     private String ticker;
 

@@ -11,6 +11,8 @@ import java.util.List;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import com.thirdpartyvendor.api.dto.DepositRequest;
@@ -25,6 +27,12 @@ public class CashHoldingsController {
     public CashHoldingsController(CashHoldingsService cashHoldingsService) {
         this.cashHoldingsService = cashHoldingsService;
     }
+
+    @GetMapping("/{currencyCode}")
+    public CashHoldingResponse getCashHoldingsByUserAndCurrencyCode(@AuthenticationPrincipal AppUser currentUser, @PathVariable String currencyCode) {
+        return cashHoldingsService.getCashHoldingByUserAndCurrencyCode(currentUser.getId(), currencyCode);
+    }
+    
 
     @GetMapping
     public List<CashHoldingResponse> getCashHoldingsByUser(@AuthenticationPrincipal AppUser currentUser) {
