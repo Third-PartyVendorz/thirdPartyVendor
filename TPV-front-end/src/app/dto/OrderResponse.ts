@@ -1,4 +1,4 @@
-import { orderStatus } from "../shared/order-status";
+import { OrderStatus } from "../shared/order-status";
 import { TradeSide } from "../shared/trade-side";
 
 export interface OrderResponse {
@@ -9,7 +9,7 @@ export interface OrderResponse {
     orderPrice: number | null;
     executionPrice: number | null;
     executionQuantity: number | null;
-    status: orderStatus;
+    status: OrderStatus;
     createdAt: string;
     orderCurrency: string;
 }
