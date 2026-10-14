@@ -15,10 +15,14 @@ import com.thirdpartyvendor.api.entity.AppUser;
 import com.thirdpartyvendor.api.entity.AppUser.UserRole;
 import com.thirdpartyvendor.api.repository.AppUserRepository;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 @Service
 public class RegistrationService {
 
 	private static final UserRole DEFAULT_ROLE = UserRole.USER;
+	private static final Logger logger = LogManager.getLogger(RegistrationService.class);
 
 	private final AppUserRepository appUserRepository;
 	private final PasswordEncoder passwordEncoder;
@@ -36,10 +40,12 @@ public class RegistrationService {
 		String password = requireText(request.password(), "Password is required");
 
 		if (request.dateOfBirth() == null) {
+			logger.warn("Registration failed: missing date of birth");
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Date of birth is required");
 		}
-
+		
 		if (appUserRepository.findByEmail(email).isPresent()) {
+			logger.warn("Registration failed: email is already registered");
 			throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already registered");
 		}
 
@@ -54,6 +60,7 @@ public class RegistrationService {
 		user.setActive(true);
 
 		AppUser savedUser = appUserRepository.save(user);
+		logger.info("Registration succeeded for new user {}", savedUser.getId());
 		return new RegisterResponse(savedUser.getId(), savedUser.getFirstName(), savedUser.getLastName(), savedUser.getEmail(), savedUser.getRole());
 	}
 	private String requireText(String value, String message) {
