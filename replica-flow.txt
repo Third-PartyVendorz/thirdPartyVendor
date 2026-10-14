@@ -23,7 +23,7 @@ CREATE PUBLICATION pub_tpvdb FOR TABLE
    trade,
    users;
 
-6. Connect to replica db --> docker exec -it tpv-replica psql -U analyst -d tpvdbreplica
+6. Connect to replica db --> docker exec -it tpv-replica psql -U analytics -d tpvreplicadb
 
 7. Initialize the duplicate schema in replica db --> Must be identical because we are on replica mode ---> Init command in replica compose
     - With logical mode you can pick and choose which tables to replicate

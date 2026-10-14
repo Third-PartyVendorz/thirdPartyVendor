@@ -20,7 +20,7 @@ def get_previous_month_trades_query():
         WHERE EXTRACT(YEAR FROM t.trade_timestamp) = {year} 
         AND EXTRACT(MONTH FROM t.trade_timestamp) = {month}
     )
-    SELECT order_intent, execution_quantity, execution_price, ticker, trade_timestamp
+    SELECT o.order_intent, ft.execution_quantity, ft.execution_price, ft.ticker, ft.trade_timestamp
     FROM filtered_trades ft
     JOIN orders o ON ft.order_id = o.order_id
     JOIN holdings h ON o.user_id = h.user_id AND o.asset_id = h.asset_id;
@@ -36,7 +36,7 @@ def get_current_month_trades_query():
         WHERE EXTRACT(YEAR FROM t.trade_timestamp) = {year} 
         AND EXTRACT(MONTH FROM t.trade_timestamp) = {month}
     )
-    SELECT order_intent, execution_quantity, execution_price, ticker, trade_timestamp
+    SELECT o.order_intent, ft.execution_quantity, ft.execution_price, ft.ticker, ft.trade_timestamp
     FROM filtered_trades ft
     JOIN orders o ON ft.order_id = o.order_id
     JOIN holdings h ON o.user_id = h.user_id AND o.asset_id = h.asset_id;
@@ -50,7 +50,7 @@ def get_custom_date_trades_query(start_date, end_date):
         WHERE CAST(t.trade_timestamp AS DATE) >= CAST(%s AS DATE) 
           AND CAST(t.trade_timestamp AS DATE) <= CAST(%s AS DATE)
     )
-    SELECT order_intent, execution_quantity, execution_price, ticker, trade_timestamp
+    SELECT o.order_intent, ft.execution_quantity, ft.execution_price, ft.ticker, ft.trade_timestamp
     FROM filtered_trades ft
     JOIN orders o ON ft.order_id = o.order_id
     JOIN holdings h ON o.user_id = h.user_id AND o.asset_id = h.asset_id;

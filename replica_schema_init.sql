@@ -44,6 +44,7 @@ CREATE TABLE orders (
     status VARCHAR(20) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     order_currency VARCHAR(3),
+    ticker VARCHAR(10) NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
@@ -57,6 +58,7 @@ CREATE TABLE trade (
     execution_quantity NUMERIC(15, 4) NOT NULL,
     trade_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     trade_currency VARCHAR(3),
+    ticker VARCHAR(10) NOT NULL,
     FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE
 );
 

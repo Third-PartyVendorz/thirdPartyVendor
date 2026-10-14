@@ -36,20 +36,18 @@ Plan:
       - Clean up frontend
           - Small details like order vs trade - done
           - Display current month on default analytics job - done
+ - Clean up Auth:
+      - Ensure that session times are properly handled, currently there is no refresh
+      - Ensure that API also validates role - done
+ - Add side metric to top k --> Buy and sell
+ - Clean up fronend
+      - Displaying 14 market intervals
  - Dockerize analytics service
 
- - ********Verify Valid Auth flow*********
-    - Rather than directly adding auth to python Auth will go through spring
-    - frontend calls to spring controller which implements auth then call to python API 
-        - python endpoint still exposed? --> only accepts requests that match the spring domain?
-
-    - Implementing JWT on python:
-        - Only need to validate --> token and expiry
-        - Any of the other logic(refresh, cookie, etc) is validated through the frontend
 
 
-- Add pricing to the analytics --> This will come after during clean up week 
-    - First implement with sheer volume then integrate
+
+
 - Add side metric to top k --> Buy and sell
 
 
