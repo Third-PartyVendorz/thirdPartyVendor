@@ -7,6 +7,15 @@
 		</div>
 
 		<div class="history-actions">
+			<button 
+				type="button"
+				class="ghost-button refresh-button"
+				(click)="loadOrders()"
+				[disabled]="isLoadingOrders"
+				aria-label="Refresh order history"
+			>
+				↻ Refresh
+			</button>
 			<button type="button" class="ghost-button" (click)="downloadCsv()">Download CSV</button>
 			<button type="button" class="primary-button" (click)="openNewOrder()">New order</button>
 		</div>
