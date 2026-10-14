@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { finalize, Subscription, timer } from 'rxjs';
+import { finalize } from 'rxjs';
 import { OrderResponse } from '../dto/OrderResponse';
 import { MessageService } from '../services/message.service';
 import { OrderService } from '../services/order.service';
@@ -37,7 +37,6 @@ type HistoryFilter = 'All orders' | 'Filled' | 'Pending' | 'Cancelled';
   styleUrl: './history-page.scss',
 })
 export class HistoryPage implements OnInit {
-  private refreshSubscription?: Subscription;
 
   constructor(
     private orderService: OrderService,
@@ -71,11 +70,6 @@ export class HistoryPage implements OnInit {
 
   ngOnInit(): void {
     this.loadOrders();
-    this.startAutoRefresh();
-  }
-
-  ngOnDestroy(): void {
-    this.refreshSubscription?.unsubscribe();
   }
 
   get summaryCards() {
@@ -139,21 +133,6 @@ export class HistoryPage implements OnInit {
       });
   }
 
-  private startAutoRefresh(): void {
-    this.refreshSubscription = timer(0, 10000).subscribe(() => {
-      this.orderService.fetchOrders().subscribe({
-        next: (orders) => {
-          this.allHistoryEntries = orders
-            .map((order) => this.mapOrderToHistoryEntry(order))
-            .sort((left, right) => right.createdAt.getTime() - left.createdAt.getTime());
-          this.cdr.markForCheck();
-        },
-        error: (error) => {
-          this.messageService.setErrorMessage(error?.error?.message ?? 'Unable to refresh order history.');
-        },
-      });
-    });
-  }
 
   selectFilter(filter: HistoryFilter): void {
     this.selectedFilter = filter;
