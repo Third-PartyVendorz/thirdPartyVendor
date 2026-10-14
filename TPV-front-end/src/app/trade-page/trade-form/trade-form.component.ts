@@ -30,6 +30,7 @@ export class TradeFormComponent implements OnInit, OnChanges {
   @Input() assetDetails: AssetTradeDetails | null = null;
   @Output() tradeSubmitted = new EventEmitter<void>();
   @Output() summaryToggled = new EventEmitter<boolean>();
+  @Output() positionChanged = new EventEmitter<number>();
 
   @ViewChild('formContainer') formContainer!: ElementRef;
 
@@ -42,6 +43,8 @@ export class TradeFormComponent implements OnInit, OnChanges {
   UnitType = UnitType;
 
   form: FormGroup;
+
+  x!: boolean;
 
   currentSide: TradeSide = TradeSide.BUY;
   currentUnit: UnitType = UnitType.SHARES;
@@ -106,22 +109,24 @@ export class TradeFormComponent implements OnInit, OnChanges {
       .subscribe({
         next: (response) => {
           this.sharesOwned = response.numShares;
+          this.positionChanged.emit(this.sharesOwned);
           this.cdr.markForCheck();
         },
         error: (error) => {
           console.error('Error retrieving shares owned:', error);
           this.sharesOwned = 0;
+          this.positionChanged.emit(0);
           this.cdr.markForCheck();
         }
       });
   }
 
   inputPlaceholder = () => {
-    let placeholderString: String = "Enter a ";
+    let placeholderString = "Enter a ";
     if (this.currentUnit === UnitType.SHARES) {
       placeholderString += "quantity ";
     } else {
-      placeholderString += "dollar amount ";
+      placeholderString += `${this.currencyName} amount `;
     }
     if (this.currentSide === TradeSide.BUY) {
       placeholderString += "to buy...";
@@ -129,6 +134,10 @@ export class TradeFormComponent implements OnInit, OnChanges {
       placeholderString += "to sell...";
     }
     return placeholderString;
+  }
+
+  get currencyName(): string {
+    return new Intl.DisplayNames(undefined, { type: 'currency' }).of(this.currency) ?? this.currency;
   }
 
   get calculatedShares(): number {
@@ -294,6 +303,7 @@ export class TradeFormComponent implements OnInit, OnChanges {
           next: (response) => {
             if (response.numShares < this.sharedOwnedAtOrderSummaryOpen) {
               this.sharesOwned = response.numShares;
+              this.positionChanged.emit(this.sharesOwned);
               this.showSharesOwnedChangedModal = true;
               this.cdr.markForCheck();
               return;

@@ -75,6 +75,7 @@ export class AssetResultComponent implements OnInit {
 	@Input() autoOpenTrade = false;
 
 	@Output() tradeButtonClicked = new EventEmitter<AssetTradeDetails>();
+	@Output() tickerNotFound = new EventEmitter<string>();
 
 	constructor(
 		private marketApiService: MarketApiService,
@@ -115,6 +116,10 @@ export class AssetResultComponent implements OnInit {
 
 				this.loading.set(false);
 				this.historicalLoading.set(false);
+
+				if (this.notFound()) {
+					this.tickerNotFound.emit(ticker);
+				}
 
 				// Auto-open trade modal if requested
 				if (this.autoOpenTrade && quote && asset) {

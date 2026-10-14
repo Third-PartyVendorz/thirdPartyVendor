@@ -5,10 +5,11 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AssetResultComponent, AssetTradeDetails } from '../asset-result/asset-result';
 import { TradeFormComponent } from './trade-form/trade-form.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { CustomSliderComponent } from '../shared/custom-slider/custom-slider';
 
 @Component({
 	standalone: true,
-	imports: [CommonModule, FormsModule, CurrencyPipe, AssetResultComponent, TradeFormComponent],
+	imports: [CommonModule, FormsModule, CurrencyPipe, AssetResultComponent, TradeFormComponent, CustomSliderComponent],
 	selector: 'app-trade-page',
 	styleUrl: './trade-page.component.scss',
 	templateUrl: './trade-page.component.html',
@@ -22,7 +23,9 @@ export class TradePage implements OnInit {
 	activeTicker = '';
 	searchError = '';
 	assetDetails = signal<AssetTradeDetails | null>(null);
+	sharesOwned = signal(0);
 	autoOpenTrade = true;
+x: any;
 
 	ngOnInit(): void {
 		this.route.queryParams
@@ -61,5 +64,14 @@ export class TradePage implements OnInit {
 
 	onAssetLoaded(details: AssetTradeDetails): void {
 		this.assetDetails.set(details);
+	}
+
+	onTickerNotFound(ticker: string): void {
+		this.searchError = `Ticker "${ticker}" could not be found.`;
+		this.assetDetails.set(null);
+	}
+
+	onPositionChanged(shares: number): void {
+		this.sharesOwned.set(shares);
 	}
 }

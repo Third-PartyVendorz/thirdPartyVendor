@@ -41,21 +41,26 @@
         }
 
         @if (hasCurrency === true || currentSide === TradeSide.SELL) {
-            <span class="trade-amount-form" [formGroup]="form">
+                        <div class="trade-amount-form" [formGroup]="form">
+                        <label class="trade-field-label">Order Type</label>
             <app-custom-slider
               [leftValue]="UnitType.SHARES"
               [rightValue]="UnitType.DOLLARS"
               leftLabel="Shares"
-              rightLabel="Dollars"
+              [rightLabel]="currencyName"
               leftColor="#3b82f6" 
               rightColor="#3b82f6"
               [(value)]="currentUnit"
               (click)="clearValueInput()"
             ></app-custom-slider>
-            <div style="display: flex; width: 100%; align-items: center;">
+            <label class="trade-field-label" for="trade-input-value">
+                {{ currentUnit === UnitType.DOLLARS ? 'Amount' : 'Quantity' }}
+            </label>
+            <div class="trade-input-row">
                 @if (currentUnit === UnitType.DOLLARS) {
                     <input
                         #inputValue
+                        id="trade-input-value"
                         type="text" 
                         inputmode="decimal" 
                         [currencyMask]="{ 
@@ -71,6 +76,7 @@
                     />
                 } @else {
                     <input
+                        id="trade-input-value"
                         type="text" 
                         inputmode="decimal" 
                         formControlName="inputValue" 
@@ -79,19 +85,7 @@
                     />
                 }
             </div>
-        </span>
-
-        @if (calculatedShares > 0) {
-            <div class="trade-summary">
-                <p>
-                  {{ currentSide }} {{ formattedShares }} shares of {{ assetDetails?.asset?.symbol }} 
-                  @ {{ assetDetails?.quote?.price | currency:assetDetails?.quote?.currency:'symbol':'1.2-2' }}/share
-                </p>
-                <p>
-                  Estimated total: {{ estimatedTotal | currency:assetDetails?.quote?.currency:'symbol':'1.2-2' }}
-                </p>
-            </div>
-        }
+        </div>
 
         @if (!showOrderSummaryPanel) {
             <button (click)="onContinueToOrderSummary()" class="trade-button" style="justify-self: center" [disabled]="isInvalidTrade()">
@@ -100,24 +94,43 @@
             </button>
         }
 
-        @if (shouldShowInsufficientFundsMessage) {
-            <div class="insufficient-funds-message">
-                <div class="message-content" style="justify-content: center;">
-					<span class="material-icons-outlined" style="font-size:larger">warning</span>
-                    <span class="message-text">You have insufficient funds to complete this trade.</span>
-                </div>
+        <div class="trade-feedback-area">
+            <div class="trade-summary" [class.trade-summary--empty]="calculatedShares <= 0">
+                @if (calculatedShares > 0) {
+                    <p>
+                      {{ currentSide }} {{ formattedShares }} shares of {{ assetDetails?.asset?.symbol }}
+                      @ {{ assetDetails?.quote?.price | currency:assetDetails?.quote?.currency:'symbol':'1.2-2' }}/share
+                    </p>
+                    <p>
+                      Estimated total: {{ estimatedTotal | currency:assetDetails?.quote?.currency:'symbol':'1.2-2' }}
+                    </p>
+                }
             </div>
-        }
 
-        @if (shouldShowInsufficientSharesMessage) {
-            <div class="insufficient-funds-message">
-                <div class="message-content">
-                    <span class="material-icons-outlined" style="font-size:larger">warning</span>
-                    <span class="message-text">You have insufficient shares to complete this trade.</span>
-                </div>
+            <div class="trade-feedback-slot"
+                 [class.trade-feedback-slot--active]="shouldShowInsufficientFundsMessage || shouldShowInsufficientSharesMessage"
+                 aria-live="polite">
+                @if (shouldShowInsufficientFundsMessage) {
+                    <div class="insufficient-funds-message">
+                        <div class="message-content">
+                            <span class="material-icons-outlined" aria-hidden="true">warning</span>
+                            <span class="message-text">Insufficient funds for this order.</span>
+                        </div>
+                    </div>
+                }
+
+                @if (shouldShowInsufficientSharesMessage) {
+                    <div class="insufficient-funds-message">
+                        <div class="message-content">
+                            <span class="material-icons-outlined" aria-hidden="true">warning</span>
+                            <span class="message-text">Insufficient shares for this order.</span>
+                        </div>
+                    </div>
+                }
             </div>
+        </div>
+
         }
-    }
     </div>
 
     @if (showOrderSummaryPanel) {
