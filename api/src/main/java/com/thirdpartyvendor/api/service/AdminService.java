@@ -11,6 +11,7 @@ import com.thirdpartyvendor.api.dto.TradeResponse;
 import com.thirdpartyvendor.api.dto.CashHoldingResponse;
 import com.thirdpartyvendor.api.entity.AppUser;
 import com.thirdpartyvendor.api.entity.Order;
+import com.thirdpartyvendor.api.entity.Trade;
 import com.thirdpartyvendor.api.repository.AppUserRepository;
 import com.thirdpartyvendor.api.repository.OrderRepository;
 import com.thirdpartyvendor.api.repository.TradeRepository;
@@ -50,18 +51,24 @@ public class AdminService {
         AuthorizationUtil.requireAdmin(currentUser);
 
         return orderRepository.findByUserId(userId).stream()
-            .map(order -> new OrderResponse(
-                order.getId(),
-                order.getUserId(),
-                order.getAssetId(),
-                order.getTicker(),
-                order.getOrderIntent(),
-                order.getQuantity(),
-                order.getOrderPrice(),
-                order.getStatus(),
-                order.getCreatedAt(),
-                order.getOrderCurrency()
-            )).collect(Collectors.toList());
+            .map(order -> {
+                Trade execution = tradeRepository.findByOrderId(order.getId()).stream()
+                    .findFirst()
+                    .orElse(null);
+                return new OrderResponse(
+                    order.getId(),
+                    order.getUserId(),
+                    order.getTicker(),
+                    order.getOrderIntent(),
+                    order.getQuantity(),
+                    order.getOrderPrice(),
+                    execution != null ? execution.getExecutionPrice() : null,
+                    execution != null ? execution.getExecutionQuantity() : null,
+                    order.getStatus(),
+                    order.getCreatedAt(),
+                    order.getOrderCurrency()
+                );
+            }).collect(Collectors.toList());
     }
 
     public UserResponse getUserById(Long userId, AppUser currentUser) {

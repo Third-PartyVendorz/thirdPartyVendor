@@ -2,7 +2,7 @@ import { OrderStatus } from "../shared/order-status";
 import { TradeSide } from "../shared/trade-side";
 
 export interface OrderResponse {
-    orderId: string;
+    orderId: number;
     ticker: string;
     orderIntent: TradeSide;
     quantity: number | null;
