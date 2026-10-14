@@ -56,6 +56,15 @@ public class CashHoldingsService {
         }
     }
 
+    public void ensureSufficientCash(String currencyCode, BigDecimal amount, Long userId) {
+        CashHolding cashHolding = cashHoldingsRepository.findByUserIdAndCurrencyCode(userId, currencyCode)
+            .orElseThrow(() -> new InsufficientCashException("User holds no cash in " + currencyCode));
+
+        if (cashHolding.getBalance().compareTo(amount) < 0) {
+            throw new InsufficientCashException("Insufficient cash in " + currencyCode);
+        }
+    }
+
     public void ensureCashHoldingExists(String currencyCode, Long userId) {
         cashHoldingsRepository.findByUserIdAndCurrencyCode(userId, currencyCode)
             .orElseGet(() -> {
@@ -74,5 +83,31 @@ public class CashHoldingsService {
                 holding.getBalance()
             ))
             .toList();
+    }
+
+    public CashHoldingResponse deposit(String currencyCode, BigDecimal amount, Long userId) {
+        validateCurrencyCode(currencyCode);
+
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new InvalidCurrencyException("Deposit amount must be greater than 0");
+        }
+
+        CashHolding cashHolding = cashHoldingsRepository.findByUserIdAndCurrencyCode(userId, currencyCode)
+            .orElseGet(() -> {
+                CashHolding newHolding = new CashHolding();
+                newHolding.setUserId(userId);
+                newHolding.setCurrencyCode(currencyCode);
+                newHolding.setBalance(BigDecimal.ZERO);
+                return newHolding;
+            });
+
+        BigDecimal newBalance = cashHolding.getBalance().add(amount);
+        cashHolding.setBalance(newBalance);
+        cashHoldingsRepository.save(cashHolding);
+
+        return new CashHoldingResponse(
+            cashHolding.getCurrencyCode(),
+            cashHolding.getBalance()
+        );
     }
 }

@@ -1,84 +1,151 @@
-* {
+:host {
+    display: block;
+}
+
+:host,
+:host * {
     box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: 'Inter', sans-serif;
 }
 
 .auth-card {
-    background: #ffffff;
-    padding: 40px 32px;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    background: rgba(255, 255, 255, 0.96);
+    border-radius: 24px;
+    padding: clamp(1.4rem, 2vw, 2rem);
+    box-shadow: 0 18px 44px rgba(2, 14, 27, 0.12);
+    border: 1px solid rgba(3, 61, 108, 0.08);
+}
+
+.auth-card__header {
+    display: grid;
+    gap: 0.3rem;
+    margin-bottom: 1.25rem;
+}
+
+.auth-card h2 {
+    margin: 0;
+    color: #0f172a;
+    font-size: clamp(1.65rem, 2.5vw, 2.1rem);
+    line-height: 1.1;
+}
+
+.auth-card__header p {
+    margin: 0;
+    color: #475569;
+    line-height: 1.6;
+}
+
+.switch-card {
+    margin-bottom: 1.25rem;
+    padding: 0.3rem;
+    border-radius: 18px;
+    background: #eef4fb;
+    border: 1px solid rgba(3, 61, 108, 0.08);
+}
+
+.tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.25rem;
+}
+
+.tabs button {
+    border: 0;
+    border-radius: 14px;
+    padding: 0.8rem 1rem;
+    background: transparent;
+    color: #475569;
+    font-size: 0.96rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 150ms ease, color 150ms ease, transform 150ms ease;
+}
+
+.tabs button:hover {
+    transform: translateY(-1px);
+}
+
+.tabs button.active {
+    background: linear-gradient(135deg, #033d6c, #022b4a);
+    color: #ffffff;
+    box-shadow: 0 12px 24px rgba(3, 61, 108, 0.22);
+}
+
+.auth-form {
+    display: grid;
+    gap: 1rem;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
 }
 
 .form-group {
-    margin-bottom: 20px;
+    display: grid;
+    gap: 0.45rem;
 }
 
 .form-group label {
-    display: block;
-    font-size: 14px;
-    font-weight: 500;
-    color: #333333;
-    margin-bottom: 6px;
+    color: #0f172a;
+    font-size: 0.92rem;
+    font-weight: 700;
 }
 
 .form-group input {
     width: 100%;
-    padding: 12px;
-    border: 1px solid #cccccc;
-    border-radius: 6px;
-    font-size: 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 14px;
+    padding: 0.95rem 1rem;
+    background: #ffffff;
+    color: #0f172a;
+    font: inherit;
     outline: none;
+    transition: border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+}
+
+.form-group input::placeholder {
+    color: #94a3b8;
 }
 
 .form-group input:focus {
-    border-color: #033D6C;
-    box-shadow: 0 0 0 2px rgba(3, 61, 108, 0.2);
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    border-color: #033d6c;
+    box-shadow: 0 0 0 4px rgba(3, 61, 108, 0.12);
 }
 
 .auth-button {
     width: 100%;
-    padding: 12px;
-    background-color: #033D6C;
+    border: 0;
+    border-radius: 14px;
+    padding: 0.95rem 1.1rem;
+    background: linear-gradient(135deg, #033d6c, #022b4a);
     color: #ffffff;
-    font-size: 16px;
-    font-weight: 600;
-    border: none;
-    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    box-shadow: 0 16px 28px rgba(3, 61, 108, 0.22);
+    transition: transform 150ms ease, box-shadow 150ms ease, filter 150ms ease;
 }
 
-.register-button:hover {
-    background-color: #022B4A;
+.auth-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 20px 34px rgba(3, 61, 108, 0.28);
+    filter: brightness(1.02);
 }
 
-h2 {
-    font-size: 24px;
-    padding: 5px;
+.auth-button:active {
+    transform: translateY(0);
 }
 
-.tabs {
-    display: flex;
-    margin-bottom: 1rem;
-}
+@media (max-width: 640px) {
+    .auth-card {
+        border-radius: 20px;
+        padding: 1rem;
+    }
 
-.tabs button {
-    padding: 10px 20px;
-    border: none;
-    background-color: #f0f0f0;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
-
-.tabs button.active {
-    background-color: #033D6C;
-    color: #ffffff;
-}
-
-.tabs button:not(.active):hover {
-    background-color: #e0e0e0;
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
 }

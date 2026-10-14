@@ -21,6 +21,7 @@ import com.thirdpartyvendor.api.error.OrderExceptions.OrderNotFoundException;
 import com.thirdpartyvendor.api.error.UserExceptions.EmailAlreadyInUseException;
 import com.thirdpartyvendor.api.error.UserExceptions.PasswordException;
 import com.thirdpartyvendor.api.error.UserExceptions.UserNotFoundException;
+import com.thirdpartyvendor.api.service.OrderExecutionService.OrderExecutionException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -58,6 +59,23 @@ public class GlobalExceptionHandler {
 		HttpServletRequest request
 	) {
 		return buildResponse(HttpStatus.NOT_FOUND, exception.getMessage(), request.getRequestURI());
+	}
+
+	@ExceptionHandler(OrderExecutionException.class)
+	public ResponseEntity<ApiErrorResponse> handleOrderExecutionException(
+		OrderExecutionException exception,
+		HttpServletRequest request
+	) {
+		String message = exception.getMessage();
+		HttpStatus status = HttpStatus.CONFLICT;
+
+		if (message != null && message.contains("not found")) {
+			status = HttpStatus.NOT_FOUND;
+		} else if (message != null && message.contains("does not belong")) {
+			status = HttpStatus.FORBIDDEN;
+		}
+
+		return buildResponse(status, message, request.getRequestURI());
 	}
 
 	@ExceptionHandler({

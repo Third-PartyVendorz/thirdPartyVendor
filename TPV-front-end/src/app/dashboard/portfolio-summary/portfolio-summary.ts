@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core';
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
 
 @Component({
+  standalone: true,
   imports: [CurrencyPipe, DecimalPipe],
   selector: 'app-portfolio-summary',
   styleUrl: './portfolio-summary.scss',

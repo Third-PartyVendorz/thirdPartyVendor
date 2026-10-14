@@ -1,15 +1,28 @@
-@if (errorService.errorMessage(); as errorMessage) {
-	<div class="error-banner" role="alert" aria-live="polite">
-		<div class="error-banner__panel">
-			<div class="error-banner__content">
-				<strong>Error</strong>
-				<span>{{ errorMessage }}</span>
+@if (messageService.message(); as message) {
+	<div class="message-banner message-banner--{{ message.type }}" [attr.role]="message.type === 'error' ? 'alert' : 'status'" aria-live="polite">
+		<div class="message-banner__panel">
+			<div class="message-banner__content">
+				<strong>
+					@switch (message.type) {
+						@case ('success') {
+							Success
+						}
+						@case ('info') {
+							Notice
+						}
+						@default {
+							Error
+						}
+					}
+				</strong>
+				<span>{{ message.text }}</span>
 			</div>
-			<button type="button" class="error-banner__dismiss" (click)="errorService.clearErrorMessage()">
+			<button type="button" class="message-banner__dismiss" (click)="messageService.clearMessage()">
 				Dismiss
 			</button>
 		</div>
 	</div>
 }
+
 
 <router-outlet />

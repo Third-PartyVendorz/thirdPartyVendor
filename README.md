@@ -108,5 +108,3 @@ To make a schema change:
 **Rules:**
 - Never edit or rename a migration file that has already been run against a shared database — Flyway tracks applied migrations by version and checksum, and changing a file afterwards will break it.
 - If you renamed or deleted a migration file locally, run `mvn clean` before restarting so stale copies in `target/classes` don't get applied alongside the new one.
-
-
