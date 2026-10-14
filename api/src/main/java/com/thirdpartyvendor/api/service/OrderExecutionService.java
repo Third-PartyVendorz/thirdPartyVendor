@@ -71,6 +71,7 @@ public class OrderExecutionService {
 
         Trade trade = new Trade();
         trade.setOrderId(order.getId());
+        trade.setTicker(order.getTicker());
         trade.setExecutionPrice(executionPrice);
         trade.setExecutionQuantity(executionQuantity);
         trade.setTradeCurrency(order.getOrderCurrency());

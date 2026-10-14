@@ -12,6 +12,7 @@ import static org.mockito.Mockito.when;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,6 +24,7 @@ import com.thirdpartyvendor.api.dto.CreateOrderRequest;
 import com.thirdpartyvendor.api.dto.MarketQuoteAPIResponse;
 import com.thirdpartyvendor.api.dto.OrderResponse;
 import com.thirdpartyvendor.api.entity.Order;
+import com.thirdpartyvendor.api.error.AuthExceptions.ForbiddenException;
 import com.thirdpartyvendor.api.error.OrderExceptions.BadOrderException;
 import com.thirdpartyvendor.api.repository.HoldingRepository;
 import com.thirdpartyvendor.api.repository.OrderRepository;
@@ -212,6 +214,20 @@ class OrderServiceTest {
         });
 
         assertEquals("Order currency is required", exception.getMessage());
+        verify(orderRepository, never()).save(any(Order.class));
+    }
+
+    @Test
+    @DisplayName("Test a user cannot cancel another user's order")
+    void testCancelOrderRejectsDifferentUser() {
+        Order order = new Order();
+        order.setId(1L);
+        order.setUserId(10L);
+        order.setStatus(Order.OrderStatus.PENDING);
+        when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
+
+        assertThrows(ForbiddenException.class, () -> orderService.cancelOrder(1L, 20L));
+
         verify(orderRepository, never()).save(any(Order.class));
     }
 }       

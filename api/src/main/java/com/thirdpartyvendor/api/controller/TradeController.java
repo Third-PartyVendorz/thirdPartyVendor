@@ -28,7 +28,10 @@ public class TradeController {
     }
 
     @GetMapping("/{tradeId}") 
-    public TradeResponse getTradeById(@PathVariable Long tradeId) {
-        return tradeService.getTradeById(tradeId);
+    public TradeResponse getTradeById(
+        @PathVariable Long tradeId,
+        @AuthenticationPrincipal AppUser currentUser
+    ) {
+        return tradeService.getTradeById(tradeId, currentUser.getId());
     }
 }
