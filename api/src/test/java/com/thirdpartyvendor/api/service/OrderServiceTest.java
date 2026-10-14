@@ -24,6 +24,7 @@ import com.thirdpartyvendor.api.dto.CreateOrderRequest;
 import com.thirdpartyvendor.api.dto.MarketQuoteAPIResponse;
 import com.thirdpartyvendor.api.dto.OrderResponse;
 import com.thirdpartyvendor.api.entity.Order;
+import com.thirdpartyvendor.api.entity.Trade;
 import com.thirdpartyvendor.api.error.OrderExceptions.BadOrderException;
 import com.thirdpartyvendor.api.repository.HoldingRepository;
 import com.thirdpartyvendor.api.repository.OrderRepository;
@@ -73,14 +74,26 @@ class OrderServiceTest {
         order2.setStatus(Order.OrderStatus.EXECUTED);
         order2.setOrderCurrency("USD");
 
+        Trade trade = new Trade();
+        trade.setOrderId(order2.getId());
+        trade.setExecutionPrice(new BigDecimal("510.25"));
+        trade.setExecutionQuantity(new BigDecimal("2.5"));
+
         when(orderRepository.findByUserId(userId)).thenReturn(Arrays.asList(order1, order2));
+        when(tradeRepository.findByOrderId(order2.getId())).thenReturn(List.of(trade));
 
         List<OrderResponse> result = orderService.getOrders(userId);
 
         assertEquals(2, result.size());
         assertEquals(order1.getId(), result.get(0).orderId());
         assertEquals(order2.getId(), result.get(1).orderId());
+        assertEquals(trade.getExecutionPrice(), result.get(1).executionPrice());
+        assertEquals(trade.getExecutionQuantity(), result.get(1).executionQuantity());
+        assertEquals(null, result.get(0).executionPrice());
+        assertEquals(null, result.get(0).executionQuantity());
         verify(orderRepository).findByUserId(userId);
+        verify(tradeRepository).findByOrderId(order1.getId());
+        verify(tradeRepository).findByOrderId(order2.getId());
     }
 
     @Test

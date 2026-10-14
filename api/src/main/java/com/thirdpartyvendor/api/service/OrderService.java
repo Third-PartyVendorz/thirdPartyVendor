@@ -136,19 +136,25 @@ public class OrderService {
 
     public List<OrderResponse> getOrders(Long userId) {
         return orderRepository.findByUserId(userId).stream()
-            .map(order -> new OrderResponse(
-                order.getId(),
-                order.getUserId(),
-                order.getTicker(),
-                order.getOrderIntent(),
-                order.getQuantity(),
-                order.getOrderPrice(),
-                null,
-                null,
-                order.getStatus(),
-                order.getCreatedAt(),
-                order.getOrderCurrency()
-            ))
+            .map(order -> {
+                Trade execution = tradeRepository.findByOrderId(order.getId()).stream()
+                    .findFirst()
+                    .orElse(null);
+
+                return new OrderResponse(
+                    order.getId(),
+                    order.getUserId(),
+                    order.getTicker(),
+                    order.getOrderIntent(),
+                    order.getQuantity(),
+                    order.getOrderPrice(),
+                    execution != null ? execution.getExecutionPrice() : null,
+                    execution != null ? execution.getExecutionQuantity() : null,
+                    order.getStatus(),
+                    order.getCreatedAt(),
+                    order.getOrderCurrency()
+                );
+            })
             .collect(Collectors.toList());
     }
 
