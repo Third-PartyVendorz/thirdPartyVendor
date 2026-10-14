@@ -1,6 +1,7 @@
 package com.thirdpartyvendor.api.config;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.http.HttpHeaders;
@@ -24,6 +25,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	private final JwtService jwtService;
 	private final AppUserRepository appUserRepository;
+	private static final List<String> PUBLIC_ENDPOINTS = Arrays.asList(
+		"/auth/register",
+		"/auth/authenticate",
+		"/auth/logout",
+		"/auth/refresh"
+	);
 
 	public JwtAuthenticationFilter(JwtService jwtService, AppUserRepository appUserRepository) {
 		this.jwtService = jwtService;
@@ -33,14 +40,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
-		String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-
-		if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+		// Skip JWT validation for public endpoints
+		if (isPublicEndpoint(request.getRequestURI())) {
 			filterChain.doFilter(request, response);
 			return;
 		}
 
-		String token = authorizationHeader.substring(7);
+		String token = null;
+		if (request.getCookies() != null) {
+			for (var cookie : request.getCookies()) {
+				if ("authToken".equals(cookie.getName())) {
+					token = cookie.getValue();
+					break;
+				}
+			}
+		}
+
+		if (token == null) {
+			filterChain.doFilter(request, response);
+			return;
+		}
 
 		try {
 			String email = jwtService.extractEmail(token);
@@ -55,9 +74,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 				}
 			}
 		} catch (Exception exception) {
+			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT");
 			SecurityContextHolder.clearContext();
+			return;
 		}
 
 		filterChain.doFilter(request, response);
+	}
+
+	private boolean isPublicEndpoint(String requestUri) {
+		return PUBLIC_ENDPOINTS.stream().anyMatch(requestUri::startsWith);
 	}
 }

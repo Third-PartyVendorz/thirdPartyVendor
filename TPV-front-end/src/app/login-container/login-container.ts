@@ -2,17 +2,30 @@ import { Component } from '@angular/core';
 import { AuthService } from '../services/auth.service';
 import { RegisterRequest } from '../dto/RegisterRequest';
 import { RegisterResponse } from '../dto/RegisterResponse';
+import { CommonModule } from '@angular/common';
+import { AuthenticationRequest } from '../dto/AuthenticationRequest';
+import { Router } from '@angular/router';
+import { MessageService } from '../services/message.service';
+import { UserContextService } from '../services/user-context.service';
+import { UserContext } from '../dto/UserContext';
+import { AuthenticationResponse } from '../dto/AuthenticationResponse';
 
 @Component({
-  imports: [],
+  standalone: true,
+  imports: [CommonModule],
   selector: 'app-login-container',
   styleUrl: './login-container.scss',
   templateUrl: './login-container.html',
 })
 export class LoginContainer {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private messageService: MessageService,
+    private userContextService: UserContextService,
+    private router: Router,
+  ) {}
 
-  activeTab: 'login' | 'register' = 'register';
+  activeTab: 'login' | 'register' = 'login';
 
   showLogin() {
     this.activeTab = 'login';
@@ -36,17 +49,56 @@ export class LoginContainer {
       dateOfBirth: new Date(String(formData.get('dateOfBirth') ?? '')),
     };
 
+    form.reset();
+
     this.register(request);
+  }
+
+  onLogin(event: Event) {
+    event.preventDefault();
+    const form = event.target as HTMLFormElement;
+    const formData = new FormData(form);
+
+    const request: AuthenticationRequest = {
+      email: String(formData.get('email') ?? ''),
+      password: String(formData.get('password') ?? ''),
+    };
+
+    form.reset();
+
+    this.authenticate(request);
   }
 
   register(request: RegisterRequest) {
     this.authService.register(request).subscribe({
       next: (response: RegisterResponse) => {
-        console.log('Registration successful: ', response);
+        this.messageService.setSuccessMessage('Registration successful. You can now log in.');
+        this.showLogin();
       },
       error: (error) => {
-        console.error('Registration failed: ', error);
+        this.messageService.setErrorMessage('Registration failed: ' + error.error.message);
       },
+    });
+  }
+
+  authenticate (request: AuthenticationRequest) {
+    this.authService.authenticate(request).subscribe({
+      next: (response: AuthenticationResponse) => {
+        this.messageService.setSuccessMessage('Login successful.');
+        const userContext: UserContext = {
+          userId: response.userId,
+          firstName: response.firstName,
+          lastName: response.lastName,
+          phoneNumber: response.phoneNumber,
+          dateOfBirth: response.dateOfBirth,
+          email: response.email
+        };
+        this.userContextService.setUserContext(userContext);
+        this.router.navigateByUrl('/dashboard');
+      },
+      error: (error) => {
+        this.messageService.setErrorMessage('Login failed: ' + error.error.message);
+      }
     });
   }
 }

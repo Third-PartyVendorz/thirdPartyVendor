@@ -1,11 +1,28 @@
-<!DOCTYPE html>
-<main>
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3rd Party Vendors</title>
-  </head>
-  <body>
-    <app-home-page/>
-  </body>
-</main>
+@if (messageService.message(); as message) {
+	<div class="message-banner message-banner--{{ message.type }}" [attr.role]="message.type === 'error' ? 'alert' : 'status'" aria-live="polite">
+		<div class="message-banner__panel">
+			<div class="message-banner__content">
+				<strong>
+					@switch (message.type) {
+						@case ('success') {
+							Success
+						}
+						@case ('info') {
+							Notice
+						}
+						@default {
+							Error
+						}
+					}
+				</strong>
+				<span>{{ message.text }}</span>
+			</div>
+			<button type="button" class="message-banner__dismiss" (click)="messageService.clearMessage()">
+				Dismiss
+			</button>
+		</div>
+	</div>
+}
+
+
+<router-outlet />

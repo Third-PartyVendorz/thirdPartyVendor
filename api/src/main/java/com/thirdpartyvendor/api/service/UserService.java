@@ -27,15 +27,13 @@ public class UserService {
 	}
 
 	/**
-	 * Edit account information. Only accessible to the associated user and admins.
-	 * @param userId
+	 * Edit the authenticated user's account information.
 	 * @param updateRequest
 	 * @param currentUser
 	 */
-	public void editUser(Long userId, EditAccountRequest updateRequest, AppUser currentUser) {
-		AuthorizationUtil.requireOwnUserOrAdmin(userId, currentUser);
+	public void editUser(EditAccountRequest updateRequest, AppUser currentUser) {
 
-		AppUser user = userRepository.findById(userId)
+		AppUser user = userRepository.findById(currentUser.getId())
 			.orElseThrow(() -> new UserNotFoundException("User not found"));
 
 		// String requestEmail = updateRequest.email().trim().toLowerCase(Locale.ROOT);
@@ -44,7 +42,7 @@ public class UserService {
 			String requestEmail = updateRequest.email().trim().toLowerCase(Locale.ROOT);
 			Optional<AppUser> userWithSameEmail = userRepository.findByEmail(requestEmail);
 			if (!userWithSameEmail.isEmpty()) {
-				if (!userWithSameEmail.get().getId().equals(userId)) {
+				if (!userWithSameEmail.get().getId().equals(currentUser.getId())) {
 					throw new EmailAlreadyInUseException("Email is already in use");
 				}
 			}
@@ -72,15 +70,13 @@ public class UserService {
 	}
 
 	/**
-	 * Change user password. Only accessible to the associated user.
-	 * @param userId
+	 * Change the authenticated user's password.
 	 * @param passwordRequest
 	 * @param currentUser
 	 */
-	public void changePassword(Long userId, ChangePasswordRequest passwordRequest, AppUser currentUser) {
-		AuthorizationUtil.requireOwnUser(userId, currentUser);
+	public void changePassword(ChangePasswordRequest passwordRequest, AppUser currentUser) {
 
-		AppUser user = userRepository.findById(userId)
+		AppUser user = userRepository.findById(currentUser.getId())
 			.orElseThrow(() -> new UserNotFoundException("User not found"));
 
 		if (!passwordEncoder.matches(passwordRequest.currentPassword().trim(), user.getPasswordHash())) {
@@ -118,8 +114,18 @@ public class UserService {
 		userRepository.save(user);
 	}
 
-	public void softDeleteUser(Long userId, AppUser currenUser) {
-		AuthorizationUtil.requireOwnUserOrAdmin(userId, currenUser);
+	public void softDeleteUser(AppUser currentUser) {
+
+		AppUser user = userRepository.findById(currentUser.getId())
+			.orElseThrow(() -> new UserNotFoundException("User not found"));
+
+		user.setActive(false);
+
+		userRepository.save(user);
+	}
+
+	public void softDeleteUser(Long userId, AppUser currentUser) {
+		AuthorizationUtil.requireAdmin(currentUser);
 
 		AppUser user = userRepository.findById(userId)
 			.orElseThrow(() -> new UserNotFoundException("User not found"));

@@ -54,7 +54,7 @@ class UserServiceTest {
 		when(appUserRepository.findByEmail("newemail@example.com")).thenReturn(Optional.empty());
 		when(appUserRepository.save(any(AppUser.class))).thenReturn(userToUpdate);
 
-		userService.editUser(userId, request, currentUser);
+		userService.editUser(request, currentUser);
 
 		ArgumentCaptor<AppUser> captor = ArgumentCaptor.forClass(AppUser.class);
 		verify(appUserRepository).save(captor.capture());
@@ -71,7 +71,7 @@ class UserServiceTest {
 		when(appUserRepository.findById(userId)).thenReturn(Optional.of(userToUpdate));
 		when(appUserRepository.save(any(AppUser.class))).thenReturn(userToUpdate);
 
-		userService.editUser(userId, request, currentUser);
+		userService.editUser(request, currentUser);
 
 		ArgumentCaptor<AppUser> captor = ArgumentCaptor.forClass(AppUser.class);
 		verify(appUserRepository).save(captor.capture());
@@ -88,7 +88,7 @@ class UserServiceTest {
 		when(appUserRepository.findById(userId)).thenReturn(Optional.of(userToUpdate));
 		when(appUserRepository.save(any(AppUser.class))).thenReturn(userToUpdate);
 
-		userService.editUser(userId, request, currentUser);
+		userService.editUser(request, currentUser);
 
 		ArgumentCaptor<AppUser> captor = ArgumentCaptor.forClass(AppUser.class);
 		verify(appUserRepository).save(captor.capture());
@@ -106,7 +106,7 @@ class UserServiceTest {
 		when(appUserRepository.findById(userId)).thenReturn(Optional.of(userToUpdate));
 		when(appUserRepository.save(any(AppUser.class))).thenReturn(userToUpdate);
 
-		userService.editUser(userId, request, currentUser);
+		userService.editUser(request, currentUser);
 
 		ArgumentCaptor<AppUser> captor = ArgumentCaptor.forClass(AppUser.class);
 		verify(appUserRepository).save(captor.capture());
@@ -123,7 +123,7 @@ class UserServiceTest {
 		when(appUserRepository.findById(userId)).thenReturn(Optional.of(userToUpdate));
 		when(appUserRepository.save(any(AppUser.class))).thenReturn(userToUpdate);
 
-		userService.editUser(userId, request, currentUser);
+		userService.editUser(request, currentUser);
 
 		ArgumentCaptor<AppUser> captor = ArgumentCaptor.forClass(AppUser.class);
 		verify(appUserRepository).save(captor.capture());
@@ -142,7 +142,7 @@ class UserServiceTest {
 		when(appUserRepository.findByEmail("newemail@example.com")).thenReturn(Optional.empty());
 		when(appUserRepository.save(any(AppUser.class))).thenReturn(userToUpdate);
 
-		userService.editUser(userId, request, currentUser);
+		userService.editUser(request, currentUser);
 
 		ArgumentCaptor<AppUser> captor = ArgumentCaptor.forClass(AppUser.class);
 		verify(appUserRepository).save(captor.capture());
@@ -165,7 +165,7 @@ class UserServiceTest {
 		when(appUserRepository.findByEmail("john@example.com")).thenReturn(Optional.of(userToUpdate));
 		when(appUserRepository.save(any(AppUser.class))).thenReturn(userToUpdate);
 
-		userService.editUser(userId, request, currentUser);
+		userService.editUser(request, currentUser);
 
 		verify(appUserRepository).save(any(AppUser.class));
 	}
@@ -183,7 +183,7 @@ class UserServiceTest {
 		when(appUserRepository.findByEmail("jane@example.com")).thenReturn(Optional.of(otherUser));
 
 		EmailAlreadyInUseException exception = assertThrows(EmailAlreadyInUseException.class,
-				() -> userService.editUser(userId, request, currentUser));
+				() -> userService.editUser(request, currentUser));
 
 		assertEquals("Email is already in use", exception.getMessage());
 		verify(appUserRepository, never()).save(any(AppUser.class));
@@ -198,7 +198,7 @@ class UserServiceTest {
 		when(appUserRepository.findById(userId)).thenReturn(Optional.empty());
 
 		UserNotFoundException exception = assertThrows(UserNotFoundException.class,
-				() -> userService.editUser(userId, request, currentUser));
+				() -> userService.editUser(request, currentUser));
 
 		assertEquals("User not found", exception.getMessage());
 		verify(appUserRepository, never()).save(any(AppUser.class));
@@ -215,7 +215,7 @@ class UserServiceTest {
 		when(appUserRepository.findById(userId)).thenReturn(Optional.of(userToUpdate));
 		when(appUserRepository.save(any(AppUser.class))).thenReturn(userToUpdate);
 
-		userService.editUser(userId, request, currentUser);
+		userService.editUser(request, currentUser);
 
 		ArgumentCaptor<AppUser> captor = ArgumentCaptor.forClass(AppUser.class);
 		verify(appUserRepository).save(captor.capture());
@@ -236,7 +236,7 @@ class UserServiceTest {
 		when(appUserRepository.findById(userId)).thenReturn(Optional.of(userToUpdate));
 		when(appUserRepository.save(any(AppUser.class))).thenReturn(userToUpdate);
 
-		userService.changePassword(userId, request, currentUser);
+		userService.changePassword(request, currentUser);
 
 		ArgumentCaptor<AppUser> captor = ArgumentCaptor.forClass(AppUser.class);
 		verify(appUserRepository).save(captor.capture());
@@ -258,7 +258,7 @@ class UserServiceTest {
 		when(appUserRepository.findById(userId)).thenReturn(Optional.of(userToUpdate));
 
 		PasswordException exception = assertThrows(PasswordException.class,
-				() -> userService.changePassword(userId, request, currentUser));
+				() -> userService.changePassword(request, currentUser));
 
 		assertEquals("Incorrect current password", exception.getMessage());
 		verify(appUserRepository, never()).save(any(AppUser.class));
@@ -278,7 +278,7 @@ class UserServiceTest {
 		when(appUserRepository.findById(userId)).thenReturn(Optional.of(userToUpdate));
 
 		PasswordException exception = assertThrows(PasswordException.class,
-				() -> userService.changePassword(userId, request, currentUser));
+				() -> userService.changePassword(request, currentUser));
 
 		assertEquals("New passwords don't match", exception.getMessage());
 		verify(appUserRepository, never()).save(any(AppUser.class));
@@ -293,7 +293,7 @@ class UserServiceTest {
 		when(appUserRepository.findById(userId)).thenReturn(Optional.empty());
 
 		UserNotFoundException exception = assertThrows(UserNotFoundException.class,
-				() -> userService.changePassword(userId, request, currentUser));
+				() -> userService.changePassword(request, currentUser));
 
 		assertEquals("User not found", exception.getMessage());
 		verify(appUserRepository, never()).save(any(AppUser.class));
@@ -315,7 +315,7 @@ class UserServiceTest {
 
 		// Should fail on incorrect password, not on mismatched new passwords
 		PasswordException exception = assertThrows(PasswordException.class,
-				() -> userService.changePassword(userId, request, currentUser));
+				() -> userService.changePassword(request, currentUser));
 
 		assertEquals("Incorrect current password", exception.getMessage());
 	}

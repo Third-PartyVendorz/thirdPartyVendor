@@ -1,0 +1,253 @@
+.profile-page {
+	display: grid;
+	gap: 1.25rem;
+	padding: 1.25rem;
+	background:
+		radial-gradient(circle at top left, rgba(248, 183, 118, 0.22), transparent 30%),
+		linear-gradient(180deg, #f7fbff 0%, #eef4f9 100%);
+	min-height: calc(100vh - 72px);
+}
+
+.card-shell {
+	border: 1px solid rgba(148, 163, 184, 0.2);
+	border-radius: 24px;
+	background: rgba(255, 255, 255, 0.95);
+	padding: 1.5rem;
+	box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+}
+
+.profile-hero {
+	display: flex;
+	justify-content: space-between;
+	gap: 1.5rem;
+	align-items: flex-start;
+	flex-wrap: wrap;
+}
+
+.profile-identity {
+	display: flex;
+	gap: 1.15rem;
+	align-items: center;
+	min-width: 0;
+}
+
+.avatar-wrap {
+	width: 88px;
+	height: 88px;
+	border-radius: 50%;
+	padding: 4px;
+	background: linear-gradient(135deg, #033d6c, #0b5ca5 68%, #f8b776);
+	flex: 0 0 auto;
+	box-shadow: 0 12px 24px rgba(3, 61, 108, 0.18);
+}
+
+.avatar-wrap img {
+	width: 100%;
+	height: 100%;
+	border-radius: 50%;
+	object-fit: cover;
+	background: #fff;
+	display: block;
+}
+
+.identity-copy {
+	display: grid;
+	gap: 0.25rem;
+	min-width: 0;
+}
+
+.eyebrow {
+	margin: 0;
+	text-transform: uppercase;
+	letter-spacing: 0.14em;
+	font-size: 0.75rem;
+	font-weight: 700;
+	color: #64748b;
+}
+
+.identity-copy h1,
+.section-heading h2 {
+	margin: 0;
+	color: #0f172a;
+}
+
+.identity-copy h1 {
+	font-size: clamp(1.8rem, 4vw, 2.8rem);
+	line-height: 1.05;
+}
+
+.role-line {
+	margin: 0;
+	font-size: 1.05rem;
+	font-weight: 700;
+	color: #033d6c;
+}
+
+.supporting-copy,
+.profile-note p {
+	margin: 0;
+	color: #475569;
+	line-height: 1.65;
+}
+
+.hero-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.75rem;
+	justify-content: flex-end;
+	align-items: center;
+	z-index: 1;
+	margin-left: auto;
+}
+
+.hero-actions button {
+	border: 0;
+	border-radius: 14px;
+	padding: 0.95rem 1.25rem;
+	font-size: 0.95rem;
+	font-weight: 800;
+	cursor: pointer;
+	transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.hero-actions button:hover {
+	transform: translateY(-1px);
+}
+
+.primary-action {
+	background: linear-gradient(135deg, #033d6c, #0b5ca5);
+	color: #fff;
+	box-shadow: 0 14px 24px rgba(3, 61, 108, 0.18);
+}
+
+.secondary-action {
+	background: #fff;
+	color: #033d6c;
+	border: 1px solid rgba(3, 61, 108, 0.14);
+}
+
+.profile-grid {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: 0.8rem;
+	align-items: start;
+}
+
+.profile-main {
+	display: grid;
+	gap: 0.8rem;
+	min-width: 0;
+}
+
+.details-card,
+.contact-card {
+	min-width: 0;
+}
+
+.section-heading {
+	display: flex;
+	justify-content: space-between;
+	gap: 1rem;
+	align-items: flex-start;
+	margin-bottom: 0.85rem;
+}
+
+.profile-note .section-heading { margin-bottom: 0.65rem; }
+
+.details-list {
+	display: grid;
+	gap: 0.65rem;
+}
+
+.detail-row,
+.contact-item {
+	display: grid;
+	gap: 0.35rem;
+}
+
+.detail-row {
+	grid-template-columns: minmax(90px, 135px) 1fr auto;
+	align-items: center;
+	padding: 0.65rem 0;
+	border-top: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.detail-row:first-child {
+	border-top: 0;
+	padding-top: 0;
+}
+
+.label {
+	color: #64748b;
+	font-size: 0.92rem;
+	font-weight: 600;
+}
+
+.value-pill,
+.muted-action {
+	display: inline-flex;
+	align-items: center;
+	justify-content: flex-start;
+	min-height: 34px;
+	padding: 0.45rem 0.9rem;
+	border-radius: 999px;
+	font-size: 0.92rem;
+	font-weight: 700;
+}
+
+.value-pill {
+	color: #0f172a;
+	background: linear-gradient(180deg, #f8fbff 0%, #eef4fb 100%);
+	border: 1px solid rgba(3, 61, 108, 0.1);
+	box-shadow: inset 0 1px 3px rgba(15, 23, 42, 0.05);
+}
+
+.muted-action {
+	color: #0b5ca5;
+	background: rgba(11, 92, 165, 0.08);
+	justify-self: end;
+}
+
+.contact-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+	gap: 0.9rem;
+}
+
+@media (max-width: 768px) {
+	.profile-page {
+		padding: 1rem;
+		gap: 1rem;
+	}
+
+	.card-shell { border-radius: 20px; padding: 1.1rem; }
+
+	.profile-hero { flex-direction: column; }
+
+	.hero-actions { justify-content: flex-start; }
+
+	.profile-grid,
+	.contact-grid { grid-template-columns: 1fr; gap: 0.7rem; }
+
+	.hero-actions {
+		margin-left: 0;
+	}
+
+	.profile-identity {
+		align-items: flex-start;
+	}
+
+	.avatar-wrap {
+		width: 72px;
+		height: 72px;
+	}
+
+	.detail-row {
+		grid-template-columns: 1fr;
+		justify-items: start;
+	}
+
+	.muted-action {
+		justify-self: start;
+	}
+}

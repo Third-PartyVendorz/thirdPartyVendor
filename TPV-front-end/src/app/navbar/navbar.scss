@@ -1,0 +1,246 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+.navbar-content {
+    background-color: #033D6C;
+    border-bottom: 4px solid #F8B776;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0 24px;
+    position: relative;
+    gap: 16px;
+}
+
+.brand-name {
+    flex: 0 1 auto;
+    min-width: 0;
+}
+
+.brand-name h1 {
+    color: #ffffff;
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 300;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: clamp(1.3rem, 3vw, 2.5rem);
+}
+
+.desktop-nav ul {
+    list-style: none;
+    display: flex;
+    gap: clamp(12px, 2vw, 30px);
+    flex-wrap: nowrap;
+    white-space: nowrap;
+}
+
+.desktop-nav {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    justify-self: center;
+}
+
+.desktop-nav ul li {
+    flex: 0 0 auto;
+}
+
+.desktop-nav ul li a {
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: 400;
+    display: inline-block;
+    padding: 4px 0;
+    border-bottom: 2px solid transparent;
+}
+
+.desktop-nav ul li a:hover {
+    color: #F8B776;
+}
+
+.profile-button {
+    border: none;
+    background: transparent;
+    color: #ffffff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+.profile-button:hover {
+    transform: scale(1.05);
+}
+
+.profile-menu {
+    position: relative;
+}
+
+.profile-dropdown {
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    min-width: 150px;
+    padding: 8px 0;
+    background-color: #ffffff;
+    border: 1px solid #F8B776;
+    border-radius: 4px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    z-index: 1001;
+}
+
+.profile-dropdown a,
+.profile-dropdown button {
+    width: 100%;
+    padding: 10px 16px;
+    border: none;
+    background: transparent;
+    color: #033D6C;
+    cursor: pointer;
+    font: inherit;
+    text-align: left;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.profile-dropdown a:hover,
+.profile-dropdown button:hover {
+    background-color: rgba(248, 183, 118, 0.2);
+}
+
+.profile-button img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.mobile-nav {
+    display: none;
+    flex-direction: column;
+    gap: 0.5rem;
+    background-color: #033D6C;
+    padding: 1rem;
+    border: 1px solid #F8B776;
+    position: fixed;
+    top: 72px;
+    right: 0;
+    width: 200px;
+    z-index: 1000;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.mobile-nav a {
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: 400;
+    padding: 0.5rem 0;
+    display: block;
+    border-left: 3px solid transparent;
+    padding-left: 0.5rem;
+}
+
+.mobile-nav a:hover {
+    color: #F8B776;
+}
+
+.mobile-menu-button {
+    border: none;
+    background: transparent;
+    color: #ffffff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    transition: color 0.3s ease;
+}
+
+.mobile-menu-button:hover {
+    color: #F8B776;
+}
+
+.nav-link.active-link {
+    color: #F8B776;
+}
+
+.desktop-nav .nav-link.active-link {
+    border-bottom-color: #F8B776;
+}
+
+.desktop-nav li.active-link .nav-link {
+    color: #F8B776;
+    border-bottom-color: #F8B776;
+}
+
+.mobile-nav .nav-link.active-link {
+    border-left-color: #F8B776;
+    background-color: rgba(248, 183, 118, 0.12);
+}
+
+@media (max-width: 980px) {
+    .desktop-nav {
+        display: none;
+    }
+    .profile-button {
+        display: none;
+    }
+    .profile-menu {
+        display: none;
+    }
+    .mobile-menu-button {
+        display: flex;
+    }
+    .mobile-nav {
+        display: flex;
+    }
+}
+
+@media (min-width: 981px) {
+    .navbar-content {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+        align-items: center;
+        column-gap: clamp(24px, 3vw, 48px);
+    }
+
+    .brand-name {
+        justify-self: start;
+        max-width: 100%;
+        padding-right: 12px;
+    }
+
+    .brand-name h1 {
+        font-size: clamp(1.2rem, 2vw, 2rem);
+    }
+
+    .desktop-nav {
+        flex: 0 0 auto;
+        overflow: visible;
+    }
+
+    .profile-button {
+        justify-self: end;
+    }
+
+    .profile-menu {
+        justify-self: end;
+    }
+
+    .mobile-menu-button {
+        display: none;
+    }
+    .mobile-nav {
+        display: none;
+    }
+}

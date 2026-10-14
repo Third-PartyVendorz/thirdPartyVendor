@@ -1,0 +1,169 @@
+<section class="history-page">
+	<header class="history-hero">
+		<div>
+			<p class="history-eyebrow">Activity log</p>
+			<h1>Order History</h1>
+			<p class="history-lead">Review past orders, execution status, and recent trading activity in one place.</p>
+		</div>
+
+		<div class="history-actions">
+			<button type="button" class="ghost-button" (click)="downloadCsv()">Download CSV</button>
+			<button type="button" class="primary-button" (click)="openNewOrder()">New order</button>
+		</div>
+	</header>
+
+	<section class="history-summary-grid" aria-label="Order summary metrics">
+		<article class="summary-card" *ngFor="let card of summaryCards">
+			<p>{{ card.label }}</p>
+			<h2>{{ card.value }}</h2>
+			<span>{{ card.detail }}</span>
+		</article>
+	</section>
+
+	<section class="trend-card">
+		<div class="trend-header">
+			<div>
+				<p class="panel-kicker">Performance</p>
+				<h2>Portfolio trend</h2>
+				<p class="trend-copy">A month-by-month view of portfolio value over time.</p>
+			</div>
+
+			<div class="trend-summary">
+				<div>
+					<span class="trend-label">Current value</span>
+					<strong>{{ currentTrendValue | currency:'USD':'symbol':'1.2-2' }}</strong>
+				</div>
+
+				<div [class.positive]="trendIsPositive" [class.negative]="!trendIsPositive">
+					<span class="trend-label">Change</span>
+					<strong>
+						{{ trendIsPositive ? '▲' : '▼' }}
+						{{ trendChange | currency:'USD':'symbol':'1.2-2' }}
+					</strong>
+					<small>{{ trendChangePercent | number:'1.2-2' }}%</small>
+				</div>
+			</div>
+		</div>
+
+		<div class="chart-shell">
+			<div class="y-axis">
+				<span *ngFor="let label of trendYAxisLabels">{{ label | currency:'USD':'symbol':'1.0-0' }}</span>
+			</div>
+
+			<div class="chart-area">
+				<svg
+					[attr.viewBox]="'0 0 ' + chartWidth + ' ' + chartHeight"
+					preserveAspectRatio="none"
+					aria-label="Portfolio value trend chart"
+					role="img"
+				>
+					<defs>
+						<linearGradient id="historyTrendFill" x1="0" x2="0" y1="0" y2="1">
+							<stop offset="0%" stop-color="rgba(11, 92, 165, 0.34)" />
+							<stop offset="100%" stop-color="rgba(11, 92, 165, 0.04)" />
+						</linearGradient>
+					</defs>
+
+					<g class="grid-lines">
+						<line *ngFor="let label of trendYAxisLabels; let index = index"
+							[attr.x1]="chartPadding"
+							[attr.x2]="chartWidth - chartPadding"
+							[attr.y1]="chartPadding + ((chartHeight - chartPadding * 2) / (trendYAxisLabels.length - 1)) * index"
+							[attr.y2]="chartPadding + ((chartHeight - chartPadding * 2) / (trendYAxisLabels.length - 1)) * index"
+						/>
+					</g>
+
+					<polygon [attr.points]="trendAreaPoints" fill="url(#historyTrendFill)"></polygon>
+					<polyline [attr.points]="trendLinePoints"></polyline>
+				</svg>
+
+				<div class="x-axis">
+					<span *ngFor="let point of trendPoints">{{ point.label }}</span>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section class="history-toolbar">
+		<div class="filter-group" aria-label="Order history filters">
+			<button
+				type="button"
+				class="filter-pill"
+				*ngFor="let filter of quickFilters"
+				[class.active]="selectedFilter === filter"
+				(click)="selectFilter(filter)"
+			>
+				{{ filter }}
+			</button>
+		</div>
+
+		<div class="range-pill">Last 30 days</div>
+	</section>
+
+	<section class="history-content">
+		<article class="history-table-panel">
+			<div class="panel-header">
+				<div>
+					<p class="panel-kicker">Order log</p>
+					<h2>Recent orders</h2>
+				</div>
+				<p class="panel-note">Showing the latest activity for your account.</p>
+			</div>
+
+			<div class="history-table-wrap">
+				<table class="history-table">
+					<thead>
+						<tr>
+							<th>Date</th>
+							<th>Ticker</th>
+							<th>Side</th>
+							<th>Qty</th>
+							<th>Price</th>
+							<th>Total</th>
+							<th>Status</th>
+							<th>Venue</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr *ngFor="let entry of historyEntries">
+							<td>
+								<div class="date-cell">
+									<strong>{{ entry.date }}</strong>
+									<span>{{ entry.time }}</span>
+								</div>
+							</td>
+							<td class="ticker-cell">{{ entry.ticker }}</td>
+							<td>
+								<span class="side-badge" [class.sell]="entry.side === 'Sell'">{{ entry.side }}</span>
+							</td>
+							<td>{{ entry.quantity }}</td>
+							<td>{{ entry.price }}</td>
+							<td>{{ entry.total }}</td>
+							<td>
+								<span [ngClass]="['status-badge', entry.statusClass]">{{ entry.status }}</span>
+							</td>
+							<td>{{ entry.venue }}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</article>
+
+		<aside class="history-sidebar">
+			<article class="sidebar-card">
+				<p class="panel-kicker">Timeline</p>
+				<h2>Recent activity</h2>
+				<div class="timeline-list">
+					<div class="timeline-item" *ngFor="let item of activityFeed">
+						<div class="timeline-dot"></div>
+						<div>
+							<h3>{{ item.title }}</h3>
+							<p>{{ item.description }}</p>
+							<span>{{ item.timestamp }}</span>
+						</div>
+					</div>
+				</div>
+			</article>
+		</aside>
+	</section>
+</section>
