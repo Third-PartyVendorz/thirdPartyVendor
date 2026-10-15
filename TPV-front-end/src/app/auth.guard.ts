@@ -31,29 +31,20 @@ export const authGuard: CanActivateFn = () => {
   return router.parseUrl('/login');
 };
 
-const roleGuard = (requiredRole: 'USER' | 'ADMIN'): CanActivateFn => () => {
+export const roleGuard: CanActivateFn = (route) => {
   const authService = inject(AuthService);
-  const userContextService = inject(UserContextService);
   const router = inject(Router);
-  const messageService = inject(MessageService);
+  const allowedRoles = route.data['roles'] as string[] | undefined;
+  const userRole = authService.getUserRole();
 
-  if (authService.getSessionState() !== true) {
-    messageService.setErrorMessage('You must be signed in to access that page.');
-    return router.parseUrl('/login');
-  }
-
-  const role = userContextService.getUserContext()?.role;
-  if (role === requiredRole) {
-    messageService.clearMessage();
+  if (allowedRoles?.includes(userRole ?? '')) {
     return true;
   }
 
-  messageService.setErrorMessage('You do not have permission to access that page.');
-  return router.parseUrl(role === 'ADMIN' ? '/admin/users' : '/dashboard');
+  return userRole === 'ADMIN'
+    ? router.parseUrl('/admin')
+    : router.parseUrl('/dashboard');
 };
-
-export const userGuard = roleGuard('USER');
-export const adminGuard = roleGuard('ADMIN');
 
 export const landingGuard: CanActivateFn = () => {
   const authService = inject(AuthService);
@@ -64,7 +55,7 @@ export const landingGuard: CanActivateFn = () => {
     return router.parseUrl('/login');
   }
 
-  return userContextService.getUserContext()?.role === 'ADMIN'
-    ? router.parseUrl('/admin/users')
+  return authService.getUserRole() === 'ADMIN'
+    ? router.parseUrl('/admin')
     : router.parseUrl('/dashboard');
 };

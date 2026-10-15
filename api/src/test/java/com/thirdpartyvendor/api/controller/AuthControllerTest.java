@@ -21,6 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.thirdpartyvendor.api.dto.AuthenticationJwtModel;
 import com.thirdpartyvendor.api.dto.AuthenticationRequest;
 import com.thirdpartyvendor.api.dto.AuthenticationResponse;
+import com.thirdpartyvendor.api.dto.AuthMeResponse;
 import com.thirdpartyvendor.api.dto.RegisterRequest;
 import com.thirdpartyvendor.api.dto.RegisterResponse;
 import com.thirdpartyvendor.api.entity.AppUser;
@@ -71,7 +72,7 @@ class AuthControllerTest {
 	void authenticatesUserAndSetsCookies() {
 		AppUser user = createUser(1L, "jane.doe@example.com");
 		when(authenticationService.authenticate(org.mockito.ArgumentMatchers.any(AuthenticationRequest.class))).thenReturn(
-			new AuthenticationJwtModel("Jane", "Doe", "555-0102", LocalDate.of(1992, 8, 22), "jane.doe@example.com", "jwt-token", 1L, "USER")
+			new AuthenticationJwtModel("Jane", "Doe", "555-0102", LocalDate.of(1992, 8, 22), "jane.doe@example.com", "jwt-token", 1L, UserRole.USER)
 		);
 		when(refreshService.createRefreshToken(1L)).thenReturn(createRefreshToken("refresh-token", user));
 
@@ -83,13 +84,14 @@ class AuthControllerTest {
 
 		assertEquals(HttpStatus.OK, result.getStatusCode());
 		assertEquals("jane.doe@example.com", result.getBody().email());
+		assertEquals(UserRole.USER, result.getBody().role());
 		assertEquals(2, response.getHeaders(HttpHeaders.SET_COOKIE).size());
 		assertNull(result.getHeaders().getFirst(HttpHeaders.SET_COOKIE));
 	}
 
 	@Test
 	void returnsMeWhenPrincipalExists() {
-		ResponseEntity<AuthenticationResponse> result = authController.me(createUser(1L, "jane.doe@example.com"));
+		ResponseEntity<AuthMeResponse> result = authController.me(createUser(1L, "jane.doe@example.com"));
 
 		assertEquals(HttpStatus.OK, result.getStatusCode());
 		assertEquals("USER", result.getBody().role());
@@ -113,11 +115,12 @@ class AuthControllerTest {
 		when(refreshService.rotateRefreshToken("refresh-token")).thenReturn(rotatedToken);
 		when(jwtService.generateToken(user)).thenReturn("new-jwt");
 
-		ResponseEntity<Void> result = authController.refresh(request, response);
+		ResponseEntity<AuthMeResponse> result = authController.refresh(request, response);
 
 		assertEquals(HttpStatus.OK, result.getStatusCode());
 		assertEquals(2, response.getHeaders(HttpHeaders.SET_COOKIE).size());
 		verify(jwtService).generateToken(user);
+		assertEquals(new AuthMeResponse(UserRole.USER), result.getBody());
 	}
 
 	@Test

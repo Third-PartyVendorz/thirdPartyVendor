@@ -73,7 +73,7 @@ public class AuthenticationService {
 			user.getEmail(),
 			jwtService.generateToken(user),
 			user.getId(),
-			user.getRole().name()
+			user.getRole()
 		);
 	}
 

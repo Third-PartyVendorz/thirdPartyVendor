@@ -1,6 +1,7 @@
 package com.thirdpartyvendor.api.dto;
 
 import java.time.LocalDate;
+import com.thirdpartyvendor.api.entity.AppUser.UserRole;
 
 public record AuthenticationJwtModel(
     String firstName,
@@ -10,7 +11,7 @@ public record AuthenticationJwtModel(
     String email,
     String jwtToken,
     Long userId,
-    String role
+    UserRole role
 ) {
     
 }
