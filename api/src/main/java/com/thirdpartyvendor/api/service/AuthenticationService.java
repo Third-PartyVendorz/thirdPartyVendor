@@ -72,7 +72,8 @@ public class AuthenticationService {
 			user.getDateOfBirth(),
 			user.getEmail(),
 			jwtService.generateToken(user),
-			user.getId()
+			user.getId(),
+			user.getRole().name()
 		);
 	}
 

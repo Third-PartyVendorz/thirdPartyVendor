@@ -43,6 +43,7 @@ public class AdminService {
         AuthorizationUtil.requireAdmin(currentUser);
 
         return userRepository.findAll().stream()
+            .filter(user -> user.getRole() != AppUser.UserRole.ADMIN)
             .map(this::mapToResponse)
             .collect(Collectors.toList());
     }

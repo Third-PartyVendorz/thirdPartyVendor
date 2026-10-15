@@ -2,6 +2,7 @@ import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from './services/auth.service';
 import { MessageService } from './services/message.service';
+import { UserContextService } from './services/user-context.service';
 
 /**
  * Auth guard that protects routes from unauthenticated access.
@@ -30,11 +31,40 @@ export const authGuard: CanActivateFn = () => {
   return router.parseUrl('/login');
 };
 
+const roleGuard = (requiredRole: 'USER' | 'ADMIN'): CanActivateFn => () => {
+  const authService = inject(AuthService);
+  const userContextService = inject(UserContextService);
+  const router = inject(Router);
+  const messageService = inject(MessageService);
+
+  if (authService.getSessionState() !== true) {
+    messageService.setErrorMessage('You must be signed in to access that page.');
+    return router.parseUrl('/login');
+  }
+
+  const role = userContextService.getUserContext()?.role;
+  if (role === requiredRole) {
+    messageService.clearMessage();
+    return true;
+  }
+
+  messageService.setErrorMessage('You do not have permission to access that page.');
+  return router.parseUrl(role === 'ADMIN' ? '/admin/users' : '/dashboard');
+};
+
+export const userGuard = roleGuard('USER');
+export const adminGuard = roleGuard('ADMIN');
+
 export const landingGuard: CanActivateFn = () => {
   const authService = inject(AuthService);
+  const userContextService = inject(UserContextService);
   const router = inject(Router);
 
-  return authService.getSessionState() === true
-    ? router.parseUrl('/dashboard')
-    : router.parseUrl('/login');
+  if (authService.getSessionState() !== true) {
+    return router.parseUrl('/login');
+  }
+
+  return userContextService.getUserContext()?.role === 'ADMIN'
+    ? router.parseUrl('/admin/users')
+    : router.parseUrl('/dashboard');
 };

@@ -7,6 +7,7 @@ public record AuthenticationResponse(
     String lastName,
     String phoneNumber,
     LocalDate dateOfBirth,
-    String email
+    String email,
+    String role
 ) {
 }

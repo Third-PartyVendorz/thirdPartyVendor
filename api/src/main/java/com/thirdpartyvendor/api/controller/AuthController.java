@@ -78,18 +78,27 @@ public class AuthController {
 			authJwtModel.lastName(),
 			authJwtModel.phoneNumber(),
 			authJwtModel.dateOfBirth(),
-			authJwtModel.email()
+			authJwtModel.email(),
+			authJwtModel.role()
 		);
 		return ResponseEntity.status(HttpStatus.OK).body(authResponse);
 	}
 
 	@GetMapping("/me")
-	public ResponseEntity<Void> me(@AuthenticationPrincipal AppUser currentUser) {
+	public ResponseEntity<AuthenticationResponse> me(@AuthenticationPrincipal AppUser currentUser) {
 		if (currentUser == null) {
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Please login again");
 		}
 
-		return ResponseEntity.ok().build();
+		return ResponseEntity.ok(new AuthenticationResponse(
+			currentUser.getId(),
+			currentUser.getFirstName(),
+			currentUser.getLastName(),
+			currentUser.getPhoneNumber(),
+			currentUser.getDateOfBirth(),
+			currentUser.getEmail(),
+			currentUser.getRole().name()
+		));
 	}
 
 	@PostMapping("/refresh")

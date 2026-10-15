@@ -71,7 +71,7 @@ class AuthControllerTest {
 	void authenticatesUserAndSetsCookies() {
 		AppUser user = createUser(1L, "jane.doe@example.com");
 		when(authenticationService.authenticate(org.mockito.ArgumentMatchers.any(AuthenticationRequest.class))).thenReturn(
-			new AuthenticationJwtModel("Jane", "Doe", "555-0102", LocalDate.of(1992, 8, 22), "jane.doe@example.com", "jwt-token", 1L)
+			new AuthenticationJwtModel("Jane", "Doe", "555-0102", LocalDate.of(1992, 8, 22), "jane.doe@example.com", "jwt-token", 1L, "USER")
 		);
 		when(refreshService.createRefreshToken(1L)).thenReturn(createRefreshToken("refresh-token", user));
 
@@ -89,9 +89,10 @@ class AuthControllerTest {
 
 	@Test
 	void returnsMeWhenPrincipalExists() {
-		ResponseEntity<Void> result = authController.me(createUser(1L, "jane.doe@example.com"));
+		ResponseEntity<AuthenticationResponse> result = authController.me(createUser(1L, "jane.doe@example.com"));
 
 		assertEquals(HttpStatus.OK, result.getStatusCode());
+		assertEquals("USER", result.getBody().role());
 	}
 
 	@Test

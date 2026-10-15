@@ -9,7 +9,8 @@ public record AuthenticationJwtModel(
     LocalDate dateOfBirth,
     String email,
     String jwtToken,
-    Long userId
+    Long userId,
+    String role
 ) {
     
 }

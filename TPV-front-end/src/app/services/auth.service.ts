@@ -54,10 +54,19 @@ export class AuthService {
   checkSession(): Observable<boolean> {
     const sessionCheckUrl = `${environment.apiBaseUrl}/auth/me`;
 
-    return this.http.get<void>(sessionCheckUrl, {
+    return this.http.get<AuthenticationResponse>(sessionCheckUrl, {
       withCredentials: true,
     }).pipe(
-      map(() => {
+      map((response) => {
+        this.userContextService.setUserContext({
+          userId: response.userId,
+          firstName: response.firstName,
+          lastName: response.lastName,
+          phoneNumber: response.phoneNumber,
+          dateOfBirth: response.dateOfBirth,
+          email: response.email,
+          role: response.role,
+        });
         this.markSessionAuthenticated();
         return true;
       }),

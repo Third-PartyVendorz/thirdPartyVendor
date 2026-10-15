@@ -1,0 +1,15 @@
+* { box-sizing: border-box; }
+.navbar-content { min-height: 72px; padding: 0 24px; display: flex; align-items: center; gap: 2rem; background: #033d6c; border-bottom: 4px solid #f8b776; color: #fff; }
+.brand-name { margin-right: auto; }
+.brand-name h1 { margin: 0; font-size: clamp(1.3rem, 3vw, 2rem); font-weight: 300; letter-spacing: 1px; }
+.brand-name span { color: #f8b776; font-size: .75rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+nav a { color: #fff; text-decoration: none; padding: .4rem 0; border-bottom: 2px solid transparent; }
+nav a:hover, nav a.active-link { color: #f8b776; border-bottom-color: #f8b776; }
+.profile-menu { position: relative; }
+.profile-button { border: 0; background: transparent; cursor: pointer; }
+.profile-button img { width: 40px; height: 40px; border-radius: 50%; }
+.profile-dropdown { position: absolute; right: 0; top: calc(100% + 12px); z-index: 10; min-width: 150px; padding: .5rem 0; display: grid; background: #fff; border: 1px solid #f8b776; border-radius: 4px; box-shadow: 0 4px 10px rgba(0,0,0,.25); color: #033d6c; }
+.profile-dropdown span, .profile-dropdown button { padding: .6rem 1rem; text-align: left; white-space: nowrap; }
+.profile-dropdown button { border: 0; background: transparent; color: #033d6c; cursor: pointer; font: inherit; }
+.profile-dropdown button:hover { background: rgba(248,183,118,.2); }
+@media (max-width: 600px) { .navbar-content { padding: 0 16px; gap: 1rem; } nav a { font-size: .9rem; } }
