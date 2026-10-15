@@ -78,7 +78,8 @@ public class AuthController {
 			authJwtModel.lastName(),
 			authJwtModel.phoneNumber(),
 			authJwtModel.dateOfBirth(),
-			authJwtModel.email()
+			authJwtModel.email(),
+			authJwtModel.role()
 		);
 		return ResponseEntity.status(HttpStatus.OK).body(authResponse);
 	}
