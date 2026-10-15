@@ -5,6 +5,7 @@ export interface AnalyticsResponse {
   sell_count: number;
   sell_volume: number;
   top_5_most_traded_assets: Record<string, string>;
+  top_5_most_traded_assets_by_side: Record<'BUY' | 'SELL', Record<string, string>>;
   total_after_hours_volume: string;
   total_market_volume: number;
   trade_volume_by_date: Record<string, string>;

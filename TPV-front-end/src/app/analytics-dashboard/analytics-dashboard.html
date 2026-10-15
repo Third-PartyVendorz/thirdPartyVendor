@@ -249,8 +249,31 @@
   <!-- Top K Most Traded Assets - Scrollable -->
   <section class="top-assets-section" *ngIf="hasActiveData()">
     <article class="chart-card">
-      <div class="card-header">
+      <div class="card-header-with-toggle">
         <h3>Top K Most Traded Assets</h3>
+        <div class="toggle-buttons">
+          <button
+            type="button"
+            class="toggle-btn"
+            [class.active]="topAssetsMode() === 'total'"
+            (click)="topAssetsMode.set('total')">
+            Total
+          </button>
+          <button
+            type="button"
+            class="toggle-btn"
+            [class.active]="topAssetsMode() === 'buy'"
+            (click)="topAssetsMode.set('buy')">
+            Buy
+          </button>
+          <button
+            type="button"
+            class="toggle-btn"
+            [class.active]="topAssetsMode() === 'sell'"
+            (click)="topAssetsMode.set('sell')">
+            Sell
+          </button>
+        </div>
       </div>
 
       <div class="top-assets-scroll">

@@ -62,6 +62,7 @@ export class AnalyticsDashboard implements OnInit {
   orderDistributionMode = signal<'count' | 'volume'>('count');
   volumeByMarketMode = signal<'volume' | 'side'>('side');
   volumeByDateMode = signal<'volume' | 'side'>('volume');
+  topAssetsMode = signal<'total' | 'buy' | 'sell'>('total');
   timelineMode = signal<'monthly' | 'custom'>('monthly');
 
   // Custom date range form
@@ -311,7 +312,11 @@ export class AnalyticsDashboard implements OnInit {
     const data = this.activeAnalyticsData();
     if (!data || !data.top_5_most_traded_assets) return [];
 
-    return Object.entries(data.top_5_most_traded_assets)
+    const assets = this.topAssetsMode() === 'total'
+      ? data.top_5_most_traded_assets
+      : data.top_5_most_traded_assets_by_side?.[this.topAssetsMode().toUpperCase() as 'BUY' | 'SELL'] ?? {};
+
+    return Object.entries(assets)
       .map(([symbol, value]) => ({ symbol, value: Number(value) }))
       .sort((a, b) => b.value - a.value)
       .map(({ symbol, value }, idx) => ({ rank: idx + 1, symbol, value }));
