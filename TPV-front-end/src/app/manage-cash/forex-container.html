@@ -1,0 +1,109 @@
+<main class="manage-cash-page">
+    <section class="forex-container" aria-labelledby="forex-title">
+        <div class="forex-content">
+    <section class="forex-hero">
+        <div>
+            <p class="eyebrow">Manage cash / Currency exchange</p>
+            <h1 id="forex-title">Move money across markets.</h1>
+            <p class="hero-copy">Exchange available cash between currencies at a live indicative rate.</p>
+        </div>
+    </section>
+
+    <section class="currency-search" aria-label="Search currencies">
+        <button
+            class="currency-info-button"
+            type="button"
+            aria-label="Currency code information"
+            [attr.aria-expanded]="showCurrencyInfo"
+            (click)="toggleCurrencyInfo()">
+            <span class="material-icons-outlined" aria-hidden="true">info</span>
+        </button>
+        @if (showCurrencyInfo) {
+            <div class="currency-info-tooltip" role="status">
+                Enter a 3-letter currency code, such as USD or EUR.
+            </div>
+        }
+        <label for="from-currency">
+            <span>From currency</span>
+            <input id="from-currency" type="text" />
+        </label>
+        <button class="search-switch" type="button" (click)="switchDirection()" [attr.aria-label]="'Switch ' + baseCurrency + ' and ' + quoteCurrency">
+            <span class="material-icons-outlined" aria-hidden="true">swap_horiz</span>
+        </button>
+        <label for="to-currency">
+            <span>To currency</span>
+            <input id="to-currency" type="text" />
+        </label>
+        <button type="button" class="search-button">
+            <span class="material-icons-outlined" aria-hidden="true">search</span>
+            Search
+        </button>
+    </section>
+
+
+
+    @if (quoteFound) {
+        <section class="forex-workspace" aria-label="Currency exchange ticket">
+            <article class="rate-card">
+                <div class="card-heading">
+                    <div>
+                        <p class="eyebrow">Live indicative rate</p>
+                        <h2>{{ baseCurrency }}/{{ quoteCurrency }}</h2>
+                    </div>
+                    <span class="material-icons-outlined rate-icon" aria-hidden="true">currency_exchange</span>
+                </div>
+
+                <div class="rate-value">1 {{ baseCurrency }} <span>=</span> {{ displayRate | number:'1.4-4' }} {{ quoteCurrency }}</div>
+                <div class="rate-meta"><span class="positive">+0.18%</span><span>Updated just now</span></div>
+
+                <div class="mini-chart" aria-label="Indicative rate trend">
+                    <span class="chart-line"></span>
+                    <span class="chart-dot chart-dot-one"></span>
+                    <span class="chart-dot chart-dot-two"></span>
+                    <span class="chart-dot chart-dot-three"></span>
+                    <span class="chart-dot chart-dot-four"></span>
+                </div>
+
+                <div class="rate-stats">
+                    <div><span>Buy</span><strong>{{ (displayRate + 0.0008) | number:'1.4-4' }}</strong></div>
+                    <div><span>Sell</span><strong>{{ (displayRate - 0.0008) | number:'1.4-4' }}</strong></div>
+                    <div><span>Spread</span><strong>0.08%</strong></div>
+                </div>
+            </article>
+
+            <article class="exchange-card">
+                <div class="card-heading exchange-heading">
+                    <div>
+                        <p class="eyebrow">Exchange ticket</p>
+                        <h2>Set your direction</h2>
+                    </div>
+                    <button class="switch-button" type="button" (click)="switchDirection()" [attr.aria-label]="'Switch ' + baseCurrency + ' and ' + quoteCurrency">
+                        <span class="material-icons-outlined" aria-hidden="true">swap_vert</span>
+                        Switch
+                    </button>
+                </div>
+
+                <div class="currency-pair">
+                    <button type="button" [class.selected]="baseCurrency === 'USD' && quoteCurrency === 'EUR'" (click)="selectPair('USD', 'EUR')">USD/EUR</button>
+                    <button type="button" [class.selected]="baseCurrency === 'GBP' && quoteCurrency === 'USD'" (click)="selectPair('GBP', 'USD')">GBP/USD</button>
+                    <button type="button" [class.selected]="baseCurrency === 'USD' && quoteCurrency === 'JPY'" (click)="selectPair('USD', 'JPY')">USD/JPY</button>
+                </div>
+
+                <div class="amount-fields">
+                    <label>Sell <span>{{ baseCurrency }}</span><input type="number" min="0" [(ngModel)]="sellAmount" (ngModelChange)="onSellAmountChange()" /></label>
+                    <div class="field-arrow"><span class="material-icons-outlined" aria-hidden="true">arrow_forward</span></div>
+                    <label>Receive <span>{{ quoteCurrency }}</span><input type="number" [value]="buyAmount | number:'1.2-2'" readonly /></label>
+                </div>
+
+                <div class="order-summary">
+                    <span>Estimated delivery</span><strong>Instant</strong>
+                    <span>Exchange fee</span><strong>$0.00</strong>
+                </div>
+                <button class="exchange-button" type="button"><span class="material-icons-outlined" aria-hidden="true">bolt</span>Review exchange</button>
+                <p class="disclaimer">Final rate is confirmed when your exchange is submitted.</p>
+            </article>
+        </section>
+    }
+        </div>
+    </section>
+</main>

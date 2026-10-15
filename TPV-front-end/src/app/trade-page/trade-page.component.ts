@@ -25,7 +25,6 @@ export class TradePage implements OnInit {
 	assetDetails = signal<AssetTradeDetails | null>(null);
 	sharesOwned = signal(0);
 	autoOpenTrade = true;
-x: any;
 
 	ngOnInit(): void {
 		this.route.queryParams
