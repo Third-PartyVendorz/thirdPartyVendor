@@ -1,8 +1,9 @@
 from datetime import datetime
 
 def get_date_tag():
-    now = datetime.now()
-    return now.month, now.year, f"{now.year}_{now.month:02d}"
+    # now = datetime.now()
+    # return now.month, now.year, f"{now.year}_{now.month:02d}"
+    return 9, 2026, "2026_09"
 
 def get_previous_month_trades_query():
     month, year, date_tag = get_date_tag()

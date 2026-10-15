@@ -158,22 +158,60 @@ def trade_volume_by_market_hour(df):
 
 
 # ===== K Most Traded Assets =====
+# def k_most_traded_assets(df, k=5):
+#     """Get the k most traded assets by volume."""      
+#     if 'ticker' not in df.columns:
+#         raise KeyError("'ticker' column not found")
+        
+#     asset_volumes = df.groupby('ticker')['execution_quantity'].sum().sort_values(ascending=False)
+        
+#     if asset_volumes.empty:
+#         raise ValueError("No asset data found")
+        
+#     top_k_assets = asset_volumes.head(k).to_dict()
+        
+#     if not top_k_assets:
+#         raise ValueError(f"Could not find {k} assets in data")
+        
+#     return top_k_assets
+    
+    
+    
+
 def k_most_traded_assets(df, k=5):
     """Get the k most traded assets by volume."""      
     if 'ticker' not in df.columns:
         raise KeyError("'ticker' column not found")
         
     asset_volumes = df.groupby('ticker')['execution_quantity'].sum().sort_values(ascending=False)
-        
+    
+    asset_volumes_by_side = df.groupby(['ticker', 'order_intent'])['execution_quantity'].sum().sort_values(ascending=False)
+
     if asset_volumes.empty:
         raise ValueError("No asset data found")
         
-    top_k_assets = asset_volumes.head(k).to_dict()
+    if asset_volumes_by_side.empty:
+        raise ValueError("No asset data found")
+    
+    asset_by_volume_and_side_dict = {}
+    for (ticker, side), volume in asset_volumes_by_side.items():
+        if side not in asset_by_volume_and_side_dict:
+            asset_by_volume_and_side_dict[side] = {}
+        asset_by_volume_and_side_dict[side][ticker] = volume
         
+    top_k_assets = asset_volumes.head(k).to_dict()
+    top_k_assets_volume_and_side = {
+        side: dict(sorted(assets.items(), key=lambda item: item[1], reverse=True)[:k])
+        for side, assets in asset_by_volume_and_side_dict.items()
+    }
+    
     if not top_k_assets:
         raise ValueError(f"Could not find {k} assets in data")
+     
+    if not top_k_assets_volume_and_side:
+        raise ValueError(f"Could not find {k} assets in data")
         
-    return top_k_assets
+    return top_k_assets, top_k_assets_volume_and_side
 # ================================================================
 
 
@@ -232,11 +270,13 @@ def perform_analytics(df, k=5):
                 
         # Metric 5: K Most Traded Assets
         try:
-            top_k_assets = k_most_traded_assets(df, k)
+            top_k_assets, top_k_assets_by_side = k_most_traded_assets(df, k)
             formatted_payload[f"top_{k}_most_traded_assets"] = top_k_assets
+            formatted_payload[f"top_{k}_most_traded_assets_by_side"] = top_k_assets_by_side
         except Exception as e:
             print(f"Warning: Failed to calculate top {k} most traded assets: {str(e)}")
             formatted_payload[f"top_{k}_most_traded_assets"] = {}
+            formatted_payload[f"top_{k}_most_traded_assets_by_side"] = {}
         
         return formatted_payload
     

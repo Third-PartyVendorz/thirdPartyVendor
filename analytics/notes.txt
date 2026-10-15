@@ -37,17 +37,18 @@ Plan:
           - Small details like order vs trade - done
           - Display current month on default analytics job - done
  - Clean up Auth:
-      - Ensure that session times are properly handled, currently there is no refresh
+      - Ensure that session times are properly handled, currently there is no refresh --> Merge adams changes then shoudl work
       - Ensure that API also validates role - done
  - Add side metric to top k --> Buy and sell
+     - Triple toggle button:
+          - total
+          - buy
+          - sell
+          - need to account for empty on UI
  - Clean up fronend
       - Displaying 14 market intervals
+      - Custom job should be reactive to screen changes
  - Dockerize analytics service
 
-
-
-
-
-- Add side metric to top k --> Buy and sell
 
 
