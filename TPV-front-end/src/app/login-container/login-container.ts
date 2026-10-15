@@ -91,7 +91,7 @@ export class LoginContainer {
           lastName: response.lastName,
           phoneNumber: response.phoneNumber,
           dateOfBirth: response.dateOfBirth,
-          email: response.email
+          email: response.email,
         };
         this.userContextService.setUserContext(userContext);
         this.router.navigateByUrl('/dashboard');

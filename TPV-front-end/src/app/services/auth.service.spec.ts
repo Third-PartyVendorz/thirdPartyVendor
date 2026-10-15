@@ -87,9 +87,10 @@ describe('AuthService', () => {
     expect(request.request.method).toBe('POST');
     expect(request.request.withCredentials).toBe(true);
 
-    request.flush(null);
+    request.flush({ role: 'USER' });
 
     expect(service.getSessionState()).toBe(true);
+    expect(service.getUserRole()).toBe('USER');
   });
 
   it('returns true and marks the session authenticated when checkSession succeeds', () => {
@@ -103,13 +104,14 @@ describe('AuthService', () => {
     expect(request.request.method).toBe('GET');
     expect(request.request.withCredentials).toBe(true);
 
-    request.flush(null);
+    request.flush({ role: 'USER' });
 
     expect(sessionIsValid).toBe(true);
     expect(service.getSessionState()).toBe(true);
+    expect(service.getUserRole()).toBe('USER');
   });
 
-  it('refreshes and retries session validation when checkSession gets a 401', () => {
+  it('refreshes session validation when checkSession gets a 401', () => {
     let sessionIsValid = false;
 
     service.checkSession().subscribe((value) => {
@@ -123,10 +125,11 @@ describe('AuthService', () => {
     expect(refreshRequest.request.method).toBe('POST');
     expect(refreshRequest.request.withCredentials).toBe(true);
 
-    refreshRequest.flush(null);
+    refreshRequest.flush({ role: 'USER' });
 
     expect(sessionIsValid).toBe(true);
     expect(service.getSessionState()).toBe(true);
+    expect(service.getUserRole()).toBe('USER');
   });
 
   it('returns false and expires the session when refresh-assisted checkSession still fails', () => {
