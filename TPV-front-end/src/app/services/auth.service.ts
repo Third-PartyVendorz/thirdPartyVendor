@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { RegisterRequest } from '../dto/RegisterRequest';
@@ -52,15 +52,27 @@ export class AuthService {
   }
 
   checkSession(): Observable<boolean> {
-    return this.http.get<void>(`${environment.apiBaseUrl}/auth/me`, {
+    const sessionCheckUrl = `${environment.apiBaseUrl}/auth/me`;
+
+    return this.http.get<void>(sessionCheckUrl, {
       withCredentials: true,
     }).pipe(
       map(() => {
         this.markSessionAuthenticated();
         return true;
       }),
-      catchError(() => {
-        return of(false);
+      catchError((error: unknown) => {
+        if (!(error instanceof HttpErrorResponse) || error.status !== 401) {
+          return of(false);
+        }
+
+        return this.refreshToken().pipe(
+          map(() => true),
+          catchError(() => {
+            this.markSessionExpired();
+            return of(false);
+          }),
+        );
       }),
     );
   }
