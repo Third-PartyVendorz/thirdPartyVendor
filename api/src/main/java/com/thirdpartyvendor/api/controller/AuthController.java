@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
+import com.thirdpartyvendor.api.dto.AuthMeResponse;
 import com.thirdpartyvendor.api.dto.AuthenticationJwtModel;
 import com.thirdpartyvendor.api.dto.AuthenticationRequest;
 import com.thirdpartyvendor.api.dto.AuthenticationResponse;
@@ -85,16 +86,16 @@ public class AuthController {
 	}
 
 	@GetMapping("/me")
-	public ResponseEntity<Void> me(@AuthenticationPrincipal AppUser currentUser) {
+	public ResponseEntity<AuthMeResponse> me(@AuthenticationPrincipal AppUser currentUser) {
 		if (currentUser == null) {
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Please login again");
 		}
 
-		return ResponseEntity.ok().build();
+		return ResponseEntity.status(HttpStatus.OK).body(new AuthMeResponse(currentUser.getRole()));
 	}
 
 	@PostMapping("/refresh")
-	public ResponseEntity<Void> refresh(
+	public ResponseEntity<AuthMeResponse> refresh(
 			HttpServletRequest httpRequest,
 			HttpServletResponse response) {
 		String refreshToken = getCookieValue(httpRequest, "refreshToken");
@@ -110,7 +111,7 @@ public class AuthController {
 		response.addHeader(HttpHeaders.SET_COOKIE, buildRefreshCookie(httpRequest, rotatedRefreshToken.getToken(), refreshExpirationMs).toString());
 		response.addHeader(HttpHeaders.SET_COOKIE, buildAuthCookie(httpRequest, jwtService.generateToken(rotatedRefreshToken.getUser()), jwtExpirationMs).toString());
 
-		return ResponseEntity.ok().build();
+		return ResponseEntity.ok(new AuthMeResponse(rotatedRefreshToken.getUser().getRole()));
 	}
 
 	@PostMapping("/logout")

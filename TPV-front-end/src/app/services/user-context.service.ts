@@ -7,8 +7,6 @@ import { UserContext } from '../dto/UserContext';
 export class UserContextService {
   constructor() { }
 
-  private userRole: string | null = null;
-
   getUserContext(): UserContext | null {
     const storedUserContext = localStorage.getItem('userContext');
 
@@ -49,13 +47,5 @@ export class UserContextService {
 
   clearUserContext() {
     localStorage.removeItem('userContext');
-  }
-
-  getUserRole(): string | null {
-    return this.userRole;
-  }
-
-  setUserRole(role: string) {
-    this.userRole = role;
   }
 }

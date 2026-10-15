@@ -21,6 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.thirdpartyvendor.api.dto.AuthenticationJwtModel;
 import com.thirdpartyvendor.api.dto.AuthenticationRequest;
 import com.thirdpartyvendor.api.dto.AuthenticationResponse;
+import com.thirdpartyvendor.api.dto.AuthMeResponse;
 import com.thirdpartyvendor.api.dto.RegisterRequest;
 import com.thirdpartyvendor.api.dto.RegisterResponse;
 import com.thirdpartyvendor.api.entity.AppUser;
@@ -90,7 +91,7 @@ class AuthControllerTest {
 
 	@Test
 	void returnsMeWhenPrincipalExists() {
-		ResponseEntity<Void> result = authController.me(createUser(1L, "jane.doe@example.com"));
+		ResponseEntity<AuthMeResponse> result = authController.me(createUser(1L, "jane.doe@example.com"));
 
 		assertEquals(HttpStatus.OK, result.getStatusCode());
 	}
@@ -113,11 +114,12 @@ class AuthControllerTest {
 		when(refreshService.rotateRefreshToken("refresh-token")).thenReturn(rotatedToken);
 		when(jwtService.generateToken(user)).thenReturn("new-jwt");
 
-		ResponseEntity<Void> result = authController.refresh(request, response);
+		ResponseEntity<AuthMeResponse> result = authController.refresh(request, response);
 
 		assertEquals(HttpStatus.OK, result.getStatusCode());
 		assertEquals(2, response.getHeaders(HttpHeaders.SET_COOKIE).size());
 		verify(jwtService).generateToken(user);
+		assertEquals(new AuthMeResponse(UserRole.USER), result.getBody());
 	}
 
 	@Test

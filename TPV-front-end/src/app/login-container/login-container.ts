@@ -91,10 +91,9 @@ export class LoginContainer {
           lastName: response.lastName,
           phoneNumber: response.phoneNumber,
           dateOfBirth: response.dateOfBirth,
-          email: response.email
+          email: response.email,
         };
         this.userContextService.setUserContext(userContext);
-        this.userContextService.setUserRole(response.role);
         this.router.navigateByUrl('/dashboard');
       },
       error: (error) => {
