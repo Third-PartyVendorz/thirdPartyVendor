@@ -94,6 +94,7 @@ export class LoginContainer {
           email: response.email
         };
         this.userContextService.setUserContext(userContext);
+        this.userContextService.setUserRole(response.role);
         this.router.navigateByUrl('/dashboard');
       },
       error: (error) => {
