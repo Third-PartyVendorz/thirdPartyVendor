@@ -30,11 +30,30 @@ export const authGuard: CanActivateFn = () => {
   return router.parseUrl('/login');
 };
 
+export const roleGuard: CanActivateFn = (route) => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
+  const allowedRoles = route.data['roles'] as string[] | undefined;
+  const userRole = authService.getUserRole();
+
+  if (allowedRoles?.includes(userRole ?? '')) {
+    return true;
+  }
+
+  return userRole === 'ADMIN'
+    ? router.parseUrl('/admin')
+    : router.parseUrl('/dashboard');
+};
+
 export const landingGuard: CanActivateFn = () => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
-  return authService.getSessionState() === true
-    ? router.parseUrl('/dashboard')
-    : router.parseUrl('/login');
+  if (authService.getSessionState() !== true) {
+    return router.parseUrl('/login');
+  }
+
+  return authService.getUserRole() === 'ADMIN'
+    ? router.parseUrl('/admin')
+    : router.parseUrl('/dashboard');
 };
