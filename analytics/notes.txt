@@ -39,16 +39,16 @@ Plan:
  - Clean up Auth:
       - Ensure that session times are properly handled, currently there is no refresh --> Merge adams changes then shoudl work
       - Ensure that API also validates role - done
- - Add side metric to top k --> Buy and sell
+ - Add side metric to top k --> Buy and sell - done
      - Triple toggle button:
-          - total
-          - buy
-          - sell
-          - need to account for empty on UI
+          - total - done
+          - buy - done
+          - sell - done
+          - need to account for empty on UI - done
  - Clean up fronend
       - Displaying 14 market intervals
       - Custom job should be reactive to screen changes
- - Dockerize analytics service
+
 
 
 
