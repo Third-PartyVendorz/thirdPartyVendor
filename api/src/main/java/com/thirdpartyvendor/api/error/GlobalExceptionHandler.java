@@ -121,7 +121,7 @@ public class GlobalExceptionHandler {
 		Exception exception,
 		HttpServletRequest request
 	) {
-		logger.error("Unandled exception occured", exception);
+		logger.error("Unhandled exception occured", exception);
 		return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred", request.getRequestURI());
 	}
 
