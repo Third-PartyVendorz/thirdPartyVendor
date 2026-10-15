@@ -45,6 +45,7 @@ class AuthenticationServiceTest {
 
 		assertEquals("jane.doe@example.com", response.email());
 		assertEquals(1L, response.userId());
+		assertEquals(UserRole.USER, response.role());
 		assertNotNull(response.jwtToken());
 		assertEquals(true, response.jwtToken().length() > 0);
 	}
