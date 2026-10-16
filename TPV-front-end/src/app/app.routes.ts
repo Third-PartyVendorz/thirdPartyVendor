@@ -8,6 +8,7 @@ import { MainLayoutComponent } from './layouts/main-layout';
 import { AssetsPage } from './assets-page/assets-page';
 import { ProfilePage } from './profile-page/profile-page';
 import { TradePage } from './trade-page/trade-page.component';
+import { ManageCash } from './manage-cash/manage-cash/manage-cash';
 
 export const routes: Routes = [
   {
@@ -29,6 +30,7 @@ export const routes: Routes = [
       { path: 'trade', component: TradePage, canActivate: [authGuard] },
       { path: 'profile', component: ProfilePage, canActivate: [authGuard] },
       { path: 'explore-assets', component: AssetsPage, canActivate: [authGuard] },
+      { path: 'manage-cash', component: ManageCash, canActivate: [authGuard] },
     ],
   },
   {
