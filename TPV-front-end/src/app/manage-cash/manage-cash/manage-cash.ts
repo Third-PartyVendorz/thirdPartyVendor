@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
 import { CashBalance } from '../cash-balance/cash-balance';
+import { ForexContainer } from '../forex-container/forex-container';
 import { NgClass } from '@angular/common';
 import { DatePipe } from '@angular/common';
 import { OnDestroy, OnInit } from '@angular/core';
 
 @Component({
-  imports: [CashBalance, NgClass, DatePipe],
+  imports: [CashBalance, ForexContainer, NgClass, DatePipe],
   selector: 'app-manage-cash',
   styleUrl: './manage-cash.scss',
   templateUrl: './manage-cash.html',
