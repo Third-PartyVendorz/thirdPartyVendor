@@ -87,9 +87,10 @@ describe('AuthService', () => {
     expect(request.request.method).toBe('POST');
     expect(request.request.withCredentials).toBe(true);
 
-    request.flush(null);
+    request.flush({ role: 'USER' });
 
     expect(service.getSessionState()).toBe(true);
+    expect(service.getUserRole()).toBe('USER');
   });
 
   it('returns true and marks the session authenticated when checkSession succeeds', () => {
@@ -103,13 +104,35 @@ describe('AuthService', () => {
     expect(request.request.method).toBe('GET');
     expect(request.request.withCredentials).toBe(true);
 
-    request.flush(null);
+    request.flush({ role: 'USER' });
 
     expect(sessionIsValid).toBe(true);
     expect(service.getSessionState()).toBe(true);
+    expect(service.getUserRole()).toBe('USER');
   });
 
-  it('returns false when checkSession fails', () => {
+  it('refreshes session validation when checkSession gets a 401', () => {
+    let sessionIsValid = false;
+
+    service.checkSession().subscribe((value) => {
+      sessionIsValid = value;
+    });
+
+    const initialRequest = httpTestingController.expectOne(`${environment.apiBaseUrl}/auth/me`);
+    initialRequest.flush({ message: 'Unauthorized' }, { status: 401, statusText: 'Unauthorized' });
+
+    const refreshRequest = httpTestingController.expectOne(`${environment.apiBaseUrl}/auth/refresh`);
+    expect(refreshRequest.request.method).toBe('POST');
+    expect(refreshRequest.request.withCredentials).toBe(true);
+
+    refreshRequest.flush({ role: 'USER' });
+
+    expect(sessionIsValid).toBe(true);
+    expect(service.getSessionState()).toBe(true);
+    expect(service.getUserRole()).toBe('USER');
+  });
+
+  it('returns false and expires the session when refresh-assisted checkSession still fails', () => {
     service.markSessionAuthenticated();
 
     let sessionIsValid: boolean | undefined;
@@ -121,7 +144,12 @@ describe('AuthService', () => {
     const request = httpTestingController.expectOne(`${environment.apiBaseUrl}/auth/me`);
     request.flush({ message: 'Unauthorized' }, { status: 401, statusText: 'Unauthorized' });
 
+    const refreshRequest = httpTestingController.expectOne(`${environment.apiBaseUrl}/auth/refresh`);
+    refreshRequest.flush({ message: 'Unauthorized' }, { status: 401, statusText: 'Unauthorized' });
+
     expect(sessionIsValid).toBe(false);
-    expect(service.getSessionState()).toBe(true);
+    expect(service.getSessionState()).toBe(false);
+    expect(userContextService.clearUserContext).toHaveBeenCalledTimes(1);
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/login');
   });
 });

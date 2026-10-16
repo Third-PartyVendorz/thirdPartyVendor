@@ -14,7 +14,11 @@ import com.thirdpartyvendor.api.repository.HoldingRepository;
 import com.thirdpartyvendor.api.repository.OrderRepository;
 import com.thirdpartyvendor.api.repository.TradeRepository;
 
+import ch.qos.logback.classic.model.processor.LoggerModelHandler;
 import jakarta.transaction.Transactional;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 
 @Service
 public class OrderExecutionService {
@@ -24,6 +28,7 @@ public class OrderExecutionService {
     private final TradeRepository tradeRepository;
     private final CashHoldingsService cashHoldingsService;
     private final MarketDataAPIClient marketDataAPIClient;
+    private static final Logger logger = LogManager.getLogger(OrderExecutionService.class);
 
     public OrderExecutionService(
         OrderRepository orderRepository,
@@ -45,6 +50,7 @@ public class OrderExecutionService {
             .orElseThrow(() -> new OrderExecutionException("Order not found"));
 
         if (!order.getUserId().equals(userId)) {
+            logger.warn("Authentication failed: active user was not found");
             throw new OrderExecutionException("Order does not belong to the current user");
         }
 
@@ -78,6 +84,9 @@ public class OrderExecutionService {
         tradeRepository.save(trade);
 
         order.setStatus(Order.OrderStatus.EXECUTED);
+        logger.info("Order {} executed with {} shares of {} at {} per share", 
+        order.getId(), order.getTicker(), executionQuantity, executionPrice);
+
         orderRepository.save(order);
     }
 
@@ -89,7 +98,6 @@ public class OrderExecutionService {
                 }
 
                 Holding newHolding = new Holding();
-                newHolding.setAssetId(order.getAssetId());
                 newHolding.setUserId(userId);
                 newHolding.setSecurity(order.getTicker());
                 newHolding.setTicker(order.getTicker());
@@ -129,7 +137,13 @@ public class OrderExecutionService {
             throw new OrderExecutionException("Insufficient shares to execute sell order");
         }
 
-        holding.setNumShares(currentShares.subtract(executionQuantity).setScale(4, RoundingMode.HALF_UP));
+        BigDecimal remainingShares = currentShares.subtract(executionQuantity).setScale(4, RoundingMode.HALF_UP);
+        if (remainingShares.compareTo(BigDecimal.ZERO) == 0) {
+            holdingRepository.delete(holding);
+            return;
+        }
+
+        holding.setNumShares(remainingShares);
         holdingRepository.save(holding);
     }
 

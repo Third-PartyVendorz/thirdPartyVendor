@@ -5,24 +5,24 @@ import java.util.Objects;
 
 public class HoldingId implements Serializable {
 
-    private Long assetId;
+    private String ticker;
     private Long userId;
 
     public HoldingId() {
 
     }
 
-    public HoldingId(Long assetId, Long userId) {
-        this.assetId = assetId;
+    public HoldingId(String ticker, Long userId) {
+        this.ticker = ticker;
         this.userId = userId;
     }
 
-    public Long getAssetId() {
-        return this.assetId;
+    public String getTicker() {
+        return this.ticker;
     }
 
-    public void setAssetId(Long assetId) {
-        this.assetId = assetId;
+    public void setTicker(String ticker) {
+        this.ticker = ticker;
     }
 
     public Long getUserId() {
@@ -42,12 +42,12 @@ public class HoldingId implements Serializable {
             return false;
         }
         HoldingId holdingId = (HoldingId) o;
-        return Objects.equals(assetId, holdingId.assetId)
+        return Objects.equals(ticker, holdingId.ticker)
             && Objects.equals(userId, holdingId.userId);
     }
 
     @Override 
     public int hashCode() {
-        return Objects.hash(assetId, userId);
+        return Objects.hash(ticker, userId);
     }
 }

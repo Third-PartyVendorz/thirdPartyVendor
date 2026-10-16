@@ -45,19 +45,6 @@ export class HistoryPage implements OnInit {
     private cdr: ChangeDetectorRef,
   ) {}
 
-  readonly trendPoints: TrendPoint[] = [
-    { label: 'Jan', value: 18420 },
-    { label: 'Feb', value: 19180 },
-    { label: 'Mar', value: 18840 },
-    { label: 'Apr', value: 19760 },
-    { label: 'May', value: 20490 },
-    { label: 'Jun', value: 21310 },
-    { label: 'Jul', value: 21980 },
-    { label: 'Aug', value: 22850 },
-    { label: 'Sep', value: 23340 },
-    { label: 'Oct', value: 24120 },
-  ];
-
   readonly chartWidth = 640;
   readonly chartHeight = 280;
   readonly chartPadding = 24;
@@ -109,6 +96,34 @@ export class HistoryPage implements OnInit {
 
     const filledOrders = this.allHistoryEntries.filter((entry) => entry.status === 'Filled').length;
     return Math.round((filledOrders / this.allHistoryEntries.length) * 100);
+  }
+
+  get trendPoints(): TrendPoint[] {
+    if (this.allHistoryEntries.length === 0) {
+      return [{ label: this.formatMonth(new Date()), value: 0 }];
+    }
+
+    const monthlyNetAmounts = new Map<string, { date: Date; amount: number }>();
+
+    for (const entry of this.allHistoryEntries) {
+      const monthStart = new Date(entry.createdAt.getFullYear(), entry.createdAt.getMonth(), 1);
+      const monthKey = `${monthStart.getFullYear()}-${monthStart.getMonth()}`;
+      const month = monthlyNetAmounts.get(monthKey) ?? { date: monthStart, amount: 0 };
+      month.amount += entry.side === 'Buy' ? entry.netAmount : -entry.netAmount;
+      monthlyNetAmounts.set(monthKey, month);
+    }
+
+    const monthlyEntries = Array.from(monthlyNetAmounts.values())
+      .sort((left, right) => left.date.getTime() - right.date.getTime());
+    let cumulativeValue = 0;
+
+    return monthlyEntries.map((month) => {
+      cumulativeValue += month.amount;
+      return {
+        label: this.formatMonth(month.date),
+        value: cumulativeValue,
+      };
+    }).slice(-10);
   }
 
   loadOrders(): void {
@@ -250,6 +265,10 @@ export class HistoryPage implements OnInit {
       hour: '2-digit',
       minute: '2-digit',
     }).format(date);
+  }
+
+  private formatMonth(date: Date): string {
+    return new Intl.DateTimeFormat('en-US', { month: 'short' }).format(date);
   }
 
   private formatRelativeTime(date: Date): string {

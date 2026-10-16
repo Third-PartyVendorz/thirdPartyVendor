@@ -11,7 +11,7 @@ sequenceDiagram
     participant C as CashFlow
     participant AL as AuditLog
 
-    U->>O: submitOrder(userId, assetId, quantity, intendedPrice)
+    U->>O: submitOrder(userId, ticker, quantity, intendedPrice)
     
     O->>O: validateOrder()
 
@@ -22,7 +22,7 @@ sequenceDiagram
     alt Asset not tradeable
         O-->>U: order rejected
     else Asset is tradeable
-        O->>M: getCurrentPrice(assetId)
+        O->>M: getCurrentPrice(ticker)
         
         M-->>O: marketPrice data
         
@@ -36,7 +36,7 @@ sequenceDiagram
             O->>I: recordIntent(orderId, quantity, intendedPrice)
             I-->>O: intentId created      
             O->>O: executeOrder()          
-            O->>R: executeTrade(orderId, assetId, executionPrice)           
+            O->>R: executeTrade(orderId, ticker, executionPrice)
             R-->>O: Trade created with tradeId           
             O->>S: createSettlement(orderId, quantity, executionPrice)          
             S->>S: recordSettlement()          

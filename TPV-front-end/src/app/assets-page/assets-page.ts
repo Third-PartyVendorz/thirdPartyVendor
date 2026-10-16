@@ -1,17 +1,19 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, signal, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Navbar } from '../navbar/navbar';
-import { AssetResultComponent } from '../asset-result/asset-result';
+import { Router } from '@angular/router';
+import { AssetResultComponent, AssetTradeDetails } from '../asset-result/asset-result';
 
 @Component({
 	standalone: true,
-	imports: [CommonModule, FormsModule, Navbar, AssetResultComponent],
+	imports: [CommonModule, FormsModule, AssetResultComponent],
 	selector: 'app-assets-page',
 	styleUrl: './assets-page.scss',
 	templateUrl: './assets-page.html',
 })
 export class AssetsPage {
+	private router = inject(Router);
+
 	searchTicker = '';
 	activeTicker = '';
 	searchError = '';
@@ -26,5 +28,11 @@ export class AssetsPage {
 
 		this.searchError = '';
 		this.activeTicker = ticker;
+	}
+
+	openTradeModal(details: AssetTradeDetails): void {
+		this.router.navigate(['/trade'], {
+			queryParams: { ticker: details.symbol },
+		});
 	}
 }
