@@ -92,9 +92,10 @@ export class LoginContainer {
           phoneNumber: response.phoneNumber,
           dateOfBirth: response.dateOfBirth,
           email: response.email,
+          role: response.role,
         };
         this.userContextService.setUserContext(userContext);
-        this.router.navigateByUrl('/dashboard');
+        this.router.navigateByUrl(response.role === 'ADMIN' ? '/admin/users' : '/dashboard');
       },
       error: (error) => {
         this.messageService.setErrorMessage('Login failed: ' + error.error.message);

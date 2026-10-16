@@ -1,0 +1,54 @@
+rm -rf /home/ec2-user/thirdPartyVendor/analytics/visuals/* /home/ec2-user/thirdPartyVendor/analytics/raw-data/*
+
+curl -H "Content-Type: application/json" http://127.0.0.1:8089/analytics
+
+
+Analytics we are going to capture:
+
+ - Buy/sell count --> toggle between bar and pie charts
+ - Buy/sell volume --> toggle between bar and pie charts
+ - Trade volume by day of the month (Bar chart that only accounts for total volume, but bar will be made of buy(greea) and sell(red))
+ - Trade volume by open market hour () (Bar chart that only accounts for total volume, but bar will be made of buy(greea) and sell(red))
+ - Open market vs After hours/pre-market trading volume
+ - k most traded assets
+
+
+
+MAY NEED TO REVISIT VOLUME BY 30 MINUTE INTERVAL
+- Is it useful to highlight this over a month --> More useful to show day per day
+
+
+Plan: 
+
+ - Finalize basic analytics - done
+ - API send basic payload to frontend - done
+ - Implement basic frontend - done
+ - Implement custom job - done
+ - Clean up:
+      - Date validation check for custom job - done
+      - Clean up queries --> inclusivity and same day - done
+ - Implement non-blocking scheduling of some variety - done
+ - Implement non-blocking strategy with frontend - done
+ - Clean up 2:
+      - Cleaning up queries
+          - Not all columns needed - done
+          - Correct joins with trade and orders tables --> data leakage - done
+      - Clean up frontend
+          - Small details like order vs trade - done
+          - Display current month on default analytics job - done
+ - Clean up Auth:
+      - Ensure that session times are properly handled, currently there is no refresh --> Merge adams changes then shoudl work
+      - Ensure that API also validates role - done
+ - Add side metric to top k --> Buy and sell - done
+     - Triple toggle button:
+          - total - done
+          - buy - done
+          - sell - done
+          - need to account for empty on UI - done
+ - Clean up fronend
+      - Displaying 14 market intervals
+      - Custom job should be reactive to screen changes
+
+
+
+
