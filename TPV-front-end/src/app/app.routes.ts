@@ -9,8 +9,8 @@ import { AssetsPage } from './assets-page/assets-page';
 import { ProfilePage } from './profile-page/profile-page';
 import { AnalyticsDashboard } from './analytics-dashboard/analytics-dashboard';
 import { TradePage } from './trade-page/trade-page.component';
-import { ForexContainer } from './manage-cash/forex-container/forex-container';
 import { AdminDashboardPage } from './admin-dashboard-page/admin-dashboard-page';
+import { ManageCash } from './manage-cash/manage-cash/manage-cash';
 
 export const routes: Routes = [
   {
@@ -32,9 +32,8 @@ export const routes: Routes = [
       { path: 'dashboard', component: DashboardPage, canActivate: [authGuard, roleGuard], data: { roles: ['USER'] } },
       { path: 'portfolio-history', component: HistoryPage, canActivate: [authGuard, roleGuard], data: { roles: ['USER'] } },
       { path: 'trade', component: TradePage, canActivate: [authGuard, roleGuard], data: { roles: ['USER'] } },
-      { path: 'exchange-currency', component: ForexContainer, canActivate: [authGuard, roleGuard], data: { roles: ['USER'] } },
       { path: 'profile', component: ProfilePage, canActivate: [authGuard, roleGuard], data: { roles: ['USER'] } },
-      { path: 'explore-assets', component: AssetsPage, canActivate: [authGuard, roleGuard], data: { roles: ['USER'] } },
+      { path: 'manage-cash', component: ManageCash, canActivate: [authGuard, roleGuard], data: { roles: ['USER'] } },
     ],
   },
   {
