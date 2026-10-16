@@ -9,10 +9,21 @@ pipeline {
                 checkout scm
             }
         }
+        // stage('Build') {
+        //     steps {
+        //         dir('api') {
+        //             sh 'mvn -B clean package -DskipTests'
+        //         }
+        //     }
+        // }
         stage('Build') {
             steps {
                 dir('api') {
-                    sh 'mvn -B clean package -DskipTests'
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
+                        sh 'echo "$DOCKERHUB_PASSWORD" | docker login --username "$DOCKERHUB_USERNAME" --password-stdin'
+                        sh 'docker build -t lukesheldon19/testing:latest .'
+                        sh 'docker push lukesheldon19/testing:latest'
+                    }
                 }
             }
         }
