@@ -75,8 +75,6 @@ h1 {
 }
 
 .currency-info-button {
-	// position: absolute;
-	left: 0.8rem;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
@@ -90,6 +88,12 @@ h1 {
 	cursor: pointer;
 }
 
+.currency-info-control {
+	position: relative;
+	flex: 0 0 1.7rem;
+	height: 1.7rem;
+}
+
 .currency-info-button:hover,
 .currency-info-button[aria-expanded='true'] {
 	background: #eaf4fa;
@@ -100,10 +104,11 @@ h1 {
 
 .currency-info-tooltip {
 	position: absolute;
-	top: 2.65rem;
-	right: 0.8rem;
+	top: calc(100% + 0.5rem);
+	left: 0;
 	z-index: 2;
-	max-width: 250px;
+	width: max-content;
+	max-width: min(250px, calc(100vw - 2rem));
 	padding: 0.7rem 0.85rem;
 	border: 1px solid #cfe2ed;
 	border-radius: 8px;
@@ -254,6 +259,13 @@ h1 {
 	color: rgba(255, 255, 255, 0.84);
 }
 
+.currency-name-pair {
+	margin: 0.3rem 0 0;
+	color: rgba(255, 255, 255, 0.68);
+	font-size: 0.78rem;
+	font-weight: 600;
+}
+
 h2 {
 	margin-bottom: 0;
 	color: #173550;
@@ -268,6 +280,10 @@ h2 {
 }
 
 .rate-value {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 1rem;
 	margin-top: 2.6rem;
 	font-size: clamp(1.75rem, 3vw, 2.35rem);
 	font-weight: 800;
@@ -276,12 +292,24 @@ h2 {
 
 .rate-value span {
 	margin: 0 0.35rem;
-	color: rgba(255, 255, 255, 0.58);
 	font-weight: 500;
 }
 
+.rate-value > span:first-child { margin: 0; }
+
+.rate-daily-change {
+	margin: 0;
+	font-size: 0.82rem;
+	letter-spacing: 0;
+	white-space: nowrap;
+}
+
+.rate-value .rate-daily-change.positive { color: #a7f3d0; }
+.rate-value .rate-daily-change.negative { color: #fecaca; }
+
 .rate-meta {
 	display: flex;
+	align-items: center;
 	gap: 0.75rem;
 	margin-top: 0.55rem;
 	color: rgba(255, 255, 255, 0.65);
@@ -293,34 +321,153 @@ h2 {
 	font-weight: 800;
 }
 
-.mini-chart {
-	position: relative;
-	height: 100px;
+.negative {
+	color: #fecaca;
+	font-weight: 800;
+}
+
+.change-metric {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.25rem;
+}
+
+.interval-change {
+	font-size: 0.74rem;
+}
+
+.interval-change.positive { color: #a7f3d0; }
+.interval-change.negative { color: #fecaca; }
+
+.forex-market-status {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+	color: rgba(255, 255, 255, 0.68);
+	font-size: 0.75rem;
+}
+
+.forex-market-status .material-icons-outlined { font-size: 0.95rem; }
+
+.forex-chart-shell {
+	display: grid;
+	gap: 0.7rem;
 	margin: 1.5rem -0.25rem 1rem;
-	border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.chart-line {
-	position: absolute;
-	inset: 18px 2% 10px;
-	border-top: 2px solid #a7f3d0;
-	clip-path: polygon(0 76%, 17% 62%, 30% 70%, 45% 32%, 58% 48%, 73% 22%, 87% 30%, 100% 0, 100% 5%, 87% 36%, 73% 28%, 58% 54%, 45% 38%, 30% 76%, 17% 68%, 0 82%);
-	background: rgba(167, 243, 208, 0.18);
+.forex-chart-controls {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.75rem;
+	color: rgba(255, 255, 255, 0.68);
+	font-size: 0.72rem;
+	font-weight: 700;
 }
 
-.chart-dot {
-	position: absolute;
-	width: 7px;
-	height: 7px;
-	border: 2px solid #07528c;
-	border-radius: 50%;
-	background: #a7f3d0;
+.interval-picker {
+	display: inline-flex;
+	gap: 0.2rem;
+	padding: 0.2rem;
+	border: 1px solid rgba(255, 255, 255, 0.16);
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.08);
 }
 
-.chart-dot-one { left: 16%; top: 51%; }
-.chart-dot-two { left: 44%; top: 22%; }
-.chart-dot-three { left: 72%; top: 12%; }
-.chart-dot-four { right: 1%; top: 1%; }
+.interval-picker button {
+	padding: 0.4rem 0.6rem;
+	border: 0;
+	border-radius: 999px;
+	background: transparent;
+	color: rgba(255, 255, 255, 0.72);
+	font: inherit;
+	font-size: 0.65rem;
+	font-weight: 800;
+	letter-spacing: 0.06em;
+	cursor: pointer;
+}
+
+.interval-picker button.active {
+	background: #fff;
+	color: #07528c;
+}
+
+.forex-chart-status {
+	margin: 0;
+	color: rgba(255, 255, 255, 0.72);
+	font-size: 0.75rem;
+	font-weight: 700;
+}
+
+.forex-chart-frame {
+	display: grid;
+	grid-template-columns: 58px minmax(0, 1fr);
+	gap: 0.65rem;
+	align-items: stretch;
+}
+
+.forex-chart-y-axis {
+	display: grid;
+	grid-template-rows: repeat(5, 1fr);
+	justify-items: end;
+	padding: 0.2rem 0;
+	color: rgba(255, 255, 255, 0.68);
+	font-size: 0.65rem;
+	font-weight: 700;
+}
+
+.forex-chart-y-axis span {
+	display: flex;
+	align-items: center;
+	min-height: 1.6rem;
+}
+
+.forex-chart-plot {
+	display: grid;
+	gap: 0.55rem;
+	min-width: 0;
+}
+
+.forex-chart-plot svg {
+	width: 100%;
+	height: 150px;
+	overflow: visible;
+	background: repeating-linear-gradient(
+		to bottom,
+		transparent 0,
+		transparent calc(25% - 1px),
+		rgba(255, 255, 255, 0.14) calc(25% - 1px),
+		rgba(255, 255, 255, 0.14) 25%
+	);
+}
+
+.forex-chart-area,
+.forex-chart-line {
+	fill: none;
+	vector-effect: non-scaling-stroke;
+}
+
+.forex-chart-area {
+	fill: url(#forex-chart-gradient);
+}
+
+.forex-chart-line {
+	stroke: #a7f3d0;
+	stroke-width: 2.4;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+.forex-chart-axis {
+	display: grid;
+	grid-template-columns: var(--forex-chart-axis-columns, repeat(1, minmax(0, 1fr)));
+	gap: 0.25rem;
+	color: rgba(255, 255, 255, 0.62);
+	font-size: 0.65rem;
+	font-weight: 700;
+}
+
+.forex-chart-axis span:last-child { text-align: right; }
 
 .rate-stats {
 	display: grid;
@@ -372,6 +519,14 @@ h2 {
 
 .switch-button:hover { background: #dcecf6; }
 .switch-button .material-icons-outlined { font-size: 1.1rem; }
+
+.exchange-card-icon {
+	padding: 0.55rem;
+	border-radius: 9px;
+	background: #eaf4fa;
+	color: #07528c;
+	font-size: 1.35rem;
+}
 
 .currency-pair {
 	display: flex;
@@ -435,18 +590,142 @@ h2 {
 .amount-fields input:focus { border-color: #2388bc; box-shadow: 0 0 0 3px rgba(35, 136, 188, 0.12); }
 .field-arrow { padding-bottom: 0.75rem; color: #7b94a9; }
 
-.order-summary {
-	grid-template-columns: 1fr auto;
+.conversion-summary {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.75rem;
 	margin: 1.35rem 0;
+	padding: 0.9rem 1rem;
+	border: 1px solid #dce9f1;
+	border-radius: 9px;
+	background: #f6fafc;
+}
+
+.conversion-summary div { display: grid; gap: 0.3rem; }
+.conversion-summary div span { color: #7891a8; font-size: 0.74rem; }
+.conversion-summary strong { color: #274968; font-size: 0.88rem; }
+.conversion-summary > .material-icons-outlined { color: #16a36e; font-size: 1.2rem; }
+.cash-availability { margin: 0 0 1rem; color: #6883a0; font-size: 0.78rem; }
+.cash-availability strong { color: #274968; }
+.exchange-button { width: 100%; padding: 0.85rem; background: #07528c; color: #fff; }
+.exchange-button:hover { background: #063f6b; }
+.exchange-button:disabled { opacity: 0.65; cursor: wait; }
+.disclaimer { margin: 0.8rem 0 0; color: #7891a8; font-size: 0.75rem; text-align: center; }
+
+.exchange-validation-error {
+	margin: 0 0 0.7rem;
+	color: #b54747;
+	font-size: 0.78rem;
+	font-weight: 700;
+	text-align: center;
+}
+
+.forex-confirmation {
+	max-width: 680px;
+	margin: 1rem auto 0;
+	padding: clamp(1.5rem, 4vw, 2.5rem);
+	border: 1px solid #d5e5ef;
+	border-radius: 12px;
+	background: rgba(255, 255, 255, 0.96);
+	box-shadow: 0 12px 28px rgba(23, 65, 102, 0.08);
+	text-align: center;
+}
+
+.confirmation-ticket {
+	max-width: none;
+	margin: 0;
+}
+
+.confirmation-icon {
+	display: grid;
+	place-items: center;
+	width: 3.5rem;
+	height: 3.5rem;
+	margin: 0 auto 1rem;
+	border-radius: 50%;
+	background: #e7f8ef;
+	color: #16a36e;
+}
+
+.confirmation-icon .material-icons-outlined { font-size: 2rem; }
+.forex-confirmation h2,
+.confirmation-ticket h2 { margin-bottom: 0.55rem; color: #123451; }
+.confirmation-subtitle { margin: 0 0 1.5rem; max-width: 460px; color: #6883a0; }
+
+.confirmation-summary {
+	display: grid;
+	grid-template-columns: 1fr auto 1fr;
+	align-items: center;
+	gap: 1rem;
+	padding: 1.25rem;
+	border: 1px solid #d5e5ef;
+	border-radius: 10px;
+	background: #f6fafc;
+}
+
+.confirmation-summary div {
+	display: grid;
+	gap: 0.3rem;
+}
+
+.confirmation-summary span:first-child,
+.confirmation-details span {
+	color: #7891a8;
+	font-size: 0.75rem;
+	font-weight: 700;
+	text-transform: uppercase;
+}
+
+.confirmation-summary strong {
+	color: #173550;
+	font-size: 1.35rem;
+	overflow-wrap: anywhere;
+}
+
+.confirmation-summary small { color: #6883a0; font-weight: 800; }
+.confirmation-arrow { color: #07528c; }
+
+.confirmation-details {
+	display: grid;
+	gap: 0.8rem;
+	margin: 1.25rem 0;
 	padding: 1rem 0;
 	border-top: 1px solid #e4edf4;
 	border-bottom: 1px solid #e4edf4;
 }
 
-.order-summary strong { color: #274968; font-size: 0.88rem; }
-.exchange-button { width: 100%; padding: 0.85rem; background: #07528c; color: #fff; }
-.exchange-button:hover { background: #063f6b; }
-.disclaimer { margin: 0.8rem 0 0; color: #7891a8; font-size: 0.75rem; text-align: center; }
+.confirmation-details div {
+	display: flex;
+	justify-content: space-between;
+	gap: 1rem;
+	text-align: left;
+}
+
+.confirmation-from-to {
+	justify-content: center;
+}
+
+.confirmation-details strong { color: #274968; font-size: 0.88rem; text-align: right; }
+.confirmation-actions { display: grid; gap: 0.65rem; }
+
+.back-button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.45rem;
+	width: 100%;
+	padding: 0.75rem;
+	border: 1px solid #cfe2ed;
+	border-radius: 8px;
+	background: #fff;
+	color: #07528c;
+	font: inherit;
+	font-weight: 800;
+	cursor: pointer;
+}
+
+.back-button:hover { background: #f0f7fb; }
 
 @media (max-width: 780px) {
 	.manage-cash-page { padding-top: 1.5rem; }
@@ -469,7 +748,13 @@ h2 {
 	.forex-container { padding: 0.75rem; }
 	.rate-card, .exchange-card { padding: 1.1rem; }
 	.rate-value { margin-top: 2rem; font-size: 1.65rem; }
+	.forex-chart-frame { grid-template-columns: 52px minmax(0, 1fr); gap: 0.45rem; }
+	.forex-chart-plot svg { height: 130px; }
 	.currency-pair button { font-size: 0.7rem; }
 	.amount-fields { grid-template-columns: 1fr; }
 	.field-arrow { display: grid; justify-content: center; padding: 0; transform: rotate(90deg); }
+	.confirmation-summary { grid-template-columns: 1fr; }
+	.confirmation-arrow { transform: rotate(90deg); }
+	.confirmation-details div { align-items: flex-start; flex-direction: column; gap: 0.2rem; }
+	.confirmation-details strong { text-align: left; }
 }

@@ -44,8 +44,6 @@ export class TradeFormComponent implements OnInit, OnChanges {
 
   form: FormGroup;
 
-  x!: boolean;
-
   currentSide: TradeSide = TradeSide.BUY;
   currentUnit: UnitType = UnitType.SHARES;
   showOrderSummaryPanel: boolean = false;
