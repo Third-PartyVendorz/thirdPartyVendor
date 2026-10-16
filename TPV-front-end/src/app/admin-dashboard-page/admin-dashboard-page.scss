@@ -1,3 +1,202 @@
 .admin-dashboard {
-  margin: 10px;
+  display: grid;
+  gap: 1.25rem;
+  min-height: calc(100vh - 72px);
+  padding: 1.25rem;
+  background: radial-gradient(circle at top left, rgba(248, 183, 118, 0.2), transparent 28%), linear-gradient(180deg, #f7fbff 0%, #eef4f9 100%);
+}
+
+.welcome-panel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 2rem;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+}
+
+.welcome-copy {
+  display: grid;
+  gap: 0.3rem;
+  max-width: 640px;
+}
+
+.eyebrow {
+  margin: 0 0 0.25rem;
+  color: #64748b;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.welcome-panel h1,
+.section-heading h2 {
+  margin: 0;
+  color: #0f172a;
+}
+
+.welcome-panel h1 {
+  font-size: clamp(2rem, 5vw, 3.8rem);
+  line-height: 1;
+}
+
+.supporting-copy {
+  max-width: 560px;
+  margin: 0.8rem 0 0;
+  color: #475569;
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.welcome-mark {
+  display: grid;
+  place-items: center;
+  width: 112px;
+  height: 112px;
+  flex: 0 0 auto;
+  border-radius: 32px;
+  background: linear-gradient(135deg, #033d6c, #0b5ca5 70%, #f8b776);
+  color: #fff;
+  font-size: 1.45rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  box-shadow: 0 18px 32px rgba(3, 61, 108, 0.2);
+}
+
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 1rem;
+  padding: 0.75rem 0.25rem 0;
+}
+
+.section-note {
+  max-width: 420px;
+  margin: 0;
+  color: #64748b;
+  line-height: 1.55;
+  text-align: right;
+}
+
+.admin-tools {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.tool-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  min-height: 190px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 20px;
+  background: #fff;
+  padding: 1.35rem;
+  color: inherit;
+  text-decoration: none;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+}
+
+.analytics-card {
+  border-color: rgba(3, 61, 108, 0.25);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.analytics-card:hover,
+.analytics-card:focus-visible {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 34px rgba(3, 61, 108, 0.14);
+  outline: none;
+}
+
+.upcoming-card {
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.tool-icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  border-radius: 12px;
+  background: #e7f0f8;
+  color: #033d6c;
+  font-size: 1.35rem;
+  font-weight: 800;
+}
+
+.upcoming-card .tool-icon {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.tool-content {
+  display: grid;
+  align-content: start;
+  gap: 0.55rem;
+}
+
+.tool-label {
+  color: #0f172a;
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.tool-description {
+  color: #64748b;
+  line-height: 1.55;
+}
+
+.tool-link {
+  margin-top: auto;
+  color: #0b5ca5;
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.upcoming-card .tool-link {
+  color: #94a3b8;
+}
+
+@media (max-width: 900px) {
+  .admin-tools {
+    grid-template-columns: 1fr;
+  }
+
+  .tool-card {
+    min-height: auto;
+  }
+}
+
+@media (max-width: 640px) {
+  .admin-dashboard {
+    padding: 1rem;
+  }
+
+  .welcome-panel,
+  .section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .welcome-panel {
+    padding: 1.35rem;
+  }
+
+  .welcome-mark {
+    width: 76px;
+    height: 76px;
+    border-radius: 22px;
+  }
+
+  .section-note {
+    text-align: left;
+  }
 }

@@ -1,3 +1,47 @@
 <main class="admin-dashboard">
-  <h1>Admin Dashboard</h1>
+  <header class="welcome-panel">
+    <div class="welcome-copy">
+      <p class="eyebrow">Administration</p>
+      <h1>Welcome back, admin.</h1>
+      <p class="supporting-copy">Your control center for keeping Third Party Vendor healthy, useful, and ready for traders.</p>
+    </div>
+    <div class="welcome-mark" aria-hidden="true">TPV</div>
+  </header>
+
+  <section class="section-heading">
+    <div>
+      <p class="eyebrow">Admin workspace</p>
+      <h2>Choose where to begin</h2>
+    </div>
+    <p class="section-note">Your core administration tools are gathered here.</p>
+  </section>
+
+  <section class="admin-tools" aria-label="Admin tools">
+    <a class="tool-card analytics-card" routerLink="/analytics">
+      <span class="tool-icon" aria-hidden="true">&#8599;</span>
+      <span class="tool-content">
+        <span class="tool-label">Analytics</span>
+        <span class="tool-description">Review trading activity, volume, market intervals, and top assets.</span>
+        <span class="tool-link">Open analytics <span aria-hidden="true">&#8594;</span></span>
+      </span>
+    </a>
+
+    <article class="tool-card upcoming-card">
+      <span class="tool-icon" aria-hidden="true">+</span>
+      <span class="tool-content">
+        <span class="tool-label">Manage users</span>
+        <span class="tool-description">Review accounts and manage access from a dedicated user workspace.</span>
+        <span class="tool-link">Coming soon</span>
+      </span>
+    </article>
+
+    <article class="tool-card upcoming-card">
+      <span class="tool-icon" aria-hidden="true">&#9776;</span>
+      <span class="tool-content">
+        <span class="tool-label">Audit logs</span>
+        <span class="tool-description">Review administrator actions, account changes, and important platform events.</span>
+        <span class="tool-link">Coming soon</span>
+      </span>
+    </article>
+  </section>
 </main>
