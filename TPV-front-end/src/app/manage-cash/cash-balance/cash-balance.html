@@ -1,1 +1,56 @@
-<p>cash-balance works!</p>
+<div class="cash-balance-card">
+    <div class="card-header">
+        <div>
+            <p class="card-eyebrow">CASH BALANCE</p>
+            <h2>Deposits & Withdrawls</h2>
+        </div>
+
+        <div class="balance-block">
+            <span class="balance-label">Available</span>
+            <span class="balance">{{ availableBalance | currency }}</span>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <label class="label">Transfer Type</label>
+        <div class="transaction-toggle">
+            <button type="button" [class.active]="transactionType === 'DEPOSIT'"
+                [attr.aria-pressed]="transactionType === 'DEPOSIT'"
+                (click)="transactionType = 'DEPOSIT'">
+                Deposit funds
+            </button>
+            <button type="button" [class.active]="transactionType === 'WITHDRAW'"
+                [attr.aria-pressed]="transactionType === 'WITHDRAW'"
+                (click)="transactionType = 'WITHDRAW'">
+                Withdraw cash
+            </button>
+        </div>
+
+        <label class="label" for="cash-amount">Amount</label>
+        <div class="amount-input">
+            <span aria-hidden="true">$</span>
+            <input id="cash-amount" type="number" min="0" step="0.01"
+                [(ngModel)]="amount" placeholder="0.00" aria-describedby="amount-help" />
+        </div>
+        <p id="amount-help" class="field-help">Enter the amount you want to move.</p>
+
+        <div class="summary" aria-label="Transaction summary">
+            <div class="summary-row">
+                <span>Available cash balance</span>
+                <strong>{{ availableBalance | currency }}</strong>
+            </div>
+
+            <div class="summary-row projected-row">
+                <span>Projected balance</span>
+                <strong [class.negative]="projectedBalance < 0">
+                    {{ projectedBalance | currency }}
+                </strong>
+            </div>
+        </div>
+
+        <button class="submit-button" [disabled]="!amount || projectedBalance < 0"
+        (click)="submitTransaction()">
+            Confirm {{ transactionType === 'DEPOSIT' ? 'deposit' : 'withdrawal' }}
+        </button>
+    </div>
+</div>
