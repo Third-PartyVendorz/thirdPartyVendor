@@ -2,6 +2,7 @@ import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from './services/auth.service';
 import { MessageService } from './services/message.service';
+import { UserContextService } from './services/user-context.service';
 
 /**
  * Auth guard that protects routes from unauthenticated access.
@@ -47,6 +48,7 @@ export const roleGuard: CanActivateFn = (route) => {
 
 export const landingGuard: CanActivateFn = () => {
   const authService = inject(AuthService);
+  const userContextService = inject(UserContextService);
   const router = inject(Router);
 
   if (authService.getSessionState() !== true) {

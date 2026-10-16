@@ -23,7 +23,8 @@ export class UserContextService {
         !parsedUserContext.lastName ||
         !parsedUserContext.phoneNumber ||
         !parsedUserContext.email ||
-        !parsedUserContext.dateOfBirth
+        !parsedUserContext.dateOfBirth ||
+        (parsedUserContext.role !== 'USER' && parsedUserContext.role !== 'ADMIN')
       ) {
         return null;
       }
@@ -35,6 +36,7 @@ export class UserContextService {
         phoneNumber: parsedUserContext.phoneNumber,
         email: parsedUserContext.email,
         dateOfBirth: new Date(parsedUserContext.dateOfBirth),
+        role: parsedUserContext.role,
       };
     } catch {
       return null;

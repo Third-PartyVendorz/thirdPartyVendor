@@ -94,6 +94,7 @@ class AuthControllerTest {
 		ResponseEntity<AuthMeResponse> result = authController.me(createUser(1L, "jane.doe@example.com"));
 
 		assertEquals(HttpStatus.OK, result.getStatusCode());
+		assertEquals("USER", result.getBody().role());
 	}
 
 	@Test

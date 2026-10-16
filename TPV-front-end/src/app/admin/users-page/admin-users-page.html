@@ -1,0 +1,41 @@
+<main class="admin-page">
+  <section class="hero card-shell">
+    <div>
+      <p class="eyebrow">Administration</p>
+      <h1>Manage users</h1>
+      <p class="supporting-copy">Search accounts and control access to the trading platform.</p>
+    </div>
+    <div class="account-count">
+      <strong>{{ isLoading ? '—' : filteredUsers.length }}</strong>
+      <span>{{ isLoading ? 'Fetching users' : 'accounts shown' }}</span>
+    </div>
+  </section>
+
+  <section class="users-card card-shell">
+    <div class="section-heading">
+      <div><p class="eyebrow">User Directory</p><h2>Account access</h2></div>
+      <button type="button" class="secondary-action" (click)="loadUsers()" [disabled]="isLoading">Refresh</button>
+    </div>
+
+    <label class="search-field">
+      <span>Search by name or email</span>
+      <input type="search" [(ngModel)]="searchTerm" placeholder="e.g. jane.doe@example.com" />
+    </label>
+
+    <div *ngIf="isLoading" class="empty-state">Loading users...</div>
+    <div *ngIf="!isLoading && filteredUsers.length === 0" class="empty-state">No users match your search.</div>
+    <div *ngIf="!isLoading && filteredUsers.length > 0" class="table-wrap">
+      <table>
+        <thead><tr><th>User</th><th>Email</th><th>Status</th><th>Access</th></tr></thead>
+        <tbody>
+          <tr *ngFor="let user of filteredUsers">
+            <td><strong>{{ user.firstName }} {{ user.lastName }}</strong><small>#{{ user.userId }}</small></td>
+            <td>{{ user.email }}</td>
+            <td><span class="status" [class.status--frozen]="user.frozen">{{ user.frozen ? 'Frozen' : 'Active' }}</span></td>
+            <td><button type="button" class="freeze-action" (click)="toggleFreeze(user)" [disabled]="updatingUserId === user.userId">{{ user.frozen ? 'Unfreeze' : 'Freeze account' }}</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
