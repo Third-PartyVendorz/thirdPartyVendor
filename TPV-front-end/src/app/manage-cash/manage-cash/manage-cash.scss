@@ -111,19 +111,9 @@
 
 
 @media (max-width: 768px) {
-    .header-content {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
     .market-status-card {
-        width: 100%;
         white-space: normal;
         align-items: flex-start;
-    }
-
-    .market-status {
-        flex: 0 0 auto;
     }
 
     .last-updated {
@@ -131,10 +121,14 @@
     }
 
     .title-section h1 {
-        font-size: 36px;
+        font-size: 1.5rem;
     }
 
     .title-section p {
-        font-size: 16px;
+        font-size: 0.8rem;
+    }
+
+    .market-status-card {
+        font: 0.7rem;
     }
 }
