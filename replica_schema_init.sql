@@ -17,14 +17,13 @@ CREATE TABLE users (
 -- HOLDINGS TABLE
 -- ============================================================================
 CREATE TABLE holdings (
-    asset_id BIGINT,
     security VARCHAR(255) NOT NULL,
     ticker VARCHAR(10) NOT NULL,
     asset_type VARCHAR(50) NOT NULL,
     num_shares NUMERIC(15, 4) NOT NULL,
     user_id BIGINT NOT NULL,
     -- Compound primary key
-    PRIMARY KEY (asset_id, user_id),
+    PRIMARY KEY (ticker, user_id),
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
@@ -32,9 +31,8 @@ CREATE TABLE holdings (
 -- ORDERS TABLE
 -- ============================================================================
 CREATE TABLE orders (
-    order_id BIGINT PRIMARY KEY,
+    order_id BIGSERIAL PRIMARY KEY,
     user_id BIGINT NOT NULL,
-    asset_id BIGINT NOT NULL,
     -- enum
     order_intent VARCHAR(10) NOT NULL,
     -- either quantity or order_price must be provided based on if user chooses shares or dollar amount.
@@ -52,7 +50,7 @@ CREATE TABLE orders (
 -- TRADE TABLE
 -- ============================================================================
 CREATE TABLE trade (
-    trade_id BIGINT PRIMARY KEY,
+    trade_id BIGSERIAL PRIMARY KEY,
     order_id BIGINT NOT NULL,
     execution_price NUMERIC(15, 4) NOT NULL,
     execution_quantity NUMERIC(15, 4) NOT NULL,
@@ -66,7 +64,7 @@ CREATE TABLE trade (
 -- CASH_HOLDINGS TABLE
 -- ============================================================================
 CREATE TABLE cash_holdings (
-    cash_id BIGINT PRIMARY KEY,
+    cash_id BIGSERIAL PRIMARY KEY,
     user_id BIGINT NOT NULL,
     currency_code VARCHAR(3) NOT NULL,
     balance NUMERIC(20, 6) NOT NULL DEFAULT 0,
@@ -79,7 +77,7 @@ CREATE TABLE cash_holdings (
 -- EXCHANGE_LOG TABLE
 -- ============================================================================
 CREATE TABLE exchange_log (
-    exchange_id BIGINT PRIMARY KEY,
+    exchange_id BIGSERIAL PRIMARY KEY,
     user_id BIGINT NOT NULL,
     from_currency VARCHAR(3) NOT NULL,
     to_currency VARCHAR(3) NOT NULL,

@@ -1,20 +1,20 @@
 -- September 2026 market seed data.
 -- Run after Flyway has applied V27 and the migration seed users (1, 2, 3) exist.
--- This script is additive and uses dedicated ID ranges so it can be rerun safely.
+-- This script is additive and uses dedicated order/trade ID ranges so it can be rerun safely.
 
 BEGIN;
 
 -- Additional assets held by the existing migration-seeded users.
-INSERT INTO holdings (asset_id, security, ticker, asset_type, num_shares, user_id) VALUES
-    (101, 'NVIDIA Corporation', 'NVDA', 'equity', 42.0000, 1),
-    (102, 'Microsoft Corporation', 'MSFT', 'equity', 18.0000, 1),
-    (103, 'Ethereum', 'ETH', 'crypto', 3.2500, 1),
-    (104, 'Amazon.com, Inc.', 'AMZN', 'equity', 24.0000, 2),
-    (105, 'Alphabet Inc.', 'GOOGL', 'equity', 16.0000, 2),
-    (106, 'Invesco QQQ Trust', 'QQQ', 'etf', 30.0000, 2),
-    (107, 'SPDR Gold Shares', 'GLD', 'etf', 35.0000, 3),
-    (108, 'Meta Platforms, Inc.', 'META', 'equity', 12.0000, 3)
-ON CONFLICT (asset_id, user_id) DO NOTHING;
+INSERT INTO holdings (security, ticker, asset_type, num_shares, user_id) VALUES
+    ('NVIDIA Corporation', 'NVDA', 'equity', 42.0000, 1),
+    ('Microsoft Corporation', 'MSFT', 'equity', 18.0000, 1),
+    ('Ethereum', 'ETH', 'crypto', 3.2500, 1),
+    ('Amazon.com, Inc.', 'AMZN', 'equity', 24.0000, 2),
+    ('Alphabet Inc.', 'GOOGL', 'equity', 16.0000, 2),
+    ('Invesco QQQ Trust', 'QQQ', 'etf', 30.0000, 2),
+    ('SPDR Gold Shares', 'GLD', 'etf', 35.0000, 3),
+    ('Meta Platforms, Inc.', 'META', 'equity', 12.0000, 3)
+ON CONFLICT (ticker, user_id) DO NOTHING;
 
 -- Currencies not already present in the migration seed, plus balances used by orders.
 INSERT INTO cash_holdings (user_id, currency_code, balance, last_updated) VALUES
@@ -28,38 +28,38 @@ ON CONFLICT (user_id, currency_code) DO NOTHING;
 
 -- Every order is executed, so each row below has one corresponding trade.
 INSERT INTO orders
-    (order_id, user_id, asset_id, ticker, order_intent, quantity, order_price, status, created_at, order_currency)
+    (order_id, user_id, ticker, order_intent, quantity, order_price, status, created_at, order_currency)
 VALUES
-    (1001, 1, 101, 'NVDA', 'BUY', 8.0000, 171.2500, 'EXECUTED', '2026-09-01 09:18:00', 'USD'),
-    (1002, 2, 104, 'AMZN', 'SELL', 5.0000, 231.8000, 'EXECUTED', '2026-09-02 10:42:00', 'EUR'),
-    (1003, 3, 107, 'GLD', 'BUY', 10.0000, 324.6000, 'EXECUTED', '2026-09-03 11:06:00', 'CAD'),
-    (1004, 1, 102, 'MSFT', 'SELL', 4.0000, 506.7500, 'EXECUTED', '2026-09-04 14:21:00', 'USD'),
-    (1005, 2, 105, 'GOOGL', 'BUY', 6.0000, 246.1500, 'EXECUTED', '2026-09-05 09:37:00', 'GBP'),
-    (1006, 3, 108, 'META', 'SELL', 3.0000, 744.3000, 'EXECUTED', '2026-09-06 13:12:00', 'AUD'),
-    (1007, 1, 103, 'ETH', 'BUY', 0.7500, 4385.0000, 'EXECUTED', '2026-09-07 15:44:00', 'USD'),
-    (1008, 2, 106, 'QQQ', 'SELL', 7.0000, 598.2000, 'EXECUTED', '2026-09-08 10:08:00', 'EUR'),
-    (1009, 3, 107, 'GLD', 'BUY', 6.0000, 326.1500, 'EXECUTED', '2026-09-09 12:29:00', 'CAD'),
-    (1010, 1, 101, 'NVDA', 'SELL', 12.0000, 176.4000, 'EXECUTED', '2026-09-10 09:51:00', 'JPY'),
-    (1011, 2, 104, 'AMZN', 'BUY', 9.0000, 233.7500, 'EXECUTED', '2026-09-11 11:16:00', 'GBP'),
-    (1012, 3, 108, 'META', 'SELL', 2.0000, 752.9000, 'EXECUTED', '2026-09-12 14:03:00', 'AUD'),
-    (1013, 1, 102, 'MSFT', 'BUY', 5.0000, 509.1000, 'EXECUTED', '2026-09-13 10:33:00', 'USD'),
-    (1014, 2, 105, 'GOOGL', 'SELL', 4.0000, 251.4500, 'EXECUTED', '2026-09-14 13:48:00', 'EUR'),
-    (1015, 3, 107, 'GLD', 'BUY', 8.0000, 329.8000, 'EXECUTED', '2026-09-15 09:24:00', 'CAD'),
-    (1016, 1, 103, 'ETH', 'SELL', 0.5000, 4520.0000, 'EXECUTED', '2026-09-16 15:02:00', 'USD'),
-    (1017, 2, 106, 'QQQ', 'BUY', 11.0000, 603.4500, 'EXECUTED', '2026-09-17 10:19:00', 'GBP'),
-    (1018, 3, 108, 'META', 'SELL', 4.0000, 761.2500, 'EXECUTED', '2026-09-18 12:41:00', 'AUD'),
-    (1019, 1, 101, 'NVDA', 'BUY', 7.0000, 181.9000, 'EXECUTED', '2026-09-19 09:46:00', 'JPY'),
-    (1020, 2, 104, 'AMZN', 'SELL', 6.0000, 239.6000, 'EXECUTED', '2026-09-20 14:27:00', 'EUR'),
-    (1021, 3, 107, 'GLD', 'BUY', 5.0000, 332.5000, 'EXECUTED', '2026-09-21 11:02:00', 'CAD'),
-    (1022, 1, 102, 'MSFT', 'SELL', 3.0000, 514.8500, 'EXECUTED', '2026-09-22 13:35:00', 'USD'),
-    (1023, 2, 105, 'GOOGL', 'BUY', 8.0000, 255.3000, 'EXECUTED', '2026-09-23 10:57:00', 'GBP'),
-    (1024, 3, 108, 'META', 'SELL', 1.0000, 775.4000, 'EXECUTED', '2026-09-24 15:18:00', 'AUD'),
-    (1025, 1, 103, 'ETH', 'BUY', 0.4000, 4610.0000, 'EXECUTED', '2026-09-25 09:11:00', 'USD'),
-    (1026, 2, 106, 'QQQ', 'SELL', 9.0000, 611.8500, 'EXECUTED', '2026-09-26 12:06:00', 'EUR'),
-    (1027, 3, 107, 'GLD', 'BUY', 7.0000, 335.2000, 'EXECUTED', '2026-09-27 10:26:00', 'CAD'),
-    (1028, 1, 101, 'NVDA', 'SELL', 10.0000, 188.7500, 'EXECUTED', '2026-09-28 14:44:00', 'JPY'),
-    (1029, 2, 104, 'AMZN', 'BUY', 4.0000, 244.9000, 'EXECUTED', '2026-09-29 11:39:00', 'GBP'),
-    (1030, 3, 108, 'META', 'SELL', 2.0000, 789.1000, 'EXECUTED', '2026-09-30 15:07:00', 'AUD')
+    (1001, 1, 'NVDA', 'BUY', 8.0000, 171.2500, 'EXECUTED', '2026-09-01 09:18:00', 'USD'),
+    (1002, 2, 'AMZN', 'SELL', 5.0000, 231.8000, 'EXECUTED', '2026-09-02 10:42:00', 'EUR'),
+    (1003, 3, 'GLD', 'BUY', 10.0000, 324.6000, 'EXECUTED', '2026-09-03 11:06:00', 'CAD'),
+    (1004, 1, 'MSFT', 'SELL', 4.0000, 506.7500, 'EXECUTED', '2026-09-04 14:21:00', 'USD'),
+    (1005, 2, 'GOOGL', 'BUY', 6.0000, 246.1500, 'EXECUTED', '2026-09-05 09:37:00', 'GBP'),
+    (1006, 3, 'META', 'SELL', 3.0000, 744.3000, 'EXECUTED', '2026-09-06 13:12:00', 'AUD'),
+    (1007, 1, 'ETH', 'BUY', 0.7500, 4385.0000, 'EXECUTED', '2026-09-07 15:44:00', 'USD'),
+    (1008, 2, 'QQQ', 'SELL', 7.0000, 598.2000, 'EXECUTED', '2026-09-08 10:08:00', 'EUR'),
+    (1009, 3, 'GLD', 'BUY', 6.0000, 326.1500, 'EXECUTED', '2026-09-09 12:29:00', 'CAD'),
+    (1010, 1, 'NVDA', 'SELL', 12.0000, 176.4000, 'EXECUTED', '2026-09-10 09:51:00', 'JPY'),
+    (1011, 2, 'AMZN', 'BUY', 9.0000, 233.7500, 'EXECUTED', '2026-09-11 11:16:00', 'GBP'),
+    (1012, 3, 'META', 'SELL', 2.0000, 752.9000, 'EXECUTED', '2026-09-12 14:03:00', 'AUD'),
+    (1013, 1, 'MSFT', 'BUY', 5.0000, 509.1000, 'EXECUTED', '2026-09-13 10:33:00', 'USD'),
+    (1014, 2, 'GOOGL', 'SELL', 4.0000, 251.4500, 'EXECUTED', '2026-09-14 13:48:00', 'EUR'),
+    (1015, 3, 'GLD', 'BUY', 8.0000, 329.8000, 'EXECUTED', '2026-09-15 09:24:00', 'CAD'),
+    (1016, 1, 'ETH', 'SELL', 0.5000, 4520.0000, 'EXECUTED', '2026-09-16 15:02:00', 'USD'),
+    (1017, 2, 'QQQ', 'BUY', 11.0000, 603.4500, 'EXECUTED', '2026-09-17 10:19:00', 'GBP'),
+    (1018, 3, 'META', 'SELL', 4.0000, 761.2500, 'EXECUTED', '2026-09-18 12:41:00', 'AUD'),
+    (1019, 1, 'NVDA', 'BUY', 7.0000, 181.9000, 'EXECUTED', '2026-09-19 09:46:00', 'JPY'),
+    (1020, 2, 'AMZN', 'SELL', 6.0000, 239.6000, 'EXECUTED', '2026-09-20 14:27:00', 'EUR'),
+    (1021, 3, 'GLD', 'BUY', 5.0000, 332.5000, 'EXECUTED', '2026-09-21 11:02:00', 'CAD'),
+    (1022, 1, 'MSFT', 'SELL', 3.0000, 514.8500, 'EXECUTED', '2026-09-22 13:35:00', 'USD'),
+    (1023, 2, 'GOOGL', 'BUY', 8.0000, 255.3000, 'EXECUTED', '2026-09-23 10:57:00', 'GBP'),
+    (1024, 3, 'META', 'SELL', 1.0000, 775.4000, 'EXECUTED', '2026-09-24 15:18:00', 'AUD'),
+    (1025, 1, 'ETH', 'BUY', 0.4000, 4610.0000, 'EXECUTED', '2026-09-25 09:11:00', 'USD'),
+    (1026, 2, 'QQQ', 'SELL', 9.0000, 611.8500, 'EXECUTED', '2026-09-26 12:06:00', 'EUR'),
+    (1027, 3, 'GLD', 'BUY', 7.0000, 335.2000, 'EXECUTED', '2026-09-27 10:26:00', 'CAD'),
+    (1028, 1, 'NVDA', 'SELL', 10.0000, 188.7500, 'EXECUTED', '2026-09-28 14:44:00', 'JPY'),
+    (1029, 2, 'AMZN', 'BUY', 4.0000, 244.9000, 'EXECUTED', '2026-09-29 11:39:00', 'GBP'),
+    (1030, 3, 'META', 'SELL', 2.0000, 789.1000, 'EXECUTED', '2026-09-30 15:07:00', 'AUD')
 ON CONFLICT (order_id) DO NOTHING;
 
 INSERT INTO trade
@@ -110,7 +110,6 @@ VALUES
 ;
 
 -- Keep identity-generated IDs above the explicit seed ranges.
-SELECT setval(pg_get_serial_sequence('holdings', 'asset_id'), GREATEST(COALESCE((SELECT MAX(asset_id) FROM holdings), 1), 108), true);
 SELECT setval(pg_get_serial_sequence('orders', 'order_id'), GREATEST(COALESCE((SELECT MAX(order_id) FROM orders), 1), 1030), true);
 SELECT setval(pg_get_serial_sequence('trade', 'trade_id'), GREATEST(COALESCE((SELECT MAX(trade_id) FROM trade), 1), 2030), true);
 SELECT setval(pg_get_serial_sequence('cash_holdings', 'cash_id'), COALESCE((SELECT MAX(cash_id) FROM cash_holdings), 1), true);
