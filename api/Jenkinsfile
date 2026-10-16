@@ -9,13 +9,13 @@ pipeline {
                 checkout scm
             }
         }
-        // stage('Build') {
-        //     steps {
-        //         dir('api') {
-        //             sh 'mvn -B clean package'
-        //         }
-        //     }
-        // }
+        stage('Build') {
+            steps {
+                dir('api') {
+                    sh 'mvn -B clean package -DskipTests'
+                }
+            }
+        }
 
     }
 }
