@@ -21,8 +21,7 @@ export function authInterceptor(
 	const authService = inject(AuthService);
 	const messageService = inject(MessageService);
 	const router = inject(Router);
-	const shouldUseCredentials =
-		req.url.startsWith(environment.apiBaseUrl) ||
+	const shouldUseCredentials = req.url.startsWith(environment.apiBaseUrl) ||
 		req.url.startsWith(environment.analyticsBaseUrl);
 	const isAuthEndpoint = req.url.includes('/auth/register') || req.url.includes('/auth/authenticate') || req.url.includes('/auth/refresh') || req.url.includes('/auth/me');
 	const interceptedRequest = shouldUseCredentials
