@@ -16,17 +16,21 @@ pipeline {
         //         }
         //     }
         // }
-        stage('Build') {
+        stage('Build and Push Spring API') {
             steps {
                 dir('api') {
                     withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
                         sh 'echo "$DOCKERHUB_PASSWORD" | docker login --username "$DOCKERHUB_USERNAME" --password-stdin'
-                        sh 'docker build -t lukesheldon19/testing:latest .'
-                        sh 'docker push lukesheldon19/testing:latest'
+                        sh 'docker build -t lukesheldon19/testing:spring-api .'
+                        sh 'docker push lukesheldon19/testing:spring-api'
                     }
                 }
             }
         }
+
+        // stage('Build and Push Flask API'){
+
+        // }
 
     }
 }
