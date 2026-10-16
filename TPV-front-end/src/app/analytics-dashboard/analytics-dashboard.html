@@ -1,0 +1,288 @@
+<app-navbar/>
+
+<div *ngIf="loading()" class="loading-state">Loading analytics...</div>
+
+<div *ngIf="analyticsResult() && !loading()" class="dashboard-container">
+
+  <!-- Shared bar chart: y-axis, gridlines, bars, and x labels share one column layout -->
+  <ng-template #barChartTpl let-chart let-rotate="rotate">
+    <div class="bar-chart">
+      <div class="y-axis">
+        <span *ngFor="let tick of chart.ticks" class="y-tick" [style.bottom.%]="tick.pct">{{ tick.label }}</span>
+      </div>
+
+      <div class="plot-area">
+        <div class="plot">
+          <div class="gridlines">
+            <div *ngFor="let tick of chart.ticks" class="gridline" [style.bottom.%]="tick.pct"></div>
+          </div>
+          <div class="columns">
+            <div *ngFor="let col of chart.columns" class="column">
+              <div class="bar-stack" [style.height.%]="col.heightPct">
+                <div
+                  *ngFor="let seg of col.segments"
+                  class="bar-segment"
+                  [style.height.%]="seg.pct"
+                  [style.background]="seg.color"
+                  [attr.title]="seg.name + ': ' + (seg.value | number:'1.0-20')"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="x-labels" [class.rotated]="rotate">
+          <span *ngFor="let col of chart.columns" class="x-label">
+            <span class="x-text">{{ col.label }}</span>
+          </span>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <!-- Shared legend -->
+  <ng-template #legendTpl let-items>
+    <div class="chart-legend">
+      <div *ngFor="let item of items" class="legend-item">
+        <div class="legend-box" [style.background]="item.color"></div>
+        <span>{{ item.label }}</span>
+      </div>
+    </div>
+  </ng-template>
+
+  <!-- Header -->
+  <header class="dashboard-header">
+    <h1>Analytics Dashboard</h1>
+  </header>
+
+  <!-- Timeline Toggle -->
+  <div class="timeline-toggle-section">
+    <div class="toggle-buttons">
+      <button
+        type="button"
+        class="toggle-btn"
+        [class.active]="timelineMode() === 'monthly'"
+        (click)="timelineMode.set('monthly')">
+        Monthly
+      </button>
+      <button
+        type="button"
+        class="toggle-btn"
+        [class.active]="timelineMode() === 'custom'"
+        (click)="timelineMode.set('custom')">
+        Custom
+      </button>
+    </div>
+  </div>
+
+  <!-- Custom Date Range Form -->
+  <form *ngIf="timelineMode() === 'custom'" class="custom-date-form" (ngSubmit)="onCustomDateSubmit()">
+    <div class="form-group">
+      <label for="startDate">Start Date:</label>
+      <input
+        id="startDate"
+        type="date"
+        class="date-input"
+        [value]="customStartDate()"
+        (change)="customStartDate.set($any($event.target).value)" />
+    </div>
+    <div class="form-group">
+      <label for="endDate">End Date:</label>
+      <input
+        id="endDate"
+        type="date"
+        class="date-input"
+        [value]="customEndDate()"
+        (change)="customEndDate.set($any($event.target).value)" />
+    </div>
+    <button 
+      type="submit" 
+      class="submit-btn" 
+      [disabled]="!isCustomDateFormValid()"
+      [title]="isCustomDateFormValid() ? 'Submit custom date range' : 'End date cannot be before start date'">
+      Submit
+    </button>
+  </form>
+
+  <section *ngIf="timelineMode() === 'monthly' && analyticsResult()?.date as title" class="job-date-title">
+    <h2>{{ title }}</h2>
+  </section>
+
+  <!-- Summary Cards -->
+  <section class="summary-section" *ngIf="hasActiveData()">
+    <div *ngFor="let card of summaryCards()" class="summary-card">
+      <div class="card-icon" [style.background]="card.color"></div>
+      <div class="card-content">
+        <p class="card-label">{{ card.label }}</p>
+          <p class="card-value">{{ card.value | number:'1.0-20' }}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Order Distribution Section -->
+  <section class="order-distribution-section" *ngIf="hasActiveData()">
+    <article class="chart-card order-distribution-card">
+      <div class="card-header-with-toggle">
+        <h3>Trade Distribution by {{ orderDistributionMode() === 'count' ? 'Count' : 'Volume' }}</h3>
+        <div class="toggle-buttons">
+          <button
+            type="button"
+            class="toggle-btn"
+            [class.active]="orderDistributionMode() === 'count'"
+            (click)="orderDistributionMode.set('count')">
+            Count
+          </button>
+          <button
+            type="button"
+            class="toggle-btn"
+            [class.active]="orderDistributionMode() === 'volume'"
+            (click)="orderDistributionMode.set('volume')">
+            Volume
+          </button>
+        </div>
+      </div>
+
+      <div class="distribution-content">
+        <!-- Bar Chart -->
+        <div class="distribution-chart bar-chart-panel">
+          <ng-container
+            *ngTemplateOutlet="barChartTpl; context: { $implicit: buySellChart(), rotate: false }">
+          </ng-container>
+        </div>
+
+        <!-- Pie Chart -->
+        <div class="distribution-chart pie-chart">
+          <svg viewBox="0 0 100 100" class="pie-svg">
+            <circle cx="50" cy="50" r="48" class="pie-empty"></circle>
+            <path
+              *ngFor="let slice of buySellPie()"
+              [attr.d]="slice.path"
+              [attr.fill]="slice.color"
+              class="pie-slice">
+            </path>
+          </svg>
+          <div class="pie-legend">
+            <div *ngFor="let slice of buySellPie()" class="legend-item">
+              <div class="legend-dot" [style.background]="slice.color"></div>
+              <span>{{ slice.label }}: {{ slice.percentage | number:'1.1-1' }}%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <!-- Order Volume by 30 Minute Market Interval -->
+  <section class="market-interval-section" *ngIf="hasActiveData()">
+    <article class="chart-card">
+      <div class="card-header-with-toggle">
+        <h3>Trade Volume by 30 Minute Market Interval</h3>
+        <div class="toggle-buttons">
+          <button
+            type="button"
+            class="toggle-btn"
+            [class.active]="volumeByMarketMode() === 'volume'"
+            (click)="volumeByMarketMode.set('volume')">
+            Volume
+          </button>
+          <button
+            type="button"
+            class="toggle-btn"
+            [class.active]="volumeByMarketMode() === 'side'"
+            (click)="volumeByMarketMode.set('side')">
+            Side
+          </button>
+        </div>
+      </div>
+
+      <ng-container
+        *ngTemplateOutlet="barChartTpl; context: { $implicit: marketHoursChart(), rotate: true }">
+      </ng-container>
+
+      <ng-container *ngTemplateOutlet="legendTpl; context: { $implicit: marketLegend() }"></ng-container>
+    </article>
+  </section>
+
+  <!-- Order Volume by Date - Scrollable -->
+  <section class="volume-by-date-section" *ngIf="hasActiveData()">
+    <article class="chart-card">
+      <div class="card-header-with-toggle">
+        <h3>Trade Volume by Date</h3>
+        <div class="toggle-buttons">
+          <button
+            type="button"
+            class="toggle-btn"
+            [class.active]="volumeByDateMode() === 'volume'"
+            (click)="volumeByDateMode.set('volume')">
+            Volume
+          </button>
+          <button
+            type="button"
+            class="toggle-btn"
+            [class.active]="volumeByDateMode() === 'side'"
+            (click)="volumeByDateMode.set('side')">
+            Side
+          </button>
+        </div>
+      </div>
+
+      <div class="volume-by-date-scroll">
+        <div *ngFor="let row of volumeByDateRows()" class="date-item">
+          <div class="date-label">{{ row.date }}</div>
+          <div class="bar-track">
+            <div class="date-bar" [style.width.%]="row.widthPct" [style.min-width.px]="row.total > 0 ? 4 : 0">
+              <div
+                *ngFor="let seg of row.segments"
+                class="date-segment"
+                [style.width.%]="seg.pct"
+                [style.background]="seg.color"
+                [attr.title]="seg.name + ': ' + (seg.value | number:'1.0-20')"></div>
+            </div>
+          </div>
+          <div class="bar-value">{{ row.total | number:'1.0-20' }} units</div>
+        </div>
+      </div>
+
+      <ng-container *ngTemplateOutlet="legendTpl; context: { $implicit: volumeByDateLegend() }"></ng-container>
+    </article>
+  </section>
+
+  <!-- Top K Most Traded Assets - Scrollable -->
+  <section class="top-assets-section" *ngIf="hasActiveData()">
+    <article class="chart-card">
+      <div class="card-header-with-toggle">
+        <h3>Top K Most Traded Assets</h3>
+        <div class="toggle-buttons">
+          <button
+            type="button"
+            class="toggle-btn"
+            [class.active]="topAssetsMode() === 'total'"
+            (click)="topAssetsMode.set('total')">
+            Total
+          </button>
+          <button
+            type="button"
+            class="toggle-btn"
+            [class.active]="topAssetsMode() === 'buy'"
+            (click)="topAssetsMode.set('buy')">
+            Buy
+          </button>
+          <button
+            type="button"
+            class="toggle-btn"
+            [class.active]="topAssetsMode() === 'sell'"
+            (click)="topAssetsMode.set('sell')">
+            Sell
+          </button>
+        </div>
+      </div>
+
+      <div class="top-assets-scroll">
+        <div *ngFor="let asset of topAssetsList()" class="asset-item">
+          <div class="asset-rank">{{ asset.rank }}.</div>
+          <div class="asset-name">{{ asset.symbol }}</div>
+          <div class="asset-value">{{ asset.value | number:'1.0-20' }} Shares</div>
+        </div>
+      </div>
+    </article>
+  </section>
+</div>
