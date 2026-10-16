@@ -225,7 +225,7 @@ export class AnalyticsDashboard implements OnInit {
 
     const keys = [...Object.keys(buyData), ...Object.keys(sellData)]
       .map(Number)
-      .filter((n) => Number.isFinite(n));
+      .filter((n) => Number.isFinite(n) && n >= 1 && n <= 13);
     if (!keys.length) return EMPTY_CHART;
 
     // Include empty intervals between the first and last so the time axis has no gaps
