@@ -277,7 +277,7 @@ def perform_analytics(df, k=5):
             print(f"Warning: Failed to calculate top {k} most traded assets: {str(e)}")
             formatted_payload[f"top_{k}_most_traded_assets"] = {}
             formatted_payload[f"top_{k}_most_traded_assets_by_side"] = {}
-        
+           
         return formatted_payload
     
     except ValueError as e:
