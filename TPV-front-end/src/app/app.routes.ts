@@ -7,6 +7,7 @@ import { HistoryPage } from './history-page/history-page';
 import { MainLayoutComponent } from './layouts/main-layout';
 import { AssetsPage } from './assets-page/assets-page';
 import { ProfilePage } from './profile-page/profile-page';
+import { AnalyticsDashboard } from './analytics-dashboard/analytics-dashboard';
 import { TradePage } from './trade-page/trade-page.component';
 import { AdminDashboardPage } from './admin-dashboard-page/admin-dashboard-page';
 
@@ -26,6 +27,7 @@ export const routes: Routes = [
     component: MainLayoutComponent,
     children: [
       { path: 'admin', component: AdminDashboardPage, canActivate: [authGuard, roleGuard], data: { roles: ['ADMIN'] } },
+      { path: 'analytics', component: AnalyticsDashboard, canActivate: [authGuard, roleGuard], data: { roles: ['ADMIN'] } },
       { path: 'dashboard', component: DashboardPage, canActivate: [authGuard, roleGuard], data: { roles: ['USER'] } },
       { path: 'portfolio-history', component: HistoryPage, canActivate: [authGuard, roleGuard], data: { roles: ['USER'] } },
       { path: 'trade', component: TradePage, canActivate: [authGuard, roleGuard], data: { roles: ['USER'] } },
@@ -38,3 +40,4 @@ export const routes: Routes = [
     redirectTo: '/login',
   },
 ];
+

@@ -23,7 +23,7 @@ def get_previous_month_trades_query():
     SELECT o.order_intent, ft.execution_quantity, ft.execution_price, ft.ticker, ft.trade_timestamp
     FROM filtered_trades ft
     JOIN orders o ON ft.order_id = o.order_id
-    JOIN holdings h ON o.user_id = h.user_id AND o.asset_id = h.asset_id;
+    JOIN holdings h ON o.user_id = h.user_id AND o.ticker = h.ticker;
     """
     
 def get_current_month_trades_query():
@@ -39,7 +39,7 @@ def get_current_month_trades_query():
     SELECT o.order_intent, ft.execution_quantity, ft.execution_price, ft.ticker, ft.trade_timestamp
     FROM filtered_trades ft
     JOIN orders o ON ft.order_id = o.order_id
-    JOIN holdings h ON o.user_id = h.user_id AND o.asset_id = h.asset_id;
+    JOIN holdings h ON o.user_id = h.user_id AND o.ticker = h.ticker;
     """
     
 def get_custom_date_trades_query(start_date, end_date):
@@ -53,6 +53,6 @@ def get_custom_date_trades_query(start_date, end_date):
     SELECT o.order_intent, ft.execution_quantity, ft.execution_price, ft.ticker, ft.trade_timestamp
     FROM filtered_trades ft
     JOIN orders o ON ft.order_id = o.order_id
-    JOIN holdings h ON o.user_id = h.user_id AND o.asset_id = h.asset_id;
+    JOIN holdings h ON o.user_id = h.user_id AND o.ticker = h.ticker;
     """
     return query, (start_date, end_date)
