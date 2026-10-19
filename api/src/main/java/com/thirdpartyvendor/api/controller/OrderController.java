@@ -12,6 +12,7 @@ import com.thirdpartyvendor.api.dto.OrderResponse;
 import com.thirdpartyvendor.api.dto.CreateOrderRequest;
 import com.thirdpartyvendor.api.entity.AppUser;
 import com.thirdpartyvendor.api.service.OrderService;
+import com.thirdpartyvendor.api.util.AuthorizationUtil;
 
 import java.util.List;
 
@@ -34,6 +35,7 @@ public class OrderController {
             @RequestBody CreateOrderRequest createOrderRequest,
             @AuthenticationPrincipal AppUser currentUser
         ) {
+            AuthorizationUtil.requireNotFrozen(currentUser);
             return ResponseEntity.status(HttpStatus.CREATED).body(orderService.createOrder(createOrderRequest, currentUser.getId()));
     }
   

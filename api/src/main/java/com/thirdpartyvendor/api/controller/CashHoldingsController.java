@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.thirdpartyvendor.api.dto.CashHoldingResponse;
 import com.thirdpartyvendor.api.entity.AppUser;
 import com.thirdpartyvendor.api.service.CashHoldingsService;
+import com.thirdpartyvendor.api.util.AuthorizationUtil;
 
 import java.util.List;
 
@@ -44,6 +45,7 @@ public class CashHoldingsController {
         @RequestBody DepositRequest depositRequest,
         @AuthenticationPrincipal AppUser currentUser
     ) {
+        AuthorizationUtil.requireNotFrozen(currentUser);
         return ResponseEntity.ok(cashHoldingsService.deposit(
             depositRequest.currencyCode(),
             depositRequest.amount(),

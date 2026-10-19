@@ -9,6 +9,7 @@ public record AuthenticationResponse(
     String phoneNumber,
     LocalDate dateOfBirth,
     String email,
-    UserRole role
+    UserRole role,
+    boolean frozen
 ) {
 }

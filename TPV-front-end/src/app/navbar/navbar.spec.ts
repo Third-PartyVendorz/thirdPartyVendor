@@ -15,6 +15,7 @@ describe('Navbar', () => {
         useValue: {
           logout: () => ({ subscribe: () => undefined }),
           markSessionExpired: () => undefined,
+          isFrozen: () => false,
         },
       }, provideRouter([])],
     }).compileComponents();
