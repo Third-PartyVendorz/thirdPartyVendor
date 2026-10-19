@@ -63,11 +63,11 @@ Stuff to do:
 
 - Add indexes to replica DB to improve query performance, since same query running every time - done
 
-- Update API to check for analytst role instead of admin role
+- Update API to check for analytst role instead of admin role - done w Jack's PR
 
-- Add a feature to download analytics report:
-     - Will be a button on the custome analytics job page
-     - Ideally download an HTMl file taht captures the integrity of the frontend
+- Add a feature to download analytics report: - done
+     - Will be a button on the custom analytics job page - done
+     - Ideally download an HTMl file taht captures the integrity of the frontend - done
 
 - Clean up frontend and make it not look like shit
 
