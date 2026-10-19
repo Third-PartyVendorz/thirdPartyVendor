@@ -137,10 +137,26 @@ input::placeholder {
     color: #98a2b3;
 }
 
+.amount-input:has(input.invalid) {
+    border-color: #d92d20;
+    background: #fff8f7;
+}
+
+input.invalid {
+    color: #b42318;
+}
+
 .field-help {
     margin: -0.5rem 0 0;
     color: #6b7788;
     font-size: 0.8rem;
+}
+
+.field-error {
+    margin: -0.5rem 0 0;
+    color: #b42318;
+    font-size: 0.8rem;
+    font-weight: 600;
 }
 
 .summary {

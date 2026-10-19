@@ -2,42 +2,62 @@
     <div class="card-header">
         <div>
             <p class="card-eyebrow">CASH BALANCE</p>
-            <h2>Deposits & Withdrawls</h2>
+            <h2>Deposits & Withdrawals</h2>
         </div>
 
         <div class="balance-block">
             <span class="balance-label">Available</span>
-            <span class="balance">{{ availableBalance | currency }}</span>
+            @if (balanceLoading()) {
+                <span class="balance">Loading...</span>
+            } @else {
+                <span class="balance">{{ availableBalance() | currency }}</span>
+            }
         </div>
     </div>
 
+    @if (balanceError()) {
+        <p class="field-error" role="alert">Unable to load your available cash balance.</p>
+    }
+
     <div class="form-section">
-        <label class="label">Transfer Type</label>
-        <div class="transaction-toggle">
-            <button type="button" [class.active]="transactionType === 'DEPOSIT'"
-                [attr.aria-pressed]="transactionType === 'DEPOSIT'"
-                (click)="transactionType = 'DEPOSIT'">
-                Deposit funds
-            </button>
-            <button type="button" [class.active]="transactionType === 'WITHDRAW'"
-                [attr.aria-pressed]="transactionType === 'WITHDRAW'"
-                (click)="transactionType = 'WITHDRAW'">
-                Withdraw cash
-            </button>
+        <div class="transfer-type">
+            <label class="label">Transfer Type</label>
+            <div class="transaction-toggle">
+                <button type="button" [class.active]="transactionType === 'DEPOSIT'"
+                    [attr.aria-pressed]="transactionType === 'DEPOSIT'"
+                    (click)="transactionType = 'DEPOSIT'">
+                    Deposit funds
+                </button>
+                <button type="button" [class.active]="transactionType === 'WITHDRAW'"
+                    [attr.aria-pressed]="transactionType === 'WITHDRAW'"
+                    (click)="transactionType = 'WITHDRAW'">
+                    Withdraw cash
+                </button>
+            </div>
         </div>
 
-        <label class="label" for="cash-amount">Amount</label>
-        <div class="amount-input">
-            <span aria-hidden="true">$</span>
-            <input id="cash-amount" type="number" min="0" step="0.01"
-                [(ngModel)]="amount" placeholder="0.00" aria-describedby="amount-help" />
-        </div>
-        <p id="amount-help" class="field-help">Enter the amount you want to move.</p>
+        <div class="amount-class">
+            <label class="label" for="cash-amount">Amount</label>
+            <div class="amount-input">
+                <span aria-hidden="true">$</span>
+                <input id="cash-amount" type="number" min="0" step="0.01"
+                    [(ngModel)]="amount" [class.invalid]="withdrawalExceedsBalance"
+                    [attr.aria-invalid]="withdrawalExceedsBalance"
+                    placeholder="0.00" aria-describedby="amount-help" />
+            </div>
+        </div> 
+            <p id="amount-help" class="field-help">Enter the amount you want to move.</p>
+
+        @if (withdrawalExceedsBalance) {
+            <p class="field-error" role="alert">
+                You can withdraw up to {{ availableBalance() | currency }}.
+            </p>
+        }
 
         <div class="summary" aria-label="Transaction summary">
             <div class="summary-row">
                 <span>Available cash balance</span>
-                <strong>{{ availableBalance | currency }}</strong>
+                <strong>{{ availableBalance() | currency }}</strong>
             </div>
 
             <div class="summary-row projected-row">
@@ -48,7 +68,7 @@
             </div>
         </div>
 
-        <button class="submit-button" [disabled]="!amount || projectedBalance < 0"
+        <button class="submit-button" [disabled]="balanceLoading() || balanceError() || !amount || withdrawalExceedsBalance"
         (click)="submitTransaction()">
             Confirm {{ transactionType === 'DEPOSIT' ? 'deposit' : 'withdrawal' }}
         </button>
