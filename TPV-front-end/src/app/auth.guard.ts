@@ -45,7 +45,7 @@ export const roleGuard: CanActivateFn = (route) => {
     return router.parseUrl('/admin');
   }
   if (userRole === 'ANALYST') {
-    return router.parseUrl('/analyst/analytics');
+    return router.parseUrl('/analytics');
   }
   return router.parseUrl('/dashboard');
 };
@@ -64,7 +64,7 @@ export const landingGuard: CanActivateFn = () => {
     return router.parseUrl('/admin');
   }
   if (role === 'ANALYST') {
-    return router.parseUrl('/analyst/analytics');
+    return router.parseUrl('/analytics');
   }
   return router.parseUrl('/dashboard');
 };
