@@ -52,3 +52,11 @@ Plan:
 
 
 
+
+
+Clean up and optimize queries:
+
+- Only fetch the data that we NEED to fetch
+- Clean up replication --> Only replicate data we NEED tpo replicate for analytics
+- Ensure analytics replica is READ ONLY
+- MAKE UI NOT LOOK LIKE SHIT
