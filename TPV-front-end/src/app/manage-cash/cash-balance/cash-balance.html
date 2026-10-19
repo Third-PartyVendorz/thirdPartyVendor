@@ -19,6 +19,10 @@
         <p class="field-error" role="alert">Unable to load your available cash balance.</p>
     }
 
+    @if (transactionError()) {
+        <p class="field-error" role="alert">Unable to complete this cash transaction.</p>
+    }
+
     <div class="form-section">
         <div class="transfer-type">
             <label class="label">Transfer Type</label>
@@ -68,9 +72,9 @@
             </div>
         </div>
 
-        <button class="submit-button" [disabled]="balanceLoading() || balanceError() || !amount || withdrawalExceedsBalance"
+        <button class="submit-button" [disabled]="balanceLoading() || balanceError() || transactionSubmitting() || !amount || withdrawalExceedsBalance"
         (click)="submitTransaction()">
-            Confirm {{ transactionType === 'DEPOSIT' ? 'deposit' : 'withdrawal' }}
+            {{ transactionSubmitting() ? 'Processing...' : 'Confirm ' + (transactionType === 'DEPOSIT' ? 'deposit' : 'withdrawal') }}
         </button>
     </div>
 </div>

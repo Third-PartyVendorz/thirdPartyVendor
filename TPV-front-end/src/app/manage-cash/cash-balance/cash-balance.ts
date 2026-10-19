@@ -17,6 +17,8 @@ export class CashBalance implements OnInit {
   availableBalance = signal(0);
   balanceLoading = signal(true);
   balanceError = signal(false);
+  transactionSubmitting = signal(false);
+  transactionError = signal(false);
 
   ngOnInit(): void {
     this.tradeService.getCashHoldingByCurrencyCode('USD').subscribe({
@@ -44,15 +46,29 @@ export class CashBalance implements OnInit {
   }
 
   submitTransaction(): void {
-    if (this.balanceLoading() || this.balanceError() || !this.amount || this.amount < 0 || this.withdrawalExceedsBalance) {
+    if (this.balanceLoading() || this.balanceError() || this.transactionSubmitting() || !this.amount || this.amount < 0 || this.withdrawalExceedsBalance) {
       return;
     }
 
-    const payload = {
-      type: this.transactionType, 
-      amount: this.amount
-    };
-    console.log(payload);
+    this.transactionSubmitting.set(true);
+    this.transactionError.set(false);
+
+    this.tradeService.postCashTransaction({
+      currencyCode: 'USD',
+      type: this.transactionType,
+      amount: this.amount,
+    }).subscribe({
+      next: (response) => {
+        this.availableBalance.set(response.balance);
+        this.amount = 0;
+        this.transactionSubmitting.set(false);
+      },
+      error: (error) => {
+        console.error('Error submitting cash transaction:', error);
+        this.transactionSubmitting.set(false);
+        this.transactionError.set(true);
+      },
+    });
   }
 }
 
