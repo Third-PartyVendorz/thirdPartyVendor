@@ -6,21 +6,19 @@
   background: radial-gradient(circle at top left, rgba(248, 183, 118, 0.2), transparent 28%), linear-gradient(180deg, #f7fbff 0%, #eef4f9 100%);
 }
 
-.welcome-panel {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 2rem;
+.welcome-panel,
+.tool-card {
   border: 1px solid rgba(148, 163, 184, 0.2);
   border-radius: 24px;
   background: rgba(255, 255, 255, 0.95);
-  padding: 2rem;
   box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
 }
 
+.welcome-panel {
+  padding: 2rem;
+}
+
 .welcome-copy {
-  display: grid;
-  gap: 0.3rem;
   max-width: 640px;
 }
 
@@ -52,21 +50,6 @@
   line-height: 1.6;
 }
 
-.welcome-mark {
-  display: grid;
-  place-items: center;
-  width: 112px;
-  height: 112px;
-  flex: 0 0 auto;
-  border-radius: 32px;
-  background: linear-gradient(135deg, #033d6c, #0b5ca5 70%, #f8b776);
-  color: #fff;
-  font-size: 1.45rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  box-shadow: 0 18px 32px rgba(3, 61, 108, 0.2);
-}
-
 .section-heading {
   display: flex;
   justify-content: space-between;
@@ -85,7 +68,7 @@
 
 .admin-tools {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1rem;
 }
 
@@ -94,29 +77,21 @@
   align-items: flex-start;
   gap: 1rem;
   min-height: 190px;
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  border-radius: 20px;
-  background: #fff;
   padding: 1.35rem;
   color: inherit;
   text-decoration: none;
-  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
 }
 
-.analytics-card {
+.workspace-card {
   border-color: rgba(3, 61, 108, 0.25);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.analytics-card:hover,
-.analytics-card:focus-visible {
+.workspace-card:hover,
+.workspace-card:focus-visible {
   transform: translateY(-3px);
   box-shadow: 0 18px 34px rgba(3, 61, 108, 0.14);
   outline: none;
-}
-
-.upcoming-card {
-  background: rgba(255, 255, 255, 0.72);
 }
 
 .tool-icon {
@@ -130,11 +105,6 @@
   color: #033d6c;
   font-size: 1.35rem;
   font-weight: 800;
-}
-
-.upcoming-card .tool-icon {
-  background: #f1f5f9;
-  color: #64748b;
 }
 
 .tool-content {
@@ -161,10 +131,6 @@
   font-weight: 800;
 }
 
-.upcoming-card .tool-link {
-  color: #94a3b8;
-}
-
 @media (max-width: 900px) {
   .admin-tools {
     grid-template-columns: 1fr;
@@ -180,20 +146,13 @@
     padding: 1rem;
   }
 
-  .welcome-panel,
-  .section-heading {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
   .welcome-panel {
     padding: 1.35rem;
   }
 
-  .welcome-mark {
-    width: 76px;
-    height: 76px;
-    border-radius: 22px;
+  .section-heading {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   .section-note {
