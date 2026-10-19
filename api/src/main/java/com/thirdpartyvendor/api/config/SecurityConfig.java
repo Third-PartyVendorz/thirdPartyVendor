@@ -43,6 +43,7 @@ public class SecurityConfig {
 				.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 				.requestMatchers("/error").permitAll()
 				.requestMatchers("/admin/**").hasRole("ADMIN")
+				.requestMatchers("/analytics/**").hasRole("ANALYST")
 				.anyRequest().authenticated());
 
 		return http.build();
