@@ -52,3 +52,21 @@ Plan:
 
 
 
+Stuff to do:
+
+- Optimize queries: - done
+     - Only get and join data we need, don't need to fetch everything - done
+
+- Only replicate necessary data for analytics job --> Currently replicating entire schema
+
+- Add indexes to replica DB to improve query performance, since same query running every time
+
+- Update API to check for analytst role instead of admin role
+
+- Add a feature to download analytics report:
+     - Will be a button on the custome analytics job page
+     - Ideally download an HTMl file taht captures the integrity of the frontend
+
+- Clean up frontend and make it not look like shit
+
+- Clean up everything and ensure that it is production ready
