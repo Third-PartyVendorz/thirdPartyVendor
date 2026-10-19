@@ -2,6 +2,7 @@ import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from './services/auth.service';
 import { MessageService } from './services/message.service';
+import { UserContextService } from './services/user-context.service';
 
 /**
  * Auth guard that protects routes from unauthenticated access.
@@ -30,11 +31,31 @@ export const authGuard: CanActivateFn = () => {
   return router.parseUrl('/login');
 };
 
-export const landingGuard: CanActivateFn = () => {
+export const roleGuard: CanActivateFn = (route) => {
   const authService = inject(AuthService);
   const router = inject(Router);
+  const allowedRoles = route.data['roles'] as string[] | undefined;
+  const userRole = authService.getUserRole();
 
-  return authService.getSessionState() === true
-    ? router.parseUrl('/dashboard')
-    : router.parseUrl('/login');
+  if (allowedRoles?.includes(userRole ?? '')) {
+    return true;
+  }
+
+  return userRole === 'ADMIN'
+    ? router.parseUrl('/admin')
+    : router.parseUrl('/dashboard');
+};
+
+export const landingGuard: CanActivateFn = () => {
+  const authService = inject(AuthService);
+  const userContextService = inject(UserContextService);
+  const router = inject(Router);
+
+  if (authService.getSessionState() !== true) {
+    return router.parseUrl('/login');
+  }
+
+  return authService.getUserRole() === 'ADMIN'
+    ? router.parseUrl('/admin')
+    : router.parseUrl('/dashboard');
 };

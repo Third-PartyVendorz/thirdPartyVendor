@@ -78,6 +78,7 @@ export class ProfilePage implements OnInit {
 						phoneNumber: this.profileDraft.phoneNumber,
 						email: this.profileDraft.email,
 						dateOfBirth: new Date(`${this.profileDraft.dateOfBirth}T00:00:00`),
+						role: this.userContext!.role,
 					};
 
 					this.userContext = updatedUserContext;

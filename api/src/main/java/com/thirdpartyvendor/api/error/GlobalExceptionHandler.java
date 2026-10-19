@@ -22,9 +22,12 @@ import com.thirdpartyvendor.api.error.UserExceptions.EmailAlreadyInUseException;
 import com.thirdpartyvendor.api.error.UserExceptions.PasswordException;
 import com.thirdpartyvendor.api.error.UserExceptions.UserNotFoundException;
 import com.thirdpartyvendor.api.service.OrderExecutionService.OrderExecutionException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+	private static final Logger logger = LogManager.getLogger(GlobalExceptionHandler.class);
 
 	@ExceptionHandler(ResponseStatusException.class)
 	public ResponseEntity<ApiErrorResponse> handleResponseStatusException(
@@ -118,6 +121,7 @@ public class GlobalExceptionHandler {
 		Exception exception,
 		HttpServletRequest request
 	) {
+		logger.error("Unhandled exception occured", exception);
 		return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred", request.getRequestURI());
 	}
 

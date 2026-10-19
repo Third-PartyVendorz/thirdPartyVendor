@@ -1,5 +1,6 @@
 package com.thirdpartyvendor.api.dto;
 import java.time.LocalDate;
+import com.thirdpartyvendor.api.entity.AppUser.UserRole;
 
 public record AuthenticationResponse(
     Long userId,
@@ -7,6 +8,7 @@ public record AuthenticationResponse(
     String lastName,
     String phoneNumber,
     LocalDate dateOfBirth,
-    String email
+    String email,
+    UserRole role
 ) {
 }

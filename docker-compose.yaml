@@ -1,0 +1,40 @@
+#Logical setup (COMMENTED OUT):
+services:
+  pg_tpv:
+    image: postgres:17
+    container_name: tpv-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"   
+    command: [
+      "postgres",
+      "-c", "wal_level=logical",
+      "-c", "max_wal_senders=10",
+      "-c", "max_replication_slots=10",
+      "-c", "shared_buffers=256MB"
+    ]
+
+  tpv_replica:
+    image: postgres:17
+    container_name: tpv-replica
+    environment:
+      POSTGRES_USER: ${REPLICA_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${REPLICA_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${REPLICA_POSTGRES_DB}
+    ports:
+      - "5433:5432"   
+    volumes:
+      - ./replica_schema_init.sql:/docker-entrypoint-initdb.d/replica_schema_init.sql:ro
+    command: [
+      "postgres",
+      "-c", "wal_level=logical",
+      "-c", "max_wal_senders=10",
+      "-c", "max_replication_slots=10",
+      "-c", "shared_buffers=256MB"
+    ]
+
+
+
