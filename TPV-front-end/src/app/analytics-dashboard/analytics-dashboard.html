@@ -101,6 +101,14 @@
       [title]="isCustomDateFormValid() ? 'Submit custom date range' : 'End date cannot be before start date'">
       Submit
     </button>
+    <button
+      type="button"
+      class="export-btn"
+      [disabled]="!customAnalyticsResult()"
+      (click)="downloadCustomReport()"
+      title="Download the loaded custom report as an HTML file">
+      Download Report
+    </button>
   </form>
 
   <section *ngIf="timelineMode() === 'monthly' && analyticsResult()?.date as title" class="job-date-title">
