@@ -46,8 +46,8 @@ def missing_token_callback(error):
 def analytics():
     jwt_payload = get_jwt()
 
-    if jwt_payload.get("role") != "ADMIN":
-        return jsonify(msg="Admin role required"), 403
+    if jwt_payload.get("role") != "ANALYST":
+        return jsonify(msg="Analyst role required"), 403
     
     analytics_payload = None
     

@@ -16,7 +16,9 @@ import { UserContextService } from './user-context.service';
 export class AuthService {
   private authenticatedSession: boolean = false;
   private readonly userRoleSignal = signal<string | null>(null);
+  private readonly frozenSignal = signal(false);
   readonly userRole = this.userRoleSignal.asReadonly();
+  readonly frozen = this.frozenSignal.asReadonly();
 
   constructor(private http: HttpClient, private userContextService: UserContextService, private router: Router) {}
 
@@ -30,6 +32,7 @@ export class AuthService {
     }).pipe(
       tap((response) => {
         this.setUserRole(response.role);
+        this.setFrozen(response.frozen === true);
         this.markSessionAuthenticated();
       }),
     );
@@ -52,6 +55,7 @@ export class AuthService {
     }).pipe(
       tap((response) => {
         this.setUserRole(response.role);
+        this.setFrozen(response.frozen === true);
         this.markSessionAuthenticated();
       }),
     );
@@ -65,6 +69,7 @@ export class AuthService {
     }).pipe(
       tap((response) => {
         this.setUserRole(response.role);
+        this.setFrozen(response.frozen === true);
       }),
       map(() => {
         this.markSessionAuthenticated();
@@ -99,13 +104,22 @@ export class AuthService {
     return this.userRoleSignal();
   }
 
+  isFrozen() {
+    return this.frozenSignal();
+  }
+
   private setUserRole(role: string | null) {
     this.userRoleSignal.set(role);
+  }
+
+  private setFrozen(frozen: boolean) {
+    this.frozenSignal.set(frozen);
   }
 
   markSessionExpired() {
     this.authenticatedSession = false;
     this.userRoleSignal.set(null);
+    this.frozenSignal.set(false);
     this.userContextService.clearUserContext();
     this.router.navigateByUrl('/login');
   }

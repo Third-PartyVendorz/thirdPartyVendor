@@ -1,0 +1,14 @@
+<div class="frozen-modal-backdrop" (click)="close()">
+    <section class="frozen-modal" role="alertdialog" aria-modal="true" aria-labelledby="frozen-account-title" (click)="$event.stopPropagation()">
+        <button class="frozen-modal__close" type="button" aria-label="Close frozen account message" (click)="close()">
+            <span class="material-icons-outlined" aria-hidden="true">close</span>
+        </button>
+        <div class="frozen-modal__icon" aria-hidden="true">
+            <span class="material-icons-outlined">error_outline</span>
+        </div>
+        <p class="frozen-modal__eyebrow">Account frozen</p>
+        <h2 id="frozen-account-title">You can't {{ action }}</h2>
+        <p class="frozen-modal__message">Your account is currently frozen. Review recent account activity and contact our support team.</p>
+        <button class="frozen-modal__button" type="button" (click)="close()">Back</button>
+    </section>
+</div>

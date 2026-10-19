@@ -95,7 +95,7 @@ export class LoginContainer {
           role: response.role,
         };
         this.userContextService.setUserContext(userContext);
-        this.router.navigateByUrl(response.role === 'ADMIN' ? '/admin/users' : '/dashboard');
+        this.router.navigateByUrl(response.role === 'ADMIN' ? '/admin' : '/dashboard');
       },
       error: (error) => {
         this.messageService.setErrorMessage('Login failed: ' + error.error.message);
