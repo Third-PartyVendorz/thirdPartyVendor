@@ -1,0 +1,223 @@
+<main class="manage-cash-page">
+    <section class="forex-container" aria-labelledby="forex-title">
+        <div class="forex-content">
+    <section class="forex-hero">
+        <div>
+            <p class="eyebrow">Currency exchange</p>
+            <h1 id="forex-title">Move money across markets.</h1>
+            <p class="hero-copy">Exchange available cash between currencies at a live indicative rate.</p>
+        </div>
+    </section>
+
+    <section class="currency-search" aria-label="Search currencies">
+        <div class="currency-info-control">
+            <button
+                class="currency-info-button"
+                type="button"
+                aria-label="Currency code information"
+                [attr.aria-expanded]="showCurrencyInfo"
+                (click)="toggleCurrencyInfo()">
+                <span class="material-icons-outlined" aria-hidden="true">info</span>
+            </button>
+            @if (showCurrencyInfo) {
+                <div class="currency-info-tooltip" role="status">
+                    Enter a valid 3-letter currency code in each field.
+                </div>
+            }
+        </div>
+        <label for="from-currency">
+            <span>From currency</span>
+            <input id="from-currency" type="text" maxlength="3" autocomplete="off" [(ngModel)]="fromCurrencyInput" (keyup.enter)="searchCurrencies()" [attr.aria-invalid]="!!searchError" />
+        </label>
+        <button class="search-switch" type="button" (click)="switchDirection()" [attr.aria-label]="'Switch ' + baseCurrency + ' and ' + quoteCurrency">
+            <span class="material-icons-outlined" aria-hidden="true">swap_horiz</span>
+        </button>
+        <label for="to-currency">
+            <span>To currency</span>
+            <input id="to-currency" type="text" maxlength="3" autocomplete="off" [(ngModel)]="toCurrencyInput" (keyup.enter)="searchCurrencies()" [attr.aria-invalid]="!!searchError" />
+        </label>
+        <button type="button" class="search-button" (click)="searchCurrencies()">
+            <span class="material-icons-outlined" aria-hidden="true">search</span>
+            Search
+        </button>
+        @if (searchError) {
+            <p class="search-error" role="alert">{{ searchError }}</p>
+        }
+    </section>
+
+
+
+    @if (quoteLoading()) {
+        <p class="quote-loading" role="status">Loading exchange rate...</p>
+    }
+
+    @if (quoteFound()) {
+        <section class="forex-workspace" aria-label="Currency exchange ticket">
+            <article class="rate-card">
+                <div class="card-heading">
+                    <div>
+                        <p class="eyebrow">Live indicative rate</p>
+                        <h2>{{ baseCurrency }}/{{ quoteCurrency }}</h2>
+                        <p class="currency-name-pair">{{ baseCurrencyName }} to {{ quoteCurrencyName }}</p>
+                    </div>
+                    <span class="material-icons-outlined rate-icon" aria-hidden="true">currency_exchange</span>
+                </div>
+
+                <div class="rate-value">
+                    <span>1 {{ baseCurrency }} <span>=</span> {{ displayRate | number:'1.4-4' }} {{ quoteCurrency }}</span>
+                    @if (dailyChange() !== null && dailyChangePercent() !== null) {
+                        <span class="change-metric rate-daily-change" [class.positive]="dailyChange()! >= 0" [class.negative]="dailyChange()! < 0">
+                            {{ dailyChange()! >= 0 ? '+' : '' }}{{ dailyChange()! | number:'1.4-4' }} {{ quoteCurrency }}
+                            ({{ dailyChangePercent()! >= 0 ? '+' : '' }}{{ dailyChangePercent()! | number:'1.2-2' }}%)
+                        </span>
+                    }
+                </div>
+                <div class="rate-meta">
+                    <span class="change-metric interval-change" [class.positive]="intervalChangeAmount >= 0" [class.negative]="intervalChangeAmount < 0">
+                        <strong>{{ selectedRange() | uppercase }}</strong>
+                        {{ intervalChangeAmount >= 0 ? '+' : '' }}{{ intervalChangeAmount | number:'1.4-4' }} {{ quoteCurrency }}
+                        ({{ intervalChangePercent >= 0 ? '+' : '' }}{{ intervalChangePercent | number:'1.2-2' }}%)
+                    </span>
+                    @if (quoteAsOf()) {
+                        <div class="market-status forex-market-status" aria-label="Last updated">
+                            <span class="material-icons-outlined" aria-hidden="true">schedule</span>
+                            <span>Last updated {{ quoteAsOf() | date:'medium' }}</span>
+                        </div>
+                    }
+                </div>
+
+                <div class="forex-chart-shell" aria-label="Indicative intraday exchange rate trend">
+                    <div class="forex-chart-controls">
+                        <div class="interval-picker" role="group" aria-label="Historical range">
+                            @for (option of rangeOptions; track option.value) {
+                                <button type="button" [class.active]="selectedRange() === option.value" (click)="setRange(option.value)">
+                                    {{ option.label }}
+                                </button>
+                            }
+                        </div>
+                        <span>{{ selectedRange() === '7d' ? 'Last 7 days' : selectedRange() === '30d' ? 'Last 30 days' : 'Last 1 year' }}</span>
+                    </div>
+                    <div class="forex-chart-frame">
+                        <div class="forex-chart-y-axis" aria-hidden="true">
+                            @for (value of chartYAxisValues; track value) {
+                                <span>{{ value | number:'1.4-4' }}</span>
+                            }
+                        </div>
+
+                        <div class="forex-chart-plot">
+                            <svg viewBox="0 0 100 100" preserveAspectRatio="none" role="img" aria-label="Indicative exchange rate trend">
+                                <defs>
+                                    <linearGradient id="forex-chart-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                        <stop offset="0%" stop-color="#a7f3d0" stop-opacity="0.32" />
+                                        <stop offset="100%" stop-color="#a7f3d0" stop-opacity="0.02" />
+                                    </linearGradient>
+                                </defs>
+                                <polyline class="forex-chart-area" [attr.points]="chartAreaPoints"></polyline>
+                                <polyline class="forex-chart-line" [attr.points]="chartLinePoints"></polyline>
+                            </svg>
+
+                            <div class="forex-chart-axis" [style.--forex-chart-axis-columns]="'repeat(' + chartAxisLabels.length + ', minmax(0, 1fr))'" aria-hidden="true">
+                                @for (label of chartAxisLabels; track label) {
+                                    <span>{{ label }}</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    @if (historicalLoading() && !historicalError()) {
+                        <p class="forex-chart-status">Loading historical data...</p>
+                    } @else if (historicalError() && !quoteFound()) {
+                        <p class="forex-chart-status">{{ historicalError() }}</p>
+                    }
+                </div>
+            </article>
+
+            @if (!showConfirmation()) {
+            <article class="exchange-card">
+                <div class="exchange-heading">
+                    <div>
+                        <p class="eyebrow">Exchange ticket</p>
+                        <h2>Set your amount</h2>
+                    </div>
+                </div>
+
+                <div class="amount-fields">
+                    <label>Sell <span>{{ baseCurrency }}</span><input type="text" inputmode="decimal" [currencyMask]="{ allowNegative: false, prefix: getCurrencySymbol() + ' ', thousands: ',', decimal: '.', precision: 2, align: 'left' }" [(ngModel)]="sellAmount" (ngModelChange)="onSellAmountChange()" /></label>
+                    <div class="field-arrow"><span class="material-icons-outlined" aria-hidden="true">arrow_forward</span></div>
+                    <label>Receive <span>{{ quoteCurrency }}</span><input type="text" inputmode="decimal" [currencyMask]="{ allowNegative: false, prefix: getQuoteCurrencySymbol() + ' ', thousands: ',', decimal: '.', precision: 2, align: 'left' }" [ngModel]="buyAmount()" readonly /></label>
+                </div>
+
+                <div class="conversion-summary">
+                    <div>
+                        <span>Current rate</span>
+                        <strong>1 {{ baseCurrency }} = {{ displayRate | number:'1.4-4' }} {{ quoteCurrency }}</strong>
+                    </div>
+                    <span class="material-icons-outlined" aria-hidden="true">trending_up</span>
+                </div>
+                @if (cashBalance() !== null) {
+                    <p class="cash-availability">Available {{ baseCurrency }}: <strong>{{ cashBalance() | currency:baseCurrency:'symbol':'1.2-2' }}</strong></p>
+                }
+                @if (accountIsFrozen) {
+                    <p class="exchange-validation-error" role="alert">You cannot continue because your account is frozen.</p>
+                }
+                @if (hasCashValidationError) {
+                    <p class="exchange-validation-error" role="alert">{{ cashValidationMessage }}</p>
+                }
+                @if (exchangeError) {
+                    <p class="exchange-validation-error" role="alert">{{ exchangeError }}</p>
+                }
+                <button class="exchange-button" type="button" (click)="reviewExchange()" [disabled]="accountIsFrozen || hasCashValidationError || sellAmountValue <= 0">
+                    <span class="material-icons-outlined" aria-hidden="true">arrow_forward</span>
+                    Continue to Exchange Summary
+                </button>
+                <p class="disclaimer">Final rate is confirmed when your exchange is submitted.</p>
+            </article>
+            } @else {
+            <article class="exchange-card confirmation-ticket" aria-labelledby="confirmation-title">
+            @if (exchangeConfirmed()) {
+                <div class="confirmation-icon">
+                    <span class="material-icons-outlined" aria-hidden="true">check_circle</span>
+                </div>
+                <p class="eyebrow">Exchange complete</p>
+                <h2 id="confirmation-title">Exchange confirmed</h2>
+                <p class="confirmation-subtitle">Your currency exchange has been submitted successfully.</p>
+            } @else {
+                <p class="eyebrow">Exchange review</p>
+                <h2 id="confirmation-title">Review your exchange</h2>
+                <p class="confirmation-subtitle">Confirm the details below before submitting your currency exchange.</p>
+            }
+
+            <div class="confirmation-summary">
+                <div class="confirmation-from-to"><span>Sell</span><strong>{{ sellAmountValue | currency:baseCurrency:'symbol':'1.2-2' }}</strong><small>{{ baseCurrency }}</small></div>
+                <span class="material-icons-outlined confirmation-arrow" aria-hidden="true">arrow_forward</span>
+                <div class="confirmation-from-to"><span>Receive</span><strong>{{ buyAmount() | currency:quoteCurrency:'symbol':'1.2-2' }}</strong><small>{{ quoteCurrency }}</small></div>
+            </div>
+
+            <div class="confirmation-details">
+                <div><span>Exchange rate</span><strong>1 {{ baseCurrency }} = {{ displayRate | number:'1.4-4' }} {{ quoteCurrency }}</strong></div>
+                <div><span>Estimated delivery</span><strong>Instant</strong></div>
+            </div>
+
+            @if (exchangeError || executionError) {
+                <p class="exchange-validation-error" role="alert">{{ exchangeError || executionError }}</p>
+            }
+
+            <div class="confirmation-actions">
+                @if (!exchangeConfirmed()) {
+                    <button class="exchange-button" type="button" (click)="confirmExchange()" [disabled]="accountIsFrozen || exchangeSubmitting()">
+                        <span class="material-icons-outlined" aria-hidden="true">{{ exchangeSubmitting() ? 'hourglass_top' : 'check' }}</span>
+                        {{ exchangeSubmitting() ? 'Submitting exchange...' : 'Confirm exchange' }}
+                    </button>
+                }
+                <button class="back-button" type="button" (click)="backToExchange()"><span class="material-icons-outlined" aria-hidden="true">arrow_back</span>{{ exchangeConfirmed() ? 'Back to exchange' : 'Back to review' }}</button>
+            </div>
+            </article>
+            }
+        </section>
+    }
+        </div>
+    </section>
+</main>
+
+@if (showFrozenAccountModal()) {
+    <app-frozen-account-modal action="exchange currencies" (dismissed)="showFrozenAccountModal.set(false)" />
+}

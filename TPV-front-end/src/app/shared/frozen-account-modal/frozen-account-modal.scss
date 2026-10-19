@@ -1,0 +1,109 @@
+:host {
+    display: contents;
+}
+
+.frozen-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1100;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: rgba(3, 61, 108, 0.58);
+}
+
+.frozen-modal {
+    position: relative;
+    width: min(100%, 440px);
+    padding: 32px;
+    color: #172b3a;
+    background: #ffffff;
+    border: 1px solid #f8b776;
+    border-radius: 8px;
+    box-shadow: 0 18px 48px rgba(3, 61, 108, 0.28);
+    text-align: center;
+}
+
+.frozen-modal__close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: grid;
+    width: 36px;
+    height: 36px;
+    place-items: center;
+    color: #496273;
+    background: transparent;
+    border: 0;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.frozen-modal__close:hover,
+.frozen-modal__close:focus-visible {
+    color: #033d6c;
+    background: #eef4f8;
+}
+
+.frozen-modal__icon {
+    display: grid;
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 18px;
+    place-items: center;
+    color: #b42318;
+    background: #fff5f4;
+    border: 2px solid #f1b5b0;
+    border-radius: 50%;
+}
+
+.frozen-modal__icon .material-icons-outlined {
+    font-size: 32px;
+    line-height: 1;
+}
+
+.frozen-modal__eyebrow {
+    margin: 0 0 8px;
+    color: #b42318;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.frozen-modal h2 {
+    margin: 0;
+    color: #033d6c;
+    font-size: 1.45rem;
+    line-height: 1.2;
+}
+
+.frozen-modal__message {
+    margin: 14px auto 24px;
+    max-width: 34ch;
+    color: #496273;
+    line-height: 1.5;
+}
+
+.frozen-modal__button {
+    min-width: 120px;
+    padding: 10px 20px;
+    color: #ffffff;
+    background: #033d6c;
+    border: 0;
+    border-radius: 4px;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 700;
+}
+
+.frozen-modal__button:hover,
+.frozen-modal__button:focus-visible {
+    background: #07578f;
+}
+
+@media (max-width: 480px) {
+    .frozen-modal {
+        padding: 28px 22px 24px;
+    }
+}

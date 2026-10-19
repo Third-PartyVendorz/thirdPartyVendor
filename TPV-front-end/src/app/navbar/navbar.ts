@@ -16,6 +16,10 @@ export class Navbar {
 
   constructor(private authService: AuthService) {}
 
+  get accountIsFrozen(): boolean {
+    return this.authService.isFrozen();
+  }
+
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
     const target = event.target as HTMLElement;
