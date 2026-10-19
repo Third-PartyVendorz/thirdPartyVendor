@@ -5,5 +5,5 @@ export interface UserContext {
     phoneNumber: string;
     dateOfBirth: Date;
     email: string;
-    role: 'USER' | 'ADMIN';
+    role: 'USER' | 'ADMIN' | 'ANALYST';
 }
