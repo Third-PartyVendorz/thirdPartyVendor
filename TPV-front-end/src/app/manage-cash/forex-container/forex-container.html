@@ -3,7 +3,7 @@
         <div class="forex-content">
     <section class="forex-hero">
         <div>
-            <p class="eyebrow">Manage cash / Currency exchange</p>
+            <p class="eyebrow">Currency exchange</p>
             <h1 id="forex-title">Move money across markets.</h1>
             <p class="hero-copy">Exchange available cash between currencies at a live indicative rate.</p>
         </div>
@@ -156,13 +156,16 @@
                 @if (cashBalance() !== null) {
                     <p class="cash-availability">Available {{ baseCurrency }}: <strong>{{ cashBalance() | currency:baseCurrency:'symbol':'1.2-2' }}</strong></p>
                 }
+                @if (accountIsFrozen) {
+                    <p class="exchange-validation-error" role="alert">You cannot continue because your account is frozen.</p>
+                }
                 @if (hasCashValidationError) {
                     <p class="exchange-validation-error" role="alert">{{ cashValidationMessage }}</p>
                 }
                 @if (exchangeError) {
                     <p class="exchange-validation-error" role="alert">{{ exchangeError }}</p>
                 }
-                <button class="exchange-button" type="button" (click)="reviewExchange()" [disabled]="hasCashValidationError || sellAmountValue <= 0">
+                <button class="exchange-button" type="button" (click)="reviewExchange()" [disabled]="accountIsFrozen || hasCashValidationError || sellAmountValue <= 0">
                     <span class="material-icons-outlined" aria-hidden="true">arrow_forward</span>
                     Continue to Exchange Summary
                 </button>
@@ -200,7 +203,7 @@
 
             <div class="confirmation-actions">
                 @if (!exchangeConfirmed()) {
-                    <button class="exchange-button" type="button" (click)="confirmExchange()" [disabled]="exchangeSubmitting()">
+                    <button class="exchange-button" type="button" (click)="confirmExchange()" [disabled]="accountIsFrozen || exchangeSubmitting()">
                         <span class="material-icons-outlined" aria-hidden="true">{{ exchangeSubmitting() ? 'hourglass_top' : 'check' }}</span>
                         {{ exchangeSubmitting() ? 'Submitting exchange...' : 'Confirm exchange' }}
                     </button>
@@ -214,3 +217,7 @@
         </div>
     </section>
 </main>
+
+@if (showFrozenAccountModal()) {
+    <app-frozen-account-modal action="exchange currencies" (dismissed)="showFrozenAccountModal.set(false)" />
+}

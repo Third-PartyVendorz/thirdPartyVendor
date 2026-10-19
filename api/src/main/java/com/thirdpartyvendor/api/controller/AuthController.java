@@ -27,6 +27,7 @@ import com.thirdpartyvendor.api.service.AuthenticationService;
 import com.thirdpartyvendor.api.service.JwtService;
 import com.thirdpartyvendor.api.service.RefreshService;
 import com.thirdpartyvendor.api.service.RegistrationService;
+import com.thirdpartyvendor.api.repository.AppUserRepository;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -39,6 +40,7 @@ public class AuthController {
 	private final AuthenticationService authenticationService;
 	private final RefreshService refreshService;
 	private final JwtService jwtService;
+	private final AppUserRepository appUserRepository;
 
 	@Value("${app.jwt.expiration-ms}")
 	private long jwtExpirationMs;
@@ -50,11 +52,13 @@ public class AuthController {
 			RegistrationService registrationService,
 			AuthenticationService authenticationService,
 			RefreshService refreshService,
-			JwtService jwtService) {
+			JwtService jwtService,
+			AppUserRepository appUserRepository) {
 		this.registrationService = registrationService;
 		this.authenticationService = authenticationService;
 		this.refreshService = refreshService;
 		this.jwtService = jwtService;
+		this.appUserRepository = appUserRepository;
 	}
 
 	@PostMapping("/register")
@@ -73,16 +77,19 @@ public class AuthController {
 		response.addHeader(HttpHeaders.SET_COOKIE, buildAuthCookie(httpRequest, authJwtModel.jwtToken(), jwtExpirationMs).toString());
 		response.addHeader(HttpHeaders.SET_COOKIE, buildRefreshCookie(httpRequest, refreshToken.getToken(), refreshExpirationMs).toString());
 
-		AuthenticationResponse authResponse = new AuthenticationResponse(
+		AppUser authenticatedUser = appUserRepository.findById(authJwtModel.userId())
+			.orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Please login again"));
+		AuthenticationResponse authenticatedResponse = new AuthenticationResponse(
 			authJwtModel.userId(),
 			authJwtModel.firstName(),
 			authJwtModel.lastName(),
 			authJwtModel.phoneNumber(),
 			authJwtModel.dateOfBirth(),
 			authJwtModel.email(),
-			authJwtModel.role()
+			authJwtModel.role(),
+			authenticatedUser.isFrozen()
 		);
-		return ResponseEntity.status(HttpStatus.OK).body(authResponse);
+		return ResponseEntity.status(HttpStatus.OK).body(authenticatedResponse);
 	}
 
 	@GetMapping("/me")
@@ -91,7 +98,7 @@ public class AuthController {
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Please login again");
 		}
 
-		return ResponseEntity.status(HttpStatus.OK).body(new AuthMeResponse(currentUser.getRole()));
+		return ResponseEntity.status(HttpStatus.OK).body(new AuthMeResponse(currentUser.getRole(), currentUser.isFrozen()));
 	}
 
 	@PostMapping("/refresh")
@@ -111,7 +118,9 @@ public class AuthController {
 		response.addHeader(HttpHeaders.SET_COOKIE, buildRefreshCookie(httpRequest, rotatedRefreshToken.getToken(), refreshExpirationMs).toString());
 		response.addHeader(HttpHeaders.SET_COOKIE, buildAuthCookie(httpRequest, jwtService.generateToken(rotatedRefreshToken.getUser()), jwtExpirationMs).toString());
 
-		return ResponseEntity.ok(new AuthMeResponse(rotatedRefreshToken.getUser().getRole()));
+		return ResponseEntity.ok(new AuthMeResponse(
+			rotatedRefreshToken.getUser().getRole(),
+			rotatedRefreshToken.getUser().isFrozen()));
 	}
 
 	@PostMapping("/logout")

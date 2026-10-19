@@ -9,12 +9,14 @@ import { parseFormattedNumber } from '../../shared/utils/number-formatter';
 import { MarketHistoricalCandle } from '../../dto/MarketHistoricalAPIResponse';
 import { TradeService } from '../../trade-page/trade.service';
 import { ForexApiService } from './forex-api.service';
+import { AuthService } from '../../services/auth.service';
+import { FrozenAccountModal } from '../../shared/frozen-account-modal/frozen-account-modal';
 
 type ForexHistoricalRange = '7d' | '30d' | '1y';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, FormsModule, NgxCurrencyDirective],
+  imports: [CommonModule, FormsModule, NgxCurrencyDirective, FrozenAccountModal],
   selector: 'app-forex-container',
   styleUrl: './forex-container.scss',
   templateUrl: './forex-container.html',
@@ -26,6 +28,7 @@ export class ForexContainer implements OnInit {
   private readonly marketApiService = inject(MarketApiService);
   private readonly tradeService = inject(TradeService);
   private readonly forexApiService = inject(ForexApiService);
+  private readonly authService = inject(AuthService);
 
   baseCurrency = '';
   quoteCurrency = '';
@@ -51,6 +54,7 @@ export class ForexContainer implements OnInit {
   showConfirmation = signal(false);
   exchangeConfirmed = signal(false);
   exchangeSubmitting = signal(false);
+  showFrozenAccountModal = signal(false);
   cashBalance = signal<number | null>(null);
   cashBalanceAtReview: number | null = null;
   executionError = '';
@@ -80,6 +84,10 @@ export class ForexContainer implements OnInit {
   get hasCashValidationError(): boolean {
     const balance = this.cashBalance();
     return balance !== null && (balance <= 0 || this.sellAmountValue > balance);
+  }
+
+  get accountIsFrozen(): boolean {
+    return this.authService.isFrozen();
   }
 
   get cashValidationMessage(): string {
@@ -169,6 +177,10 @@ export class ForexContainer implements OnInit {
   }
 
   ngOnInit(): void {
+    if (this.accountIsFrozen) {
+      this.showFrozenAccountModal.set(true);
+    }
+
     this.route.queryParams
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((params) => {
@@ -244,6 +256,11 @@ export class ForexContainer implements OnInit {
   }
 
   reviewExchange(): void {
+    if (this.accountIsFrozen) {
+      this.showFrozenAccountModal.set(true);
+      return;
+    }
+
     if (parseFormattedNumber(this.sellAmount) <= 0 || !this.quoteFound()) {
       this.exchangeError = 'Enter an amount before reviewing the exchange.';
       return;
@@ -259,6 +276,11 @@ export class ForexContainer implements OnInit {
   }
 
   confirmExchange(): void {
+    if (this.accountIsFrozen) {
+      this.showFrozenAccountModal.set(true);
+      return;
+    }
+
     if (this.exchangeSubmitting()) return;
 
     this.tradeService.getCashHoldingByCurrencyCode(this.baseCurrency)
@@ -424,6 +446,11 @@ export class ForexContainer implements OnInit {
   }
 
   private submitExchange(): void {
+    if (this.accountIsFrozen) {
+      this.showFrozenAccountModal.set(true);
+      return;
+    }
+
     this.exchangeSubmitting.set(true);
     this.executionError = '';
 

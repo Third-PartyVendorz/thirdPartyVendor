@@ -13,9 +13,17 @@
     </nav>
 
     <div class="profile-menu">
+        <div class="profile-actions">
+        @if (accountIsFrozen) {
+            <span class="frozen-warning" role="status" tabindex="0" aria-label="Account frozen">
+                <span class="material-icons-outlined" aria-hidden="true">error_outline</span>
+                <span class="frozen-warning__tooltip" role="tooltip">Your account is frozen</span>
+            </span>
+        }
         <button class="profile-button" type="button" (click)="toggleProfileMenu($event)" [attr.aria-expanded]="isProfileMenuOpen" aria-haspopup="menu" aria-label="Open profile menu">
-        <img src="/profile-icon.jpg" alt="Profile Icon">
+            <img src="/profile-icon.jpg" alt="Profile Icon">
         </button>
+        </div>
         <div class="profile-dropdown" *ngIf="isProfileMenuOpen" role="menu">
             <a routerLink="/profile" role="menuitem" (click)="isProfileMenuOpen = false">View profile</a>
             <button type="button" role="menuitem" (click)="logout()">Logout</button>
@@ -33,5 +41,11 @@
     <a class="nav-link" routerLink="/trade" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">Execute Trade</a>
     <a class="nav-link" routerLink="/explore-assets" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">Explore Assets</a>
     <a class="nav-link" routerLink="/manage-cash" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">Manage Cash</a>
+    @if (accountIsFrozen) {
+        <span class="frozen-warning frozen-warning--mobile" role="status" tabindex="0" aria-label="Account frozen">
+            <span class="material-icons-outlined" aria-hidden="true">error_outline</span>
+            <span class="frozen-warning__tooltip" role="tooltip">Your account is frozen</span>
+        </span>
+    }
     <a class="nav-link" routerLink="/profile" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">Profile</a>
 </div>

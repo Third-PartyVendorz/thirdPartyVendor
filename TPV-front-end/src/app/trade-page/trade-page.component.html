@@ -69,3 +69,7 @@
 		</ng-container>
 	</ng-template>
 </section>
+
+@if (showFrozenAccountModal) {
+	<app-frozen-account-modal action="place a trade" (dismissed)="showFrozenAccountModal = false" />
+}
