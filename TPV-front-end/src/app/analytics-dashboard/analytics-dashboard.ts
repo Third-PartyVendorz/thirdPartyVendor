@@ -186,7 +186,7 @@ export class AnalyticsDashboard implements OnInit {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Analytics Dashboard: ${this.escapeHtml(startDate)} to ${this.escapeHtml(endDate)}</title>
+  <title>Analytics Report: ${this.escapeHtml(startDate)} to ${this.escapeHtml(endDate)}</title>
   <style>
     :root { color-scheme: light; font-family: Arial, sans-serif; color: #0f172a; background: #f8fafc; }
     * { box-sizing: border-box; } body { max-width: 1600px; margin: 0 auto; padding: 32px; background: #f8fafc; }
@@ -217,7 +217,7 @@ export class AnalyticsDashboard implements OnInit {
   </style>
 </head>
 <body>
-  <h1>Analytics Dashboard</h1>
+  <h1>Analytics Report</h1>
   <div class="period">Custom period: ${this.escapeHtml(startDate)} to ${this.escapeHtml(endDate)}</div>
   <div class="summary">${summaryCards}</div>
   <section class="chart-card"><div class="card-header"><h3>Trade Distribution by <span data-label="order">Count</span></h3><div class="toggle-buttons" data-toggle="order"><button class="toggle-btn active" data-value="count">Count</button><button class="toggle-btn" data-value="volume">Volume</button></div></div><div data-panel="order-count" class="active">${renderOrder(true)}</div><div data-panel="order-volume">${renderOrder(false)}</div></section>
