@@ -86,3 +86,11 @@ CREATE TABLE trade (
 --     exchange_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 --     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 -- );
+
+
+
+CREATE INDEX idx_trade_timestamp
+ON trade (trade_timestamp);
+
+CREATE INDEX idx_trade_order_id
+ON trade (order_id);

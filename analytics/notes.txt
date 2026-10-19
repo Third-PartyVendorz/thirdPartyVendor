@@ -57,15 +57,11 @@ Stuff to do:
 - Optimize queries: - done
      - Only get and join data we need, don't need to fetch everything - done
 
-- Only replicate necessary data for analytics job --> Currently replicating entire schema
-     - In replica lets say I create a new single table db with only 5 columns that I need:
-          - Query changes to SELECT * FROM table WHERE date >= ... AND date < ...;
+- Only replicate necessary data for analytics job --> Currently replicating entire schema - done
+     - In replica lets say I create a new single table db with only 5 columns that I need: - done
+          - Query changes to SELECT * FROM table WHERE date >= ... AND date < ...; - done
 
-
-
-
-
-- Add indexes to replica DB to improve query performance, since same query running every time
+- Add indexes to replica DB to improve query performance, since same query running every time - done
 
 - Update API to check for analytst role instead of admin role
 
@@ -76,3 +72,15 @@ Stuff to do:
 - Clean up frontend and make it not look like shit
 
 - Clean up everything and ensure that it is production ready
+
+
+
+
+
+
+
+
+
+UPDATE users
+SET role = 'ADMIN'
+WHERE user_id = 4;
