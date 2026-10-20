@@ -1,0 +1,14 @@
+https://github.com/aws-samples/amazon-ecs-fullstack-app-terraform/tree/main/Infrastructure
+
+Start with networking
+    - Everything on the backend of things depends on the VPC
+
+Then go to services that are just AWS internal
+    - ECR
+
+Backend services that live in VPC
+    - ECS and RDS
+
+External services that client interacts wih
+    - S3
+    - Cloudfront
