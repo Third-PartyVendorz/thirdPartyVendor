@@ -30,7 +30,7 @@ export const routes: Routes = [
     path: 'analytics',
     component: AnalystLayoutComponent,
     canActivate: [authGuard, roleGuard],
-    data: { roles: ['ANALYST', 'ADMIN'] },
+    data: { roles: ['ANALYST'] },
     children: [
       { path: '', component: AnalyticsDashboard },
     ],
