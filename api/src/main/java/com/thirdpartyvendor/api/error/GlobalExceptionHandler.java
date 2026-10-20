@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.thirdpartyvendor.api.error.AuthExceptions.ForbiddenException;
+import com.thirdpartyvendor.api.error.AuditExceptions.AuditEventNotFoundException;
+import com.thirdpartyvendor.api.error.AuditExceptions.InvalidAuditIdException;
+import com.thirdpartyvendor.api.error.AuditExceptions.UnsupportedAuditEventException;
 import com.thirdpartyvendor.api.error.CashExceptions.InsufficientCashException;
 import com.thirdpartyvendor.api.error.CashExceptions.InvalidCurrencyException;
 import com.thirdpartyvendor.api.error.ForexExceptions.ExchangeAmountExcpetion;
@@ -62,6 +65,25 @@ public class GlobalExceptionHandler {
 		HttpServletRequest request
 	) {
 		return buildResponse(HttpStatus.NOT_FOUND, exception.getMessage(), request.getRequestURI());
+	}
+
+	@ExceptionHandler(AuditEventNotFoundException.class)
+	public ResponseEntity<ApiErrorResponse> handleAuditEventNotFoundException(
+		AuditEventNotFoundException exception,
+		HttpServletRequest request
+	) {
+		return buildResponse(HttpStatus.NOT_FOUND, exception.getMessage(), request.getRequestURI());
+	}
+
+	@ExceptionHandler({
+		InvalidAuditIdException.class,
+		UnsupportedAuditEventException.class
+	})
+	public ResponseEntity<ApiErrorResponse> handleAuditBadRequestException(
+		RuntimeException exception,
+		HttpServletRequest request
+	) {
+		return buildResponse(HttpStatus.BAD_REQUEST, exception.getMessage(), request.getRequestURI());
 	}
 
 	@ExceptionHandler(OrderExecutionException.class)

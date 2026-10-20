@@ -1,1 +1,80 @@
-<h1>Audit page</h1>
+<main class="audit-page">
+	<header class="audit-hero">
+		<div>
+			<p class="eyebrow">Administration / Dispute lookup</p>
+			<h1>Transaction audit</h1>
+			<p class="supporting-copy">Find exactly what happened to a client order, trade, or exchange and when it happened.</p>
+		</div>
+		<div class="record-count">
+			<strong>{{ filteredEvents.length }}</strong>
+			<span>matching records</span>
+		</div>
+	</header>
+
+	<section class="audit-panel search-controls" aria-label="Audit search">
+		<label class="type-field">
+			Event type
+			<select [(ngModel)]="selectedType">
+				<option *ngFor="let type of eventTypes" [ngValue]="type">{{ type }}</option>
+			</select>
+		</label>
+		<label class="search-field">
+			Search by ID
+			<input type="search" [(ngModel)]="searchInput" (keyup.enter)="search()" placeholder="Enter transaction ID" />
+		</label>
+		<button type="button" class="search-button" (click)="search()">Search</button>
+		<button type="button" class="clear-button" (click)="clearFilters()">Clear</button>
+	</section>
+
+	<section class="audit-panel results-panel">
+		<div class="panel-heading">
+			<div>
+				<p class="eyebrow">Immutable event records</p>
+				<h2>Activity log</h2>
+			</div>
+			<span class="read-only-label">Read only</span>
+		</div>
+		<p class="panel-help">Search by the ID from the client dispute or confirmation. Select a record to inspect its recorded evidence.</p>
+
+		<div class="table-wrap" *ngIf="filteredEvents.length; else emptyResults">
+			<table>
+				<thead>
+					<tr>
+						<th>When</th><th>Event</th><th>Client</th><th>Reference</th><th>Asset / pair</th><th>Status</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr *ngFor="let event of filteredEvents" (click)="selectEvent(event)" [class.selected-row]="selectedEvent?.id === event.id">
+						<td><strong>{{ formatTimestamp(event.timestamp) }}</strong><small>{{ event.actor }}</small></td>
+						<td><span class="event-type">{{ event.type }}</span><small>{{ event.action }}</small></td>
+						<td><strong>{{ event.client }}</strong><small>User #{{ event.clientId }}</small></td>
+						<td>{{ event.reference }}<small>{{ event.id }}</small></td>
+						<td>{{ event.instrument }}</td>
+						<td><span class="status" [class.status--warning]="event.status === 'Rejected' || event.status === 'Cancelled'">{{ event.status }}</span></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<ng-template #emptyResults>
+			<p class="empty-state" *ngIf="hasSearch; else searchPrompt">No {{ submittedType?.toLowerCase() }} events match this ID.</p>
+			<ng-template #searchPrompt><p class="empty-state">Choose an event type and enter its ID to view the record.</p></ng-template>
+		</ng-template>
+	</section>
+
+	<aside class="audit-panel detail-panel" *ngIf="selectedEvent as event" aria-label="Selected audit event">
+		<div class="panel-heading">
+			<div><p class="eyebrow">Dispute evidence / {{ event.id }}</p><h2>{{ event.action }}</h2></div>
+			<button type="button" class="close-button" (click)="selectedEvent = null" aria-label="Close event details">×</button>
+		</div>
+		<p class="detail-summary">{{ event.summary }}</p>
+		<div class="detail-grid">
+			<div><span>Client</span><strong>{{ event.client }} (#{{ event.clientId }})</strong></div>
+			<div><span>Recorded</span><strong>{{ formatTimestamp(event.timestamp) }}</strong></div>
+			<div><span>Reference</span><strong>{{ event.reference }}</strong></div>
+			<div><span>Actor</span><strong>{{ event.actor }}</strong></div>
+		</div>
+		<div class="detail-section"><h3>What happened</h3><p>{{ event.action }} at {{ formatTimestamp(event.timestamp) }} by {{ event.actor }}.</p><p *ngFor="let detail of event.details">{{ detail }}</p></div>
+		<div class="detail-section"><h3>Pricing evidence</h3><p>{{ event.pricing }}</p></div>
+		<div class="detail-section"><h3>Account impact</h3><p>{{ event.impact }}</p></div>
+	</aside>
+</main>
