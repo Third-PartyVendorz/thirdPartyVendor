@@ -59,11 +59,13 @@
 	<ng-container>
 		<app-asset-result
 			[ticker]="activeTicker"
+			(assetFound)="onAssetFound($event)"
+			(tickerNotFound)="onTickerNotFound($event)"
 			(tradeButtonClicked)="openTradeModal($event)"
 		></app-asset-result>
 	</ng-container>
 
-	<section *ngIf="activeTicker" class="asset-activity-panel command-panel" aria-labelledby="asset-activity-title">
+	<section *ngIf="activityTicker === activeTicker" class="asset-activity-panel command-panel" aria-labelledby="asset-activity-title">
 		<div class="asset-activity-panel__header">
 			<div>
 				<p class="assets-eyebrow">Your activity</p>

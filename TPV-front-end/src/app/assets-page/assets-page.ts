@@ -40,6 +40,7 @@ export class AssetsPage implements OnInit {
 	cryptoCurrency = 'USD';
 	marketType: 'equity' | 'crypto' = 'equity';
 	activeTicker = '';
+	activityTicker = '';
 	searchError = '';
 	currentHolding: Holding | null = null;
 	securityOrders: OrderResponse[] = [];
@@ -81,7 +82,7 @@ export class AssetsPage implements OnInit {
 			this.cryptoCurrency = currency || 'USD';
 		}
 		this.activeTicker = ticker;
-		this.loadUserActivity(ticker);
+		this.activityTicker = '';
 	}
 
 	submitSearch(): void {
@@ -94,6 +95,7 @@ export class AssetsPage implements OnInit {
 
 		this.searchError = '';
 		this.activeTicker = ticker;
+		this.activityTicker = '';
 		this.router.navigate([], {
 			relativeTo: this.route,
 			queryParams: { ticker },
@@ -134,6 +136,21 @@ export class AssetsPage implements OnInit {
 		}
 		this.activityAttempts = 0;
 		this.beginActivityLoad(ticker);
+	}
+
+	onAssetFound(ticker: string): void {
+		if (this.activeTicker !== ticker) {
+			return;
+		}
+
+		this.activityTicker = ticker;
+		this.loadUserActivity(ticker);
+	}
+
+	onTickerNotFound(ticker: string): void {
+		if (this.activeTicker === ticker) {
+			this.activityTicker = '';
+		}
 	}
 
 	private beginActivityLoad(ticker: string): void {

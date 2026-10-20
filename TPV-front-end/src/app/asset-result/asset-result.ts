@@ -75,6 +75,7 @@ export class AssetResultComponent implements OnInit {
 	@Input() autoOpenTrade = false;
 
 	@Output() tradeButtonClicked = new EventEmitter<AssetTradeDetails>();
+	@Output() assetFound = new EventEmitter<string>();
 	@Output() tickerNotFound = new EventEmitter<string>();
 
 	constructor(
@@ -108,6 +109,10 @@ export class AssetResultComponent implements OnInit {
 
 				if (asset) {
 					this.asset.set(asset.data);
+				}
+
+				if (quote && asset) {
+					this.assetFound.emit(ticker);
 				}
 
 				if (candles) {
