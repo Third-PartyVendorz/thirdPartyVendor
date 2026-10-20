@@ -101,6 +101,14 @@
       [title]="isCustomDateFormValid() ? 'Submit custom date range' : 'End date cannot be before start date'">
       Submit
     </button>
+    <button
+      type="button"
+      class="export-btn"
+      [disabled]="!customAnalyticsResult()"
+      (click)="downloadCustomReport()"
+      title="Download the loaded custom report as an HTML file">
+      Download Report
+    </button>
   </form>
 
   <section *ngIf="timelineMode() === 'monthly' && analyticsResult()?.date as title" class="job-date-title">
@@ -250,7 +258,7 @@
   <section class="top-assets-section" *ngIf="hasActiveData()">
     <article class="chart-card">
       <div class="card-header-with-toggle">
-        <h3>Top K Most Traded Assets</h3>
+        <h3>Most Traded Assets</h3>
         <div class="toggle-buttons">
           <button
             type="button"
