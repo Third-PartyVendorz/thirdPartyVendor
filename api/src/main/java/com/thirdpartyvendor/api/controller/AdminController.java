@@ -16,6 +16,8 @@ import com.thirdpartyvendor.api.dto.UserResponse;
 import com.thirdpartyvendor.api.dto.OrderResponse;
 import com.thirdpartyvendor.api.dto.TradeResponse;
 import com.thirdpartyvendor.api.dto.CashHoldingResponse;
+import com.thirdpartyvendor.api.dto.AuditEventResponse;
+import com.thirdpartyvendor.api.service.AuditService;
 import java.util.List;
 
 @RestController
@@ -23,10 +25,12 @@ import java.util.List;
 public class AdminController {
     private final UserService userService;
     private final AdminService adminService;
+    private final AuditService auditService;
 
-    public AdminController(UserService userService, AdminService adminService) {
+    public AdminController(UserService userService, AdminService adminService, AuditService auditService) {
         this.userService = userService;
         this.adminService = adminService;
+        this.auditService = auditService;
     }
 
     @PostMapping("/users/{userId}/freeze")
@@ -91,6 +95,15 @@ public class AdminController {
         @AuthenticationPrincipal AppUser currentUser
     ) {
         return adminService.getUserCashHoldings(userId, currentUser);
+    }
+
+    @GetMapping("/audit/{eventType}/{eventId}")
+    public AuditEventResponse getAuditEvent(
+        @PathVariable String eventType,
+        @PathVariable String eventId,
+        @AuthenticationPrincipal AppUser currentUser
+    ) {
+        return auditService.findEvent(eventType, eventId, currentUser);
     }
 
 }

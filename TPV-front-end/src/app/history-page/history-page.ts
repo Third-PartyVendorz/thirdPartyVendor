@@ -242,7 +242,7 @@ export class HistoryPage implements OnInit {
   }
 
   private mapStatus(status: OrderResponse['status']): OrderHistoryEntry['status'] {
-    if (status === 'EXECUTED') {
+    if (status === 'FILLED') {
       return 'Filled';
     }
 

@@ -83,7 +83,7 @@ public class OrderExecutionService {
         trade.setTradeCurrency(order.getOrderCurrency());
         tradeRepository.save(trade);
 
-        order.setStatus(Order.OrderStatus.EXECUTED);
+        order.setStatus(Order.OrderStatus.FILLED);
         logger.info("Order {} executed with {} shares of {} at {} per share", 
         order.getId(), order.getTicker(), executionQuantity, executionPrice);
 
