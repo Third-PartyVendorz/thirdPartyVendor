@@ -36,4 +36,10 @@ public class AuthorizationUtil {
 		}
 	}
 
+	public static void requireNotFrozen(AppUser currentUser) {
+		if (currentUser.isFrozen()) {
+			throw new ForbiddenException("Your account is frozen.");
+		}
+	}
+
 }

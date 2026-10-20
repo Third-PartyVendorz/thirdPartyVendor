@@ -41,21 +41,30 @@ export const roleGuard: CanActivateFn = (route) => {
     return true;
   }
 
-  return userRole === 'ADMIN'
-    ? router.parseUrl('/admin')
-    : router.parseUrl('/dashboard');
+  if (userRole === 'ADMIN') {
+    return router.parseUrl('/admin');
+  }
+  if (userRole === 'ANALYST') {
+    return router.parseUrl('/analytics');
+  }
+  return router.parseUrl('/dashboard');
 };
 
 export const landingGuard: CanActivateFn = () => {
   const authService = inject(AuthService);
   const userContextService = inject(UserContextService);
   const router = inject(Router);
+  const role = authService.getUserRole();
 
   if (authService.getSessionState() !== true) {
     return router.parseUrl('/login');
   }
 
-  return authService.getUserRole() === 'ADMIN'
-    ? router.parseUrl('/admin')
-    : router.parseUrl('/dashboard');
+  if (role === 'ADMIN') {
+    return router.parseUrl('/admin');
+  }
+  if (role === 'ANALYST') {
+    return router.parseUrl('/analytics');
+  }
+  return router.parseUrl('/dashboard');
 };

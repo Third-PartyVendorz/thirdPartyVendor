@@ -88,7 +88,7 @@
         </div>
 
         @if (!showOrderSummaryPanel) {
-            <button (click)="onContinueToOrderSummary()" class="trade-button" style="justify-self: center" [disabled]="isInvalidTrade()">
+            <button (click)="onContinueToOrderSummary()" class="trade-button" style="justify-self: center" [disabled]="accountIsFrozen || isInvalidTrade()">
                 Continue to Order Summary
                 <span class="material-icons-outlined trade-button__icon">arrow_forward</span>
             </button>
@@ -108,8 +108,17 @@
             </div>
 
             <div class="trade-feedback-slot"
-                 [class.trade-feedback-slot--active]="shouldShowInsufficientFundsMessage || shouldShowInsufficientSharesMessage"
+                 [class.trade-feedback-slot--active]="accountIsFrozen || shouldShowInsufficientFundsMessage || shouldShowInsufficientSharesMessage"
                  aria-live="polite">
+                @if (accountIsFrozen) {
+                    <div class="insufficient-funds-message frozen-account-message">
+                        <div class="message-content">
+                            <span class="material-icons-outlined" aria-hidden="true">error_outline</span>
+                            <span class="message-text">You cannot place an order because your account is frozen.</span>
+                        </div>
+                    </div>
+                }
+
                 @if (shouldShowInsufficientFundsMessage) {
                     <div class="insufficient-funds-message">
                         <div class="message-content">
@@ -233,7 +242,7 @@
 
                 <div class="panel-actions">
                     @if (!isSubmittingOrder && !orderSubmitted && !orderError) {
-                        <button (click)="onPlaceOrder()" class="place-trade-button" [disabled]="isInvalidTrade()">
+                        <button (click)="onPlaceOrder()" class="place-trade-button" [disabled]="accountIsFrozen || isInvalidTrade()">
                             Place Order
                             <span class="material-icons-outlined trade-button__icon">compare_arrows</span>
                         </button>
@@ -334,4 +343,8 @@
             </div>
         </div>
     </div>
+}
+
+@if (showFrozenAccountModal) {
+    <app-frozen-account-modal action="place a trade" (dismissed)="showFrozenAccountModal = false" />
 }

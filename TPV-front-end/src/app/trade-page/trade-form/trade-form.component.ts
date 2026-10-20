@@ -11,6 +11,8 @@ import { TradeService } from '../trade.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { OrderResponse } from '../../dto/OrderResponse';
 import { OrderRequest } from '../../dto/OrderRequest';
+import { AuthService } from '../../services/auth.service';
+import { FrozenAccountModal } from '../../shared/frozen-account-modal/frozen-account-modal';
 
 enum UnitType {
   SHARES = "SHARES",
@@ -20,7 +22,7 @@ enum UnitType {
 @Component({
   selector: 'app-trade-form-selector',
   standalone: true,
-  imports: [CommonModule, CustomSliderComponent, NgxCurrencyDirective, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, CustomSliderComponent, NgxCurrencyDirective, FormsModule, ReactiveFormsModule, FrozenAccountModal],
   templateUrl: './trade-form.component.html',
   styleUrl: './trade-form.component.scss',
 })
@@ -38,13 +40,12 @@ export class TradeFormComponent implements OnInit, OnChanges {
   private destroyRef: DestroyRef = inject(DestroyRef);
   private cdr: ChangeDetectorRef = inject(ChangeDetectorRef);
   private router: Router = inject(Router);
+  private authService: AuthService = inject(AuthService);
 
   TradeSide = TradeSide;
   UnitType = UnitType;
 
   form: FormGroup;
-
-  x!: boolean;
 
   currentSide: TradeSide = TradeSide.BUY;
   currentUnit: UnitType = UnitType.SHARES;
@@ -56,6 +57,7 @@ export class TradeFormComponent implements OnInit, OnChanges {
   orderError: boolean = false;
   orderErrorMessage: string = '';
   submittedOrderResponse: OrderResponse | null = null;
+  showFrozenAccountModal = false;
 
   currency: string = 'USD';
   buyingPower: number = 0;
@@ -69,6 +71,10 @@ export class TradeFormComponent implements OnInit, OnChanges {
     this.form = this.fb.group({
       inputValue: ['']
     });
+  }
+
+  get accountIsFrozen(): boolean {
+    return this.authService.isFrozen();
   }
 
   ngOnInit(): void {
@@ -256,6 +262,12 @@ export class TradeFormComponent implements OnInit, OnChanges {
   }
 
   onContinueToOrderSummary = (): void => {
+    if (this.authService.isFrozen()) {
+      this.showFrozenAccountModal = true;
+      this.cdr.markForCheck();
+      return;
+    }
+
     if (this.isInvalidTrade()) {
       console.warn('Trade validation failed');
       return;
@@ -343,6 +355,13 @@ export class TradeFormComponent implements OnInit, OnChanges {
   }
 
   submitOrder = (): void => {
+    if (this.authService.isFrozen()) {
+      this.showFrozenAccountModal = true;
+      this.cdr.markForCheck();
+      return;
+    }
+
+
     const orderRequest: OrderRequest = {
       ticker: this.ticker,
       orderIntent: this.currentSide,

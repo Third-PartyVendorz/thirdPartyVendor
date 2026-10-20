@@ -3,56 +3,41 @@ from datetime import datetime
 def get_date_tag():
     now = datetime.now()
     return now.month, now.year, f"{now.year}_{now.month:02d}"
-
-def get_previous_month_trades_query():
-    month, year, date_tag = get_date_tag()
-    if month == 1:
-        month = 12
-        year -= 1
-    else:
-        month -= 1
-    
-    date_tag = f"{year}_{month:02d}"
-    return f"""
-    WITH filtered_trades AS (
-        SELECT t.*
-        FROM trade t
-        WHERE EXTRACT(YEAR FROM t.trade_timestamp) = {year} 
-        AND EXTRACT(MONTH FROM t.trade_timestamp) = {month}
-    )
-    SELECT o.order_intent, ft.execution_quantity, ft.execution_price, ft.ticker, ft.trade_timestamp
-    FROM filtered_trades ft
-    JOIN orders o ON ft.order_id = o.order_id
-    JOIN holdings h ON o.user_id = h.user_id AND o.ticker = h.ticker;
-    """
     
 def get_current_month_trades_query():
-    month, year, date_tag = get_date_tag()
-    
-    return f"""
-    WITH filtered_trades AS (
-        SELECT t.*
-        FROM trade t
-        WHERE EXTRACT(YEAR FROM t.trade_timestamp) = {year} 
-        AND EXTRACT(MONTH FROM t.trade_timestamp) = {month}
-    )
-    SELECT o.order_intent, ft.execution_quantity, ft.execution_price, ft.ticker, ft.trade_timestamp
-    FROM filtered_trades ft
-    JOIN orders o ON ft.order_id = o.order_id
-    JOIN holdings h ON o.user_id = h.user_id AND o.ticker = h.ticker;
+    month, year, _ = get_date_tag()
+    month_start = datetime(year, month, 1)
+    if month == 12:
+        next_month_start = datetime(year + 1, 1, 1)
+    else:
+        next_month_start = datetime(year, month + 1, 1)
+
+    query = """
+    SELECT o.order_intent,
+           t.execution_quantity,
+           t.execution_price,
+           o.ticker,
+           t.trade_timestamp
+    FROM trade AS t
+    JOIN orders AS o ON t.order_id = o.order_id
+    WHERE t.trade_timestamp >= %s
+      AND t.trade_timestamp < %s;
     """
+    return query, (month_start, next_month_start)
     
 def get_custom_date_trades_query(start_date, end_date):
+    start_date = datetime.fromisoformat(start_date)
+    end_date = datetime.fromisoformat(end_date)
+    
     query = """
-    WITH filtered_trades AS (
-        SELECT t.*
-        FROM trade t
-        WHERE CAST(t.trade_timestamp AS DATE) >= CAST(%s AS DATE) 
-          AND CAST(t.trade_timestamp AS DATE) <= CAST(%s AS DATE)
-    )
-    SELECT o.order_intent, ft.execution_quantity, ft.execution_price, ft.ticker, ft.trade_timestamp
-    FROM filtered_trades ft
-    JOIN orders o ON ft.order_id = o.order_id
-    JOIN holdings h ON o.user_id = h.user_id AND o.ticker = h.ticker;
+    SELECT o.order_intent,
+           t.execution_quantity,
+           t.execution_price,
+           o.ticker,
+           t.trade_timestamp
+    FROM trade AS t
+    JOIN orders AS o ON t.order_id = o.order_id
+    WHERE t.trade_timestamp >= %s
+      AND t.trade_timestamp < %s;
     """
     return query, (start_date, end_date)

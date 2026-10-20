@@ -6,4 +6,5 @@ export interface AuthenticationResponse {
     dateOfBirth: Date;
     email: string;
     role: 'USER' | 'ADMIN';
+    frozen: boolean;
 }

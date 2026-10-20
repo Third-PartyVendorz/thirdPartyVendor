@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from analytics_driver import run_analytics_job, run_custom_analytics_job
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 from dotenv import load_dotenv
 import os
@@ -46,8 +46,8 @@ def missing_token_callback(error):
 def analytics():
     jwt_payload = get_jwt()
 
-    if jwt_payload.get("role") != "ADMIN":
-        return jsonify(msg="Admin role required"), 403
+    if jwt_payload.get("role") != "ANALYST":
+        return jsonify(msg="Analyst role required"), 403
     
     analytics_payload = None
     

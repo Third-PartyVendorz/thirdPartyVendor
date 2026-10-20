@@ -1,0 +1,25 @@
+<header class="navbar-content">
+  <div class="brand-name">
+    <h1>Third Party Vendor</h1>
+    <span>Analytics</span>
+  </div>
+  <nav aria-label="Analytics navigation">
+    <a routerLink="/analytics" routerLinkActive="active-link">Analytics Dashboard</a>
+  </nav>
+  <div class="profile-menu">
+    <button
+      class="profile-button"
+      type="button"
+      (click)="toggleProfileMenu($event)"
+      [attr.aria-expanded]="isProfileMenuOpen"
+      aria-haspopup="menu"
+      aria-label="Open profile menu"
+    >
+      <img src="/profile-icon.jpg" alt="Analyst profile">
+    </button>
+    <div class="profile-dropdown" *ngIf="isProfileMenuOpen" role="menu">
+      <span role="menuitem">Analyst</span>
+      <button type="button" role="menuitem" (click)="logout()">Logout</button>
+    </div>
+  </div>
+</header>
