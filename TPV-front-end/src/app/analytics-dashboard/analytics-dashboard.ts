@@ -189,32 +189,33 @@ export class AnalyticsDashboard implements OnInit {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Analytics Report: ${this.escapeHtml(startDate)} to ${this.escapeHtml(endDate)}</title>
   <style>
-    :root { color-scheme: light; font-family: Arial, sans-serif; color: #0f172a; background: #f8fafc; }
-    * { box-sizing: border-box; } body { max-width: 1600px; margin: 0 auto; padding: 32px; background: #f8fafc; }
-    h1 { font-size: 32px; margin: 0 0 8px; } h2 { font-size: 21px; margin: 0; } h3 { font-size: 18px; margin: 0; }
-    .period { color: #64748b; margin-bottom: 28px; } section { margin-top: 24px; }
+    @import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&display=swap');
+    :root { color-scheme: light; font-family: 'Source Sans 3', sans-serif; color: #0f172a; background: #eef4f9; }
+    * { box-sizing: border-box; } body { max-width: 1600px; margin: 0 auto; padding: 32px; background: #eef4f9; }
+    h1 { font-size: 32px; color: #033d6c; letter-spacing: -.01em; margin: 0 0 8px; } h2 { font-size: 21px; margin: 0; } h3 { font-size: 18px; color: #033d6c; margin: 0; }
+    .period { color: #496b88; margin-bottom: 28px; } section { margin-top: 24px; }
     .summary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
-    .summary-card, .chart-card { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+    .summary-card, .chart-card { background: #fff; border: 1px solid #d7e4ee; border-radius: 8px; padding: 24px; box-shadow: 0 6px 18px rgba(3,61,108,.06); }
     .summary-card { display: flex; align-items: center; gap: 20px; } .card-icon { width: 48px; height: 48px; border-radius: 8px; background: #f59e0b; opacity: .15; }
-    .card-label, .legend-item, .date-label, .bar-value, .asset-value { color: #64748b; } .card-label { font-size: 13px; font-weight: bold; text-transform: uppercase; letter-spacing: .05em; }
+    .card-label, .legend-item, .date-label, .bar-value, .asset-value { color: #496b88; } .card-label { font-size: 13px; font-weight: bold; text-transform: uppercase; letter-spacing: .05em; }
     .card-value { font-size: 28px; font-weight: 800; margin-top: 7px; } .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
     .distribution-content { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: center; } .bar-chart { display: grid; grid-template-columns: 56px minmax(0,1fr); gap: 8px; padding-top: 8px; }
     .y-axis, .plot { height: 250px; position: relative; } .y-tick { position: absolute; right: 0; transform: translateY(50%); font-size: 12px; font-weight: 600; color: #94a3b8; }
-    .plot { border-left: 1px solid #cbd5e1; border-bottom: 1px solid #cbd5e1; } .gridline { position: absolute; left: 0; right: 0; height: 1px; background: #f1f5f9; }
+    .plot { border-left: 1px solid #bfd1df; border-bottom: 1px solid #bfd1df; } .gridline { position: absolute; left: 0; right: 0; height: 1px; background: #e4eef6; }
     .columns { position: absolute; inset: 0; display: flex; } .column { flex: 1; display: flex; align-items: flex-end; justify-content: center; }
     .bar-stack { width: 60%; max-width: 96px; display: flex; flex-direction: column; overflow: hidden; border-radius: 4px 4px 0 0; } .bar-segment { width: 100%; }
     .plot-area { min-width: 0; } .x-labels { display: flex; margin-top: 8px; } .x-label { flex: 1; text-align: center; font-size: 12px; font-weight: 600; color: #475569; }
     .x-label.rotated { height: 72px; writing-mode: vertical-rl; transform: rotate(180deg); text-align: left; }
     .chart-legend { display: flex; gap: 24px; margin-top: 16px; } .legend-item { display: flex; align-items: center; gap: 8px; font-size: 14px; }
     .legend-box, .legend-dot { width: 15px; height: 15px; border-radius: 3px; display: inline-block; } .pie-layout { display: flex; align-items: center; justify-content: center; gap: 32px; }
-    .pie-svg { width: 210px; height: 210px; } .pie-legend { display: grid; gap: 12px; } .date-item { display: grid; grid-template-columns: 100px minmax(0,1fr) 110px; gap: 16px; align-items: center; padding: 12px 0; border-bottom: 1px solid #e2e8f0; }
-    .date-label { text-align: right; font-weight: 600; } .bar-track { height: 24px; background: #f8fafc; border-radius: 3px; } .date-bar { height: 100%; display: flex; overflow: hidden; border-radius: 3px; }
-    .date-bar span { height: 100%; } .bar-value { font-size: 13px; font-weight: 600; white-space: nowrap; } .asset-item { display: grid; grid-template-columns: 40px 1fr 1fr; gap: 16px; padding: 16px; border-bottom: 1px solid #e2e8f0; }
+    .pie-svg { width: 210px; height: 210px; } .pie-legend { display: grid; gap: 12px; } .date-item { display: grid; grid-template-columns: 100px minmax(0,1fr) 110px; gap: 16px; align-items: center; padding: 12px 0; border-bottom: 1px solid #d7e4ee; }
+    .date-label { text-align: right; font-weight: 600; } .bar-track { height: 24px; background: #f4f8fb; border-radius: 3px; } .date-bar { height: 100%; display: flex; overflow: hidden; border-radius: 3px; }
+    .date-bar span { height: 100%; } .bar-value { font-size: 13px; font-weight: 600; white-space: nowrap; } .asset-item { display: grid; grid-template-columns: 40px 1fr 1fr; gap: 16px; padding: 16px; border-bottom: 1px solid #d7e4ee; }
     .asset-rank, .asset-name { font-weight: 700; } .asset-value { text-align: right; font-size: 14px; } .scroll { max-height: 400px; overflow-y: auto; padding-right: 8px; }
-    .scroll::-webkit-scrollbar { width: 8px; } .scroll::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; } .scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-    .toggle-buttons { display: flex; gap: 8px; background: #f1f5f9; padding: 4px; border-radius: 6px; } .toggle-btn { min-width: 84px; padding: 8px 16px; border: 0; border-radius: 4px; background: transparent; color: #64748b; font-weight: 600; cursor: pointer; } .toggle-btn.active { background: #033d6c; color: white; }
+    .scroll::-webkit-scrollbar { width: 8px; } .scroll::-webkit-scrollbar-track { background: #e4eef6; border-radius: 4px; } .scroll::-webkit-scrollbar-thumb { background: #bfd1df; border-radius: 4px; }
+    .toggle-buttons { display: flex; gap: 8px; background: #e4eef6; padding: 4px; border-radius: 6px; } .toggle-btn { min-width: 84px; padding: 8px 16px; border: 0; border-radius: 4px; background: transparent; color: #496b88; font-weight: 600; cursor: pointer; } .toggle-btn.active { background: #033d6c; color: white; }
     [data-panel] { display: none; } [data-panel].active { display: block; }
-    @media (max-width: 800px) { body { padding: 16px; } .summary, .distribution-content { grid-template-columns: 1fr; } .pie-layout { flex-direction: column; } .date-item { grid-template-columns: 80px minmax(0,1fr) 90px; gap: 8px; } }
+    @media (max-width: 800px) { body { padding: 16px; } .summary, .distribution-content { grid-template-columns: 1fr; } .card-header { flex-direction: column; align-items: flex-start; gap: 12px; } .pie-layout { flex-direction: column; } .date-item { grid-template-columns: 80px minmax(0,1fr) 90px; gap: 8px; } }
   </style>
 </head>
 <body>
