@@ -3,6 +3,7 @@ import { Component, OnInit, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { Navbar } from './../navbar/navbar';
+import { AnalystNavbar } from './../analyst/analyst-navbar/analyst-navbar';
 import { AnalyticsResponse } from '../dto/AnalyticsResponse';
 import { AnalyticsService } from '../services/analytics.service';
 
@@ -48,7 +49,7 @@ const EMPTY_CHART: BarChartModel = { ticks: [], columns: [] };
 
 @Component({
   standalone: true,
-  imports: [Navbar, NgFor, NgIf, NgTemplateOutlet, DecimalPipe, FormsModule],
+  imports: [AnalystNavbar, NgFor, NgIf, NgTemplateOutlet, DecimalPipe, FormsModule],
   selector: 'app-analytics-dashboard',
   styleUrl: './analytics-dashboard.scss',
   templateUrl: './analytics-dashboard.html',
