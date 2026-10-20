@@ -69,11 +69,11 @@ Stuff to do:
      - Will be a button on the custom analytics job page - done
      - Ideally download an HTMl file taht captures the integrity of the frontend - done
 
-- Clean up frontend and make it not look like shit
+- Clean up frontend and make it not look like shit - done
 
 - Clean up everything and ensure that it is production ready
 
-- Form on custom analytics job needs to be reactive to screen change 
+- Form on custom analytics job needs to be reactive to screen change - done
 
 
 
