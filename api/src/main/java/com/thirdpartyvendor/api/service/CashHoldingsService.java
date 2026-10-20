@@ -116,4 +116,23 @@ public class CashHoldingsService {
             cashHolding.getBalance()
         );
     }
+
+    public CashHoldingResponse transact(String currencyCode, String type, BigDecimal amount, Long userId) {
+        validateCurrencyCode(currencyCode);
+
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new InvalidCurrencyException("Transaction amount must be greater than 0");
+        }
+
+        if ("DEPOSIT".equals(type)) {
+            return deposit(currencyCode, amount, userId);
+        }
+
+        if ("WITHDRAW".equals(type)) {
+            updateCashHolding(currencyCode, amount.negate(), userId);
+            return getCashHoldingByUserAndCurrencyCode(userId, currencyCode);
+        }
+
+        throw new InvalidCurrencyException("Invalid cash transaction type: " + type);
+    }
 }
