@@ -4,12 +4,18 @@ export interface Holding {
     userId: number;
     security: string;
     assetType: string;
-    // companyName: string;
-    // averageCost: number;
-    // lastPrice: number;
-    // marketValue: number;
-    // gainLoss: number;
-    // gainLossPercent: number;
-    // dailyChangePercent: number;
-
+    // Market data (fetched from MarketApiService)
+    lastPrice?: number;
+    name?: string;
+    type?: string;
+    price?: number;
+    change?: number;
+    changePercent?: number;
+    previousClose?: number;
+    // Calculated fields
+    marketValue?: number;
+    gainLoss?: number;
+    gainLossPercent?: number;
+    dailyChangePercent?: number;
+    companyName?: string;
 }

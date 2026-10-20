@@ -7,6 +7,11 @@ import { PortfolioGraphics } from '../portfolio-graphics/portfolio-graphics';
 import { HoldingService } from '../../services/holding.service';
 import { AuthService } from '../../services/auth.service';
 import { Holding } from '../holdings-table/holding.model';
+import { MarketApiService } from '../../services/marketApi.service';
+import { switchMap, forkJoin, catchError } from 'rxjs';
+import { of } from 'rxjs';
+import { MarketQuoteAPIResponse } from '../../dto/MarketQuoteAPIResponse';
+import { MarketSymbolAPIResponse } from '../../dto/MarketSymbolAPIResponse';
 
 @Component({
   standalone: true,
@@ -24,7 +29,8 @@ export class DashboardPage implements OnInit {
   constructor(
     private holdingService: HoldingService,
     private authService: AuthService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private marketApiService: MarketApiService
   ) {}
 
   ngOnInit(): void {
@@ -36,19 +42,106 @@ export class DashboardPage implements OnInit {
     this.errorMessage = null;
     this.cdr.markForCheck();
     
-    this.holdingService.fetchHoldingsFromAPI().subscribe({
-      next: (data: Holding[]) => {
-        this.holdings = data;
-        console.log('Holdings loaded:', data);
+    this.holdingService.fetchHoldingsFromAPI().pipe(
+      switchMap((holdings: Holding[]) => {
+        // Create observables for all market quote AND asset info requests
+        const quoteRequests: { [key: string]: any } = {};
+        const assetRequests: { [key: string]: any } = {};
+        
+        holdings.forEach(holding => {
+          // Fetch quote data (price, change, etc.)
+          quoteRequests[holding.ticker] = this.marketApiService.fetchQuote(holding.ticker).pipe(
+            catchError(error => {
+              console.error(`Error fetching quote for ${holding.ticker}:`, {
+                status: error.status,
+                statusText: error.statusText,
+                message: error.message,
+                url: error.url,
+                error: error.error
+              });
+              return of(null);
+            })
+          );
+          
+          // Fetch asset info (company name, symbol data, etc.)
+          assetRequests[holding.ticker] = this.marketApiService.fetchAssetInfo(holding.ticker).pipe(
+            catchError(error => {
+              console.error(`Error fetching asset info for ${holding.ticker}:`, {
+                status: error.status,
+                statusText: error.statusText,
+                message: error.message,
+                url: error.url,
+                error: error.error
+              });
+              return of(null);
+            })
+          );
+        });
+
+        // Wait for all requests to complete
+        return forkJoin({
+          quotes: forkJoin(quoteRequests),
+          assets: forkJoin(assetRequests)
+        }).pipe(
+          switchMap((result) => {
+            const quoteResponses = result.quotes as Record<string, MarketQuoteAPIResponse | null>;
+            const assetResponses = result.assets as Record<string, MarketSymbolAPIResponse | null>;
+            
+            // Merge both quote and asset data into holdings
+            holdings.forEach(holding => {
+              const quoteResponse = quoteResponses[holding.ticker];
+              const assetResponse = assetResponses[holding.ticker];
+              
+              // Apply quote data
+              if (quoteResponse && quoteResponse.data) {
+                const marketData = quoteResponse.data;
+                holding.price = marketData.price;
+                holding.change = marketData.change;
+                holding.dailyChangePercent = marketData.changePercent;
+                
+                // Calculate derived fields if averageCost is available
+                if (holding.price) {
+                  holding.marketValue = holding.numShares * marketData.price;
+                  // holding.gainLoss = holding.marketValue - (holding.numShares * holding.averageCost);
+                  // holding.gainLossPercent = (holding.gainLoss / (holding.numShares * holding.averageCost)) * 100;
+                }
+              }
+              
+              // Apply asset data (company name, etc.)
+              if (assetResponse && assetResponse.data) {
+                holding.companyName = assetResponse.data.name;
+              }
+            });
+
+            return of(holdings);
+          })
+        );
+      }),
+      catchError(error => {
+        console.error('Error fetching holdings or market data:', {
+          status: error?.status,
+          statusText: error?.statusText,
+          message: error?.message,
+          url: error?.url,
+          error: error?.error,
+          fullError: error
+        });
+        this.errorMessage = 'Failed to load holdings or market data. Check console for details.';
+        return of([]);
+      })
+    ).subscribe({
+      next: (enrichedHoldings: Holding[]) => {
+        this.holdings = enrichedHoldings;
+        console.log('Holdings enriched with market data and company names:', this.holdings);
         this.isLoading = false;
-        this.cdr.markForCheck();  // Notify change detection
+        this.cdr.markForCheck();
       },
       error: (error) => {
-        console.error('Error fetching holdings:', error);
-        this.errorMessage = 'Failed to load holdings from API.';
+        console.error('Error in subscription:', error);
+        this.errorMessage = 'Failed to load holdings.';
         this.holdings = [];
         this.isLoading = false;
-        this.cdr.markForCheck();  // Notify change detection
+        this.cdr.markForCheck();
       }
     });
   }
