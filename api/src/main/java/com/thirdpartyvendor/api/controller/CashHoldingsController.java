@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.thirdpartyvendor.api.dto.CashHoldingResponse;
+import com.thirdpartyvendor.api.dto.CashTransactionResponse;
 import com.thirdpartyvendor.api.entity.AppUser;
 import com.thirdpartyvendor.api.service.CashHoldingsService;
 import com.thirdpartyvendor.api.util.AuthorizationUtil;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import com.thirdpartyvendor.api.dto.DepositRequest;
+import com.thirdpartyvendor.api.dto.TransactionRequest;
 import org.springframework.http.ResponseEntity;
 
 @RestController 
@@ -33,6 +34,13 @@ public class CashHoldingsController {
     public CashHoldingResponse getCashHoldingsByUserAndCurrencyCode(@AuthenticationPrincipal AppUser currentUser, @PathVariable String currencyCode) {
         return cashHoldingsService.getCashHoldingByUserAndCurrencyCode(currentUser.getId(), currencyCode);
     }
+
+    @GetMapping("/transactions")
+    public List<CashTransactionResponse> getRecentTransactions(
+        @AuthenticationPrincipal AppUser currentUser
+    ) {
+        return cashHoldingsService.getRecentTransactions(currentUser.getId());
+    }
     
 
     @GetMapping
@@ -41,14 +49,15 @@ public class CashHoldingsController {
     }
 
     @PostMapping 
-    public ResponseEntity<CashHoldingResponse> deposit(
-        @RequestBody DepositRequest depositRequest,
+    public ResponseEntity<CashHoldingResponse> transact(
+        @RequestBody TransactionRequest transactionRequest,
         @AuthenticationPrincipal AppUser currentUser
     ) {
         AuthorizationUtil.requireNotFrozen(currentUser);
-        return ResponseEntity.ok(cashHoldingsService.deposit(
-            depositRequest.currencyCode(),
-            depositRequest.amount(),
+        return ResponseEntity.ok(cashHoldingsService.transact(
+            transactionRequest.currencyCode(),
+            transactionRequest.type(),
+            transactionRequest.amount(),
             currentUser.getId()
         ));
     }

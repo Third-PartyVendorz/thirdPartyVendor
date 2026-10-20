@@ -3,10 +3,12 @@ import { Injectable } from "@angular/core";
 import { Observable, of, throwError } from "rxjs";
 import { delay, switchMap } from "rxjs/operators";
 import { CashHoldingResponse } from "../dto/CashHoldingResponse";
+import { CashTransactionRequest } from "../dto/CashTransactionRequest";
 import { environment } from "../../environments/environment.local";
 import { HoldingResponse } from "../dto/HoldingResponse";
 import { OrderRequest } from "../dto/OrderRequest";
 import { OrderResponse } from "../dto/OrderResponse";
+import { CashTransactionResponse } from "../dto/CashTransactionResponse";
 
 
 @Injectable({
@@ -17,6 +19,14 @@ export class TradeService {
 
   getCashHoldingByCurrencyCode(currencyCode: string): Observable<CashHoldingResponse> {
     return this.http.get<CashHoldingResponse>(`${environment.apiBaseUrl}/cashHoldings/${currencyCode}`);
+  }
+
+  postCashTransaction(request: CashTransactionRequest): Observable<CashHoldingResponse> {
+    return this.http.post<CashHoldingResponse>(`${environment.apiBaseUrl}/cashHoldings`, request);
+  }
+
+  getRecentCashTransactions(): Observable<CashTransactionResponse[]> {
+    return this.http.get<CashTransactionResponse[]>(`${environment.apiBaseUrl}/cashHoldings/transactions`);
   }
 
   getQuantitySharesOwned(symbol: string): Observable<HoldingResponse> {

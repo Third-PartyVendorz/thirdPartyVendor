@@ -52,3 +52,35 @@ Plan:
 
 
 
+Stuff to do:
+
+- Optimize queries: - done
+     - Only get and join data we need, don't need to fetch everything - done
+
+- Only replicate necessary data for analytics job --> Currently replicating entire schema - done
+     - In replica lets say I create a new single table db with only 5 columns that I need: - done
+          - Query changes to SELECT * FROM table WHERE date >= ... AND date < ...; - done
+
+- Add indexes to replica DB to improve query performance, since same query running every time - done
+
+- Update API to check for analytst role instead of admin role - done w Jack's PR
+
+- Add a feature to download analytics report: - done
+     - Will be a button on the custom analytics job page - done
+     - Ideally download an HTMl file taht captures the integrity of the frontend - done
+
+- Clean up frontend and make it not look like shit - done
+
+- Clean up everything and ensure that it is production ready
+
+- Form on custom analytics job needs to be reactive to screen change - done
+
+
+
+
+
+
+
+UPDATE users
+SET role = 'ANALYST'
+WHERE user_id = 4;

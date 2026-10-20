@@ -2,15 +2,19 @@ package com.thirdpartyvendor.api.service;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thirdpartyvendor.api.dto.CashHoldingResponse;
+import com.thirdpartyvendor.api.dto.CashTransactionResponse;
 import com.thirdpartyvendor.api.dto.CurrencyData;
 import com.thirdpartyvendor.api.entity.CashHolding;
+import com.thirdpartyvendor.api.entity.CashTransaction;
 import com.thirdpartyvendor.api.error.CashExceptions.InsufficientCashException;
 import com.thirdpartyvendor.api.error.CashExceptions.InvalidCurrencyException;
 import com.thirdpartyvendor.api.repository.CashHoldingsRepository;
+import com.thirdpartyvendor.api.repository.CashTransactionRepository;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -21,15 +25,21 @@ import java.util.Map;
 @Service
 public class CashHoldingsService {
     private final CashHoldingsRepository cashHoldingsRepository;
+    private final CashTransactionRepository cashTransactionRepository;
     private final Map<String, CurrencyData> currencies;
     
-    public CashHoldingsService(ObjectMapper mapper, CashHoldingsRepository cashHoldingsRepository) throws IOException {
+    public CashHoldingsService(
+        ObjectMapper mapper,
+        CashHoldingsRepository cashHoldingsRepository,
+        CashTransactionRepository cashTransactionRepository
+    ) throws IOException {
         ClassPathResource resource = new ClassPathResource("currency.json");
         this.currencies = mapper.readValue(
             resource.getInputStream(),
             new TypeReference<Map<String, CurrencyData>>() {}
         );
         this.cashHoldingsRepository = cashHoldingsRepository;
+        this.cashTransactionRepository = cashTransactionRepository;
     }
     
     public void validateCurrencyCode(String currencyCode) {
@@ -91,6 +101,18 @@ public class CashHoldingsService {
             .toList();
     }
 
+    public List<CashTransactionResponse> getRecentTransactions(Long userId) {
+        return cashTransactionRepository.findTop5ByUserIdOrderByCreatedAtDesc(userId).stream()
+            .map(transaction -> new CashTransactionResponse(
+                transaction.getId(),
+                transaction.getCurrencyCode(),
+                transaction.getType(),
+                transaction.getAmount(),
+                transaction.getCreatedAt()
+            ))
+            .toList();
+    }
+
     public CashHoldingResponse deposit(String currencyCode, BigDecimal amount, Long userId) {
         validateCurrencyCode(currencyCode);
 
@@ -115,5 +137,43 @@ public class CashHoldingsService {
             cashHolding.getCurrencyCode(),
             cashHolding.getBalance()
         );
+    }
+
+    @Transactional
+    public CashHoldingResponse transact(String currencyCode, String type, BigDecimal amount, Long userId) {
+        validateCurrencyCode(currencyCode);
+
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new InvalidCurrencyException("Transaction amount must be greater than 0");
+        }
+
+        if ("DEPOSIT".equals(type)) {
+            CashHoldingResponse response = deposit(currencyCode, amount, userId);
+            saveTransaction(currencyCode, CashTransaction.TransactionType.DEPOSIT, amount, userId);
+            return response;
+        }
+
+        if ("WITHDRAW".equals(type)) {
+            updateCashHolding(currencyCode, amount.negate(), userId);
+            CashHoldingResponse response = getCashHoldingByUserAndCurrencyCode(userId, currencyCode);
+            saveTransaction(currencyCode, CashTransaction.TransactionType.WITHDRAW, amount, userId);
+            return response;
+        }
+
+        throw new InvalidCurrencyException("Invalid cash transaction type: " + type);
+    }
+
+    private void saveTransaction(
+        String currencyCode,
+        CashTransaction.TransactionType type,
+        BigDecimal amount,
+        Long userId
+    ) {
+        CashTransaction transaction = new CashTransaction();
+        transaction.setUserId(userId);
+        transaction.setCurrencyCode(currencyCode);
+        transaction.setType(type);
+        transaction.setAmount(amount);
+        cashTransactionRepository.save(transaction);
     }
 }

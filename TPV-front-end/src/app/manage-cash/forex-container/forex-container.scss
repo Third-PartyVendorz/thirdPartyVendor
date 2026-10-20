@@ -10,9 +10,14 @@
 }
 
 .forex-container {
+	box-sizing: border-box;
 	width: min(1240px, 100%);
 	margin: 0 auto;
 	padding: 0;
+	border: 1px solid #d9dde3;
+	border-radius: 0.75rem;
+	background: #fff;
+	box-shadow: 0 0.75rem 2rem rgba(28, 37, 48, 0.06);
 }
 
 .forex-content {
@@ -60,17 +65,19 @@
 
 .forex-hero {
 	display: flex;
-    flex-direction: row;
-	gap: 2rem;
-	margin-bottom: 1.5rem;
+	flex-direction: row;
+	gap: 1rem;
+	margin-bottom: 1.25rem;
+	padding-bottom: 1.25rem;
+	border-bottom: 1px solid #e7eaee;
 }
 
 .eyebrow {
-	margin: 0 0 0.45rem;
-	color: #4b7192;
-	font-size: 0.72rem;
-	font-weight: 800;
-	letter-spacing: 0.13em;
+	margin: 0 0 0.3rem;
+	color: #6b7788;
+	font-size: 0.7rem;
+	font-weight: 700;
+	letter-spacing: 0.06rem;
 	text-transform: uppercase;
 }
 
@@ -89,10 +96,10 @@ h1 {
 }
 
 .hero-copy {
-	max-width: 520px;
+	max-width: 34rem;
 	margin-bottom: 0;
-	color: #6883a0;
-	font-size: 1rem;
+	color: #526071;
+	font-size: 0.85rem;
 }
 
 .currency-search {
@@ -163,7 +170,7 @@ h1 {
 	flex-direction: column;
 	min-width: 0;
 	gap: 0.4rem;
-	color: #6883a0;
+	color: #526071;
 	font-size: 0.78rem;
 	font-weight: 700;
 }
@@ -173,8 +180,8 @@ h1 {
 	min-width: 0;
 	box-sizing: border-box;
 	padding: 0.7rem 0.8rem;
-	border: 1px solid #d0dfeb;
-	border-radius: 8px;
+	border: 1px solid #aeb8c2;
+	border-radius: 0.5rem;
 	outline: 0;
 	color: var(--color-text);
 	font: inherit;
@@ -229,12 +236,12 @@ h1 {
 	margin-bottom: 0.1rem;
 	border: 1px solid #cfe2ed;
 	border-radius: 50%;
-	background: #edf6fb;
-	color: #07528c;
+	background: #eef3f7;
+	color: #004785;
 	cursor: pointer;
 }
 
-.search-switch:hover { background: #dcecf6; }
+.search-switch:hover { background: #e1e8ef; }
 .search-switch .material-icons-outlined { font-size: 1.15rem; }
 
 .market-pill {

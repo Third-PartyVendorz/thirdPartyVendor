@@ -6,6 +6,8 @@ import { OrderResponse } from '../dto/OrderResponse';
 import { MessageService } from '../services/message.service';
 import { OrderService } from '../services/order.service';
 import { PageHeader } from '../shared/page-header/page-header';
+import { TradeService } from '../trade-page/trade.service';
+import { CashTransactionResponse } from '../dto/CashTransactionResponse';
 
 type OrderHistoryEntry = {
   orderId: number;
@@ -41,6 +43,7 @@ export class HistoryPage implements OnInit {
 
   constructor(
     private orderService: OrderService,
+    private tradeService: TradeService,
     private messageService: MessageService,
     private router: Router,
     private cdr: ChangeDetectorRef,
@@ -53,11 +56,34 @@ export class HistoryPage implements OnInit {
   selectedFilter: HistoryFilter = 'All orders';
   isLoadingOrders = false;
   private allHistoryEntries: OrderHistoryEntry[] = [];
+  recentCashTransactions: CashTransactionResponse[] = [];
+  isLoadingCashTransactions = false;
 
   readonly quickFilters: HistoryFilter[] = ['All orders', 'Filled', 'Pending', 'Cancelled'];
 
   ngOnInit(): void {
     this.loadOrders();
+    this.loadRecentCashTransactions();
+  }
+
+  loadRecentCashTransactions(): void {
+    this.isLoadingCashTransactions = true;
+    this.tradeService.getRecentCashTransactions()
+      .pipe(finalize(() => {
+        this.isLoadingCashTransactions = false;
+        this.cdr.markForCheck();
+      }))
+      .subscribe({
+        next: (transactions) => {
+          this.recentCashTransactions = transactions;
+          this.cdr.markForCheck();
+        },
+        error: (error) => {
+          this.recentCashTransactions = [];
+          console.error('Unable to load recent cash transactions:', error);
+          this.cdr.markForCheck();
+        },
+      });
   }
 
   get summaryCards() {
@@ -291,6 +317,15 @@ export class HistoryPage implements OnInit {
 
     const diffInDays = Math.round(diffInHours / 24);
     return `${diffInDays} day${diffInDays === 1 ? '' : 's'} ago`;
+  }
+
+  formatCashTransactionType(type: CashTransactionResponse['type']): string {
+    return type === 'DEPOSIT' ? 'Deposit' : 'Withdrawal';
+  }
+
+  formatCashTransactionAmount(transaction: CashTransactionResponse): string {
+    const sign = transaction.type === 'DEPOSIT' ? '+' : '-';
+    return `${sign}${this.formatCurrency(transaction.amount)}`;
   }
 
   private isSameDay(left: Date, right: Date): boolean {

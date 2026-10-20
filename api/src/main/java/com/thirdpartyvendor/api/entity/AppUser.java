@@ -26,7 +26,8 @@ public class AppUser {
 
 	public enum UserRole {
 		USER,
-		ADMIN
+		ADMIN,
+		ANALYST
 	}
 
 	@Id
