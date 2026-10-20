@@ -4,7 +4,7 @@
             <h1>Portfolio</h1>
             <p>Your investments at a glance</p>
         </div>
-        <button class="trade-button">
+        <button class="trade-button" [routerLink]="['/trade']">
             TRADE <span>↗</span>
         </button>
     </div>
@@ -28,14 +28,14 @@
         <div class="metric">
             <div class="label">Buying Power</div>
             <div class="small-value">
-                {{ buyingPower | currency:'USD':'symbol': '1.2-2' }}
+                {{ buyingPower() | currency:'USD':'symbol': '1.2-2' }}
             </div>
         </div>
 
         <div class="metric">
             <div class="label">Cash Balance</div>
             <div class="small-value">
-                {{ cashBalance | currency:'USD':'symbol': '1.2-2' }}
+                {{ cashBalance() | currency:'USD':'symbol': '1.2-2' }}
             </div>
         </div>
 
