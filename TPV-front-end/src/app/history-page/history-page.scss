@@ -421,6 +421,57 @@ polygon {
 	line-height: 1.5;
 }
 
+.cash-activity-card {
+	display: grid;
+	gap: 0.75rem;
+}
+
+.cash-activity-card .panel-header {
+	margin-bottom: 0;
+}
+
+.cash-activity-card h2 {
+	font-size: 1.15rem;
+}
+
+.cash-activity-list {
+	display: grid;
+	gap: 0.75rem;
+}
+
+.cash-activity-item {
+	display: flex;
+	justify-content: space-between;
+	gap: 0.75rem;
+	align-items: center;
+	padding: 0.75rem 0;
+	border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+.cash-activity-item:last-child {
+	border-bottom: 0;
+	padding-bottom: 0;
+}
+
+.cash-activity-item > div {
+	display: grid;
+	gap: 0.2rem;
+}
+
+.cash-activity-item span,
+.cash-activity-state {
+	color: #64748b;
+	font-size: 0.85rem;
+}
+
+.deposit-amount {
+	color: #047857;
+}
+
+.withdrawal-amount {
+	color: #b91c1c;
+}
+
 .next-steps-list {
 	margin: 0.9rem 0 0;
 	padding-left: 1.2rem;
