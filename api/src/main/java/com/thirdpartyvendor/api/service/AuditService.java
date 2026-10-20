@@ -2,7 +2,9 @@ package com.thirdpartyvendor.api.service;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.thirdpartyvendor.api.dto.AuditEventResponse;
 import com.thirdpartyvendor.api.entity.AppUser;
@@ -14,9 +16,6 @@ import com.thirdpartyvendor.api.repository.ForexLogRepository;
 import com.thirdpartyvendor.api.repository.OrderRepository;
 import com.thirdpartyvendor.api.repository.TradeRepository;
 import com.thirdpartyvendor.api.util.AuthorizationUtil;
-import com.thirdpartyvendor.api.error.AuditExceptions.AuditEventNotFoundException;
-import com.thirdpartyvendor.api.error.AuditExceptions.InvalidAuditIdException;
-import com.thirdpartyvendor.api.error.AuditExceptions.UnsupportedAuditEventException;
 
 @Service
 public class AuditService {
@@ -45,42 +44,38 @@ public class AuditService {
             case "trade" -> mapTrade(findTrade(numericEventId));
             case "order" -> mapOrder(findOrder(numericEventId));
             case "forex" -> mapForex(findForex(numericEventId));
-            default -> throw new UnsupportedAuditEventException("Unsupported audit event type: " + eventType);
+            default -> throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unsupported audit event type");
         };
     }
 
     private Long parseEventId(String eventId) {
         try {
-            Long parsedId = Long.valueOf(eventId.trim());
-            if (parsedId <= 0) {
-                throw new InvalidAuditIdException("The event ID must be a positive number");
-            }
-            return parsedId;
+            return Long.valueOf(eventId.trim());
         } catch (NumberFormatException exception) {
-            throw new InvalidAuditIdException("The event ID must be a positive number");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ID must be numeric");
         }
     }
 
     private Trade findTrade(Long eventId) {
         return tradeRepository.findById(eventId)
-            .orElseThrow(() -> new AuditEventNotFoundException("No trade was found with ID " + eventId));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Trade not found"));
     }
 
     private Order findOrder(Long eventId) {
         return orderRepository.findById(eventId)
-            .orElseThrow(() -> new AuditEventNotFoundException("No order was found with ID " + eventId));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found"));
     }
 
     private ForexLog findForex(Long eventId) {
         return forexLogRepository.findById(eventId)
-            .orElseThrow(() -> new AuditEventNotFoundException("No forex exchange was found with ID " + eventId));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Forex exchange not found"));
     }
 
     private AuditEventResponse mapOrder(Order order) {
         AppUser client = findClient(order.getUserId());
         String status = order.getStatus().name();
         String action = switch (order.getStatus()) {
-            case EXECUTED -> "Order executed";
+            case FILLED -> "Order filled";
             case CANCELLED -> "Order cancelled";
             default -> "Order accepted";
         };
@@ -138,7 +133,7 @@ public class AuditService {
 
     private AppUser findClient(Long userId) {
         return userRepository.findById(userId)
-            .orElseThrow(() -> new AuditEventNotFoundException("The client linked to this event could not be found"));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Client not found"));
     }
 
     private String clientName(AppUser client) {

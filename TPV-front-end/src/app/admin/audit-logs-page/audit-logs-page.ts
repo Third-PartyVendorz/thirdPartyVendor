@@ -63,12 +63,7 @@ export class AuditLogsPage {
           this.changeDetectorRef.markForCheck();
         },
         error: (error) => {
-          const backendMessage = typeof error?.error === 'string' ? error.error : error?.error?.message;
-          const message = backendMessage
-            ?? (error?.status === 404 ? 'No record was found with that ID.' : null)
-            ?? (error?.status === 400 ? 'Enter a valid numeric ID.' : null)
-            ?? 'The audit record could not be loaded.';
-          this.messageService.setErrorMessage(message);
+          this.messageService.setErrorMessage(error?.error?.message ?? 'Unable to find this audit record.');
           this.changeDetectorRef.markForCheck();
         },
       });
