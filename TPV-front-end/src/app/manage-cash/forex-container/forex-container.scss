@@ -11,13 +11,35 @@
 
 .forex-container {
 	box-sizing: border-box;
-	width: min(1240px, 100%);
-	margin: 0 auto;
-	padding: 0;
+	width: 100%;
+	margin: 0;
+	padding: clamp(1.25rem, 3vw, 1.75rem);
 	border: 1px solid #d9dde3;
 	border-radius: 0.75rem;
 	background: #fff;
 	box-shadow: 0 0.75rem 2rem rgba(28, 37, 48, 0.06);
+}
+
+.forex-card-header {
+	margin-bottom: 1.25rem;
+	padding-bottom: 1.25rem;
+	border-bottom: 1px solid #e7eaee;
+}
+
+.card-eyebrow {
+	margin: 0 0 0.3rem;
+	color: #6b7788;
+	font-size: 0.7rem;
+	font-weight: 700;
+	letter-spacing: 0.06rem;
+	text-transform: uppercase;
+}
+
+.forex-card-header h2 {
+	margin: 0;
+	color: #1c2530;
+	font-size: 1.6rem;
+	line-height: 1.1;
 }
 
 .forex-content {
@@ -104,18 +126,17 @@ h1 {
 
 .currency-search {
 	position: relative;
-	display: flex;
-	// align-items: end;
-	gap: 0.55rem;
-	width: min(920px, 100%);
-	margin: 1.5rem 0 2rem;
-	min-height: 4.5rem;
-	padding: 0.75rem 1rem;
-	border: 1px solid var(--color-border);
-	border-radius: 8px;
-	background: var(--color-surface);
-	box-shadow: var(--shadow-surface);
-    // width: fit-content;
+	display: grid;
+	grid-template-columns: auto minmax(0, 1fr) auto minmax(0, 1fr) auto;
+	align-items: end;
+	gap: 0.65rem;
+	width: 100%;
+	margin: 0 0 1.5rem;
+	min-height: 0;
+	padding: 0;
+	border: 0;
+	background: transparent;
+	box-shadow: none;
 }
 
 .currency-info-button {
@@ -136,6 +157,7 @@ h1 {
 	position: relative;
 	flex: 0 0 1.7rem;
 	height: 1.7rem;
+	align-self: baseline;
 }
 
 .currency-info-button:hover,
@@ -166,7 +188,6 @@ h1 {
 
 .currency-search label {
 	display: flex;
-	flex: 0 0 180px;
 	flex-direction: column;
 	min-width: 0;
 	gap: 0.4rem;
@@ -208,8 +229,7 @@ h1 {
     font-weight: 800;
     cursor: pointer;
     height: fit-content;
-    align-self: center;
-	margin-left: 2rem;
+	margin-left: 0;
 }
 
 .search-button:hover { background: var(--color-brand-deep); }
@@ -278,21 +298,6 @@ h1 {
 	border-radius: 8px;
 	background: rgba(255, 255, 255, 0.94);
 	box-shadow: var(--shadow-surface);
-}
-
-.currency-search-hint {
-	grid-column: 1 / -1;
-	display: flex;
-	align-items: center;
-	gap: 0.4rem;
-	margin: 0;
-	color: var(--color-text-subtle);
-	font-size: 0.82rem;
-}
-
-.currency-search-hint .material-icons-outlined {
-	color: var(--color-accent-deep);
-	font-size: 1rem;
 }
 
 .exchange-context {
@@ -859,7 +864,7 @@ h2 {
 
 @media (max-width: 780px) {
 	.manage-cash-page { padding-top: 1.5rem; }
-	.forex-container { padding: 1rem; }
+	.forex-container { padding: 1.25rem; }
 	.forex-hero { align-items: flex-start; flex-direction: column; gap: 1rem; }
 	.currency-search {
 		display: flex;
@@ -875,7 +880,7 @@ h2 {
 
 @media (max-width: 480px) {
 	.manage-cash-page { padding-right: 0.75rem; padding-left: 0.75rem; }
-	.forex-container { padding: 0.75rem; }
+	.forex-container { padding: 1rem; }
 	.rate-card, .exchange-card { padding: 1.1rem; }
 	.rate-value { margin-top: 2rem; font-size: 1.65rem; }
 	.forex-chart-frame { grid-template-columns: 52px minmax(0, 1fr); gap: 0.45rem; }

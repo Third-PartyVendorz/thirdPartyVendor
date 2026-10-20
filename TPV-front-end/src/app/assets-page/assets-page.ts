@@ -14,10 +14,11 @@ import { OrderResponse } from '../dto/OrderResponse';
 import { forkJoin, of } from 'rxjs';
 import { catchError, distinctUntilChanged, map, retry, startWith, timeout } from 'rxjs/operators';
 import { CustomSliderComponent } from '../shared/custom-slider/custom-slider';
+import { MarketStatus } from '../shared/market-status/market-status';
 
 @Component({
 	standalone: true,
-	imports: [CommonModule, FormsModule, AssetResultComponent, PageHeader, CustomSliderComponent],
+	imports: [CommonModule, FormsModule, AssetResultComponent, PageHeader, CustomSliderComponent, MarketStatus],
 	selector: 'app-assets-page',
 	styleUrl: './assets-page.scss',
 	templateUrl: './assets-page.html',

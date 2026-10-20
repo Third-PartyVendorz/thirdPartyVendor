@@ -1,5 +1,10 @@
 <section class="forex-container" aria-labelledby="forex-title">
-        <div class="forex-content">
+    <header class="forex-card-header">
+        <p class="card-eyebrow">FOREX</p>
+        <h2 id="forex-title">Foreign exchange</h2>
+    </header>
+
+    <div class="forex-content">
     <section class="currency-search command-panel" aria-label="Search currencies">
         <div class="currency-info-control">
             <button
@@ -20,7 +25,7 @@
             <span>From currency</span>
             <input class="field-control" id="from-currency" type="text" maxlength="3" autocomplete="off" [(ngModel)]="fromCurrencyInput" (keyup.enter)="searchCurrencies()" [attr.aria-invalid]="!!searchError" />
         </label>
-        <button class="search-switch" type="button" (click)="switchDirection()" [attr.aria-label]="'Switch ' + baseCurrency + ' and ' + quoteCurrency">
+        <button class="search-switch" type="button" tabindex="-1" (click)="switchDirection()" [attr.aria-label]="'Switch ' + baseCurrency + ' and ' + quoteCurrency">
             <span class="material-icons-outlined" aria-hidden="true">swap_horiz</span>
         </button>
         <label for="to-currency">
@@ -34,7 +39,6 @@
         @if (searchError) {
             <p class="search-error" role="alert">{{ searchError }}</p>
         }
-        <p class="currency-search-hint"><span class="material-icons-outlined" aria-hidden="true">tips_and_updates</span>Use three-letter codes such as GBP, USD, or EUR.</p>
     </section>
 
     @if (quoteLoading()) {

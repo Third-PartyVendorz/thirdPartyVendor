@@ -9,10 +9,11 @@ import { AuthService } from '../services/auth.service';
 import { FrozenAccountModal } from '../shared/frozen-account-modal/frozen-account-modal';
 import { PageHeader } from '../shared/page-header/page-header';
 import { CustomSliderComponent } from '../shared/custom-slider/custom-slider';
+import { MarketStatus } from '../shared/market-status/market-status';
 
 @Component({
 	standalone: true,
-	imports: [CommonModule, FormsModule, CurrencyPipe, DatePipe, AssetResultComponent, TradeFormComponent, FrozenAccountModal, PageHeader, CustomSliderComponent],
+	imports: [CommonModule, FormsModule, CurrencyPipe, DatePipe, AssetResultComponent, TradeFormComponent, FrozenAccountModal, PageHeader, CustomSliderComponent, MarketStatus],
 	selector: 'app-trade-page',
 	styleUrl: './trade-page.component.scss',
 	templateUrl: './trade-page.component.html',

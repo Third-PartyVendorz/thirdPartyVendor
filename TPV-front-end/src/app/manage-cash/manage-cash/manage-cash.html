@@ -1,31 +1,19 @@
 <main class="manage-cash-page">
-    <div class="manage-cash-header">
-        <div class="header-content">
-            <app-page-header
-                eyebrow="Manage cash"
-                title="Manage Cash"
-                description="Move capital between currencies with live rates and clear execution details."
-            />
-
-            <div class="market-status-card">
-                <div class="market-status" [ngClass]="{
-                    'market-open': marketOpen,
-                    'market-closed': !marketOpen
-                }">
-                    <span class="status-dot"></span>
-                    <span class="status-text">{{ marketOpen ? 'Market Open' : 'Market Closed' }}</span>
-                </div>
-                <div class="divider"></div>
-                <div class="last-updated">
-                    Last updated:
-                    {{ lastUpdated | date : 'MMM d, y h:mm a' }}
-                </div>
-            </div>
-        </div>
-    </div>
+    <app-page-header
+        eyebrow="Manage cash"
+        title="Manage Cash"
+        description="Move capital between currencies with live rates and clear execution details."
+    >
+        <app-market-status />
+    </app-page-header>
 
     <div class="manage-cash-content">
-        <app-cash-balance />
-        <app-forex-container />
+        <section class="manage-cash-column" aria-label="Cash movement">
+            <app-cash-balance />
+        </section>
+
+        <section class="manage-cash-column" aria-label="Foreign exchange">
+            <app-forex-container />
+        </section>
     </div>
 </main>
