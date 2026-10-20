@@ -27,14 +27,21 @@ export const routes: Routes = [
     component: AuthPage,
   },
   {
+    path: 'analytics',
+    component: AnalystLayoutComponent,
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ANALYST', 'ADMIN'] },
+    children: [
+      { path: '', component: AnalyticsDashboard },
+    ],
+  },
+  {
     path: '',
     component: MainLayoutComponent,
     children: [
       { path: 'admin', component: AdminDashboardPage, canActivate: [authGuard, roleGuard], data: { roles: ['ADMIN'] } },
-      { path: 'analytics', component: AnalyticsDashboard, canActivate: [authGuard, roleGuard], data: { roles: ['ANALYST'] } },
       { path: 'admin/users', component: AdminUsersPage, canActivate: [authGuard, roleGuard], data: { roles: ['ADMIN'] } },
       { path: 'admin/audit', component: AuditLogsPage, canActivate: [authGuard, roleGuard], data: { roles: ['ADMIN'] } },
-      { path: 'analytics', component: AnalyticsDashboard, canActivate: [authGuard, roleGuard], data: { roles: ['ADMIN'] } },
       { path: 'dashboard', component: DashboardPage, canActivate: [authGuard, roleGuard], data: { roles: ['USER'] } },
       { path: 'portfolio-history', component: HistoryPage, canActivate: [authGuard, roleGuard], data: { roles: ['USER'] } },
       { path: 'trade', component: TradePage, canActivate: [authGuard, roleGuard], data: { roles: ['USER'] } },
@@ -48,4 +55,3 @@ export const routes: Routes = [
     redirectTo: '/login',
   },
 ];
-

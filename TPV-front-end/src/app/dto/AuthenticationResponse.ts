@@ -5,6 +5,6 @@ export interface AuthenticationResponse {
     phoneNumber: string;
     dateOfBirth: Date;
     email: string;
-    role: 'USER' | 'ADMIN';
+    role: 'USER' | 'ADMIN' | 'ANALYST';
     frozen: boolean;
 }
