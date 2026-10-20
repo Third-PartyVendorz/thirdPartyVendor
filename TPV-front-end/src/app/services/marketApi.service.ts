@@ -27,6 +27,10 @@ export class MarketApiService {
     });
   }
 
+  fetchForexQuote(fromCurrency: string, toCurrency: string): Observable<MarketQuoteAPIResponse> {
+    return this.fetchQuote(`FX:${fromCurrency}${toCurrency}`);
+  }
+
   fetchAssetInfo(ticker: string): Observable<MarketSymbolAPIResponse> {
     return this.http.get<MarketSymbolAPIResponse>(`${this.FAUXNANCE_API_URL}/symbols/${ticker}`, {
       headers: {
@@ -47,5 +51,9 @@ export class MarketApiService {
       },
       params,
     });
+  }
+
+  fetchForexHistoricalCandles(fromCurrency: string, toCurrency: string, from: string, to: string): Observable<MarketHistoricalAPIResponse> {
+    return this.fetchHistoricalCandles(`FX:${fromCurrency}${toCurrency}`, from, to);
   }
 }

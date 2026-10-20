@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,6 +28,7 @@ import com.thirdpartyvendor.api.dto.RegisterResponse;
 import com.thirdpartyvendor.api.entity.AppUser;
 import com.thirdpartyvendor.api.entity.AppUser.UserRole;
 import com.thirdpartyvendor.api.entity.RefreshToken;
+import com.thirdpartyvendor.api.repository.AppUserRepository;
 import com.thirdpartyvendor.api.service.AuthenticationService;
 import com.thirdpartyvendor.api.service.JwtService;
 import com.thirdpartyvendor.api.service.RefreshService;
@@ -38,7 +40,14 @@ class AuthControllerTest {
 	private final AuthenticationService authenticationService = mock(AuthenticationService.class);
 	private final RefreshService refreshService = mock(RefreshService.class);
 	private final JwtService jwtService = mock(JwtService.class);
-	private final AuthController authController = new AuthController(registrationService, authenticationService, refreshService, jwtService);
+	private final AppUserRepository appUserRepository = mock(AppUserRepository.class);
+	private final AuthController authController = new AuthController(
+		registrationService,
+		authenticationService,
+		refreshService,
+		jwtService,
+		appUserRepository
+	);
 
 	private MockHttpServletRequest request;
 	private MockHttpServletResponse response;
@@ -75,6 +84,7 @@ class AuthControllerTest {
 			new AuthenticationJwtModel("Jane", "Doe", "555-0102", LocalDate.of(1992, 8, 22), "jane.doe@example.com", "jwt-token", 1L, UserRole.USER)
 		);
 		when(refreshService.createRefreshToken(1L)).thenReturn(createRefreshToken("refresh-token", user));
+		when(appUserRepository.findById(1L)).thenReturn(Optional.of(user));
 
 		ResponseEntity<AuthenticationResponse> result = authController.authenticate(
 			new AuthenticationRequest("jane.doe@example.com", "secret123"),
@@ -94,7 +104,7 @@ class AuthControllerTest {
 		ResponseEntity<AuthMeResponse> result = authController.me(createUser(1L, "jane.doe@example.com"));
 
 		assertEquals(HttpStatus.OK, result.getStatusCode());
-		assertEquals("USER", result.getBody().role());
+		assertEquals(UserRole.USER, result.getBody().role());
 	}
 
 	@Test
@@ -120,7 +130,7 @@ class AuthControllerTest {
 		assertEquals(HttpStatus.OK, result.getStatusCode());
 		assertEquals(2, response.getHeaders(HttpHeaders.SET_COOKIE).size());
 		verify(jwtService).generateToken(user);
-		assertEquals(new AuthMeResponse(UserRole.USER), result.getBody());
+		assertEquals(new AuthMeResponse(UserRole.USER, false), result.getBody());
 	}
 
 	@Test

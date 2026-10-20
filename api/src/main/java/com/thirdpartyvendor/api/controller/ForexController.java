@@ -7,6 +7,7 @@ import com.thirdpartyvendor.api.dto.ForexRequest;
 import com.thirdpartyvendor.api.dto.ForexResponse;
 import com.thirdpartyvendor.api.entity.AppUser;
 import com.thirdpartyvendor.api.service.ForexService;
+import com.thirdpartyvendor.api.util.AuthorizationUtil;
 
 import java.util.List;
 
@@ -35,6 +36,7 @@ public class ForexController {
 
     @PostMapping
     public ResponseEntity<ForexResponse> submitExchange(@RequestBody ForexRequest forexRequest, @AuthenticationPrincipal AppUser currentUser) {
+        AuthorizationUtil.requireNotFrozen(currentUser);
         return ResponseEntity.status(HttpStatus.CREATED).body(forexService.executeExchange(forexRequest, currentUser.getId()));
     }
 
