@@ -45,7 +45,7 @@
 				</thead>
 				<tbody>
 					<tr *ngFor="let event of filteredEvents" (click)="selectEvent(event)" [class.selected-row]="selectedEvent?.id === event.id">
-						<td><strong>{{ formatTimestamp(event.timestamp) }}</strong><small>{{ event.actor }}</small></td>
+						<td>{{ formatTimestamp(event.timestamp) }}</td>
 						<td><span class="event-type">{{ event.type }}</span><small>{{ event.action }}</small></td>
 						<td><strong>{{ event.client }}</strong><small>User #{{ event.clientId }}</small></td>
 						<td>{{ event.reference }}<small>{{ event.id }}</small></td>
@@ -68,13 +68,16 @@
 		</div>
 		<p class="detail-summary">{{ event.summary }}</p>
 		<div class="detail-grid">
+			<div><span>Event type</span><strong>{{ event.type }}</strong></div>
+			<div><span>Status</span><strong>{{ event.status }}</strong></div>
 			<div><span>Client</span><strong>{{ event.client }} (#{{ event.clientId }})</strong></div>
 			<div><span>Recorded</span><strong>{{ formatTimestamp(event.timestamp) }}</strong></div>
-			<div><span>Reference</span><strong>{{ event.reference }}</strong></div>
-			<div><span>Actor</span><strong>{{ event.actor }}</strong></div>
+			<div><span>Record ID</span><strong>{{ event.id }}</strong></div>
+			<div><span>Instrument</span><strong>{{ event.instrument }}</strong></div>
 		</div>
-		<div class="detail-section"><h3>What happened</h3><p>{{ event.action }} at {{ formatTimestamp(event.timestamp) }} by {{ event.actor }}.</p><p *ngFor="let detail of event.details">{{ detail }}</p></div>
-		<div class="detail-section"><h3>Pricing evidence</h3><p>{{ event.pricing }}</p></div>
-		<div class="detail-section"><h3>Account impact</h3><p>{{ event.impact }}</p></div>
+		<div class="detail-section"><h3>Recorded event</h3><p>{{ event.summary }}</p></div>
+		<div class="detail-section"><h3>Recorded values</h3><p *ngFor="let detail of event.details">{{ detail }}</p></div>
+		<div class="detail-section" *ngIf="event.type !== 'Order'"><h3>{{ event.type === 'Trade' ? 'Execution price' : 'Exchange rate' }}</h3><p>{{ event.pricing }}</p></div>
+		<div class="detail-section" *ngIf="event.type === 'Forex exchange'"><h3>Cash movement</h3><p>{{ event.impact }}</p></div>
 	</aside>
 </main>

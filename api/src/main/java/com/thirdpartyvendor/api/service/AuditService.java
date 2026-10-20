@@ -1,6 +1,8 @@
 package com.thirdpartyvendor.api.service;
 
 import java.util.List;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -73,25 +75,60 @@ public class AuditService {
 
     private AuditEventResponse mapOrder(Order order) {
         AppUser client = findClient(order.getUserId());
-        String status = order.getStatus().name();
+        Trade execution = tradeRepository.findByOrderId(order.getId()).stream().findFirst().orElse(null);
+        BigDecimal calculatedQuantity = calculateQuantity(order, execution);
+        String orderValue = formatPrice(order.getOrderPrice(), order.getOrderCurrency());
+        String priceDetail = execution != null
+            ? "Execution price: " + formatPrice(execution.getExecutionPrice(), execution.getTradeCurrency())
+            : order.getOrderPrice() != null
+                ? "Order value: " + orderValue
+                : "Price: Not recorded";
+        String summary = calculatedQuantity != null
+            ? order.getOrderIntent() + " order recorded for " + calculatedQuantity + " " + order.getTicker() + " at " + priceDetail + "."
+            : order.getOrderIntent() + " order value of " + orderValue + " recorded for " + order.getTicker() + ".";
+        String status = switch (order.getStatus()) {
+            case PENDING -> "Pending";
+            case FILLED -> "Filled";
+            case CANCELLED -> "Cancelled";
+        };
         String action = switch (order.getStatus()) {
+            case PENDING -> "Order pending";
             case FILLED -> "Order filled";
             case CANCELLED -> "Order cancelled";
-            default -> "Order accepted";
         };
 
         return new AuditEventResponse(
             String.valueOf(order.getId()), "Order", action, clientName(client), client.getId(),
             String.valueOf(order.getId()), order.getTicker(), status, order.getCreatedAt(), "Order service",
-            order.getOrderIntent() + " order recorded for " + order.getQuantity() + " " + order.getTicker() + ".",
+            summary,
             List.of(
                 "Order intent: " + order.getOrderIntent(),
-                "Requested quantity: " + order.getQuantity(),
-                "Requested price: " + order.getOrderPrice() + " " + order.getOrderCurrency()
+                calculatedQuantity == null
+                    ? "Quantity: Not yet determined"
+                    : (order.getQuantity() == null ? "Calculated quantity: " : "Requested quantity: ") + calculatedQuantity,
+                priceDetail
             ),
-            "Requested price: " + order.getOrderPrice() + " " + order.getOrderCurrency(),
+            priceDetail,
             "No cash or holdings impact recorded at order creation"
         );
+    }
+
+    private BigDecimal calculateQuantity(Order order, Trade execution) {
+        if (order.getQuantity() != null) {
+            return order.getQuantity();
+        }
+        if (order.getOrderPrice() == null || execution == null || execution.getExecutionPrice() == null
+            || execution.getExecutionPrice().compareTo(BigDecimal.ZERO) == 0) {
+            return null;
+        }
+        return order.getOrderPrice().divide(execution.getExecutionPrice(), 4, RoundingMode.HALF_UP);
+    }
+
+    private String formatPrice(java.math.BigDecimal price, String currency) {
+        if (price == null) {
+            return "Not recorded";
+        }
+        return currency == null || currency.isBlank() ? price.toString() : price + " " + currency;
     }
 
     private AuditEventResponse mapTrade(Trade trade) {
