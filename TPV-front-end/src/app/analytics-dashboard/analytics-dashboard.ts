@@ -177,7 +177,7 @@ export class AnalyticsDashboard implements OnInit {
       return `<div class="scroll">${dateRows}</div>${this.renderExportLegend(isSide ? this.sideLegend : this.totalLegend)}`;
     };
     const renderAssets = (mode: 'total' | 'buy' | 'sell') => {
-      const assets = mode === 'total' ? data.top_5_most_traded_assets : data.top_5_most_traded_assets_by_side?.[mode.toUpperCase() as 'BUY' | 'SELL'] ?? {};
+      const assets = mode === 'total' ? data.top_10_most_traded_assets : data.top_10_most_traded_assets_by_side?.[mode.toUpperCase() as 'BUY' | 'SELL'] ?? {};
       const sortedAssets = Object.entries(assets).sort(([, leftValue], [, rightValue]) => Number(rightValue) - Number(leftValue));
       return `<div class="scroll">${sortedAssets.map(([symbol, value], index) => `<div class="asset-item"><div class="asset-rank">${index + 1}.</div><div class="asset-name">${this.escapeHtml(symbol)}</div><div class="asset-value">${formatNumber(value)} Shares</div></div>`).join('')}</div>`;
     };
@@ -224,7 +224,7 @@ export class AnalyticsDashboard implements OnInit {
   <section class="chart-card"><div class="card-header"><h3>Trade Distribution by <span data-label="order">Count</span></h3><div class="toggle-buttons" data-toggle="order"><button class="toggle-btn active" data-value="count">Count</button><button class="toggle-btn" data-value="volume">Volume</button></div></div><div data-panel="order-count" class="active">${renderOrder(true)}</div><div data-panel="order-volume">${renderOrder(false)}</div></section>
   <section class="chart-card"><div class="card-header"><h3>Trade Volume by 30 Minute Market Interval</h3><div class="toggle-buttons" data-toggle="market"><button class="toggle-btn active" data-value="side">Side</button><button class="toggle-btn" data-value="volume">Volume</button></div></div><div data-panel="market-side" class="active">${renderMarket(true)}</div><div data-panel="market-volume">${renderMarket(false)}</div></section>
   <section class="chart-card"><div class="card-header"><h3>Trade Volume by Date</h3><div class="toggle-buttons" data-toggle="date"><button class="toggle-btn active" data-value="volume">Volume</button><button class="toggle-btn" data-value="side">Side</button></div></div><div data-panel="date-volume" class="active">${renderDates(false)}</div><div data-panel="date-side">${renderDates(true)}</div></section>
-  <section class="chart-card"><div class="card-header"><h3>Top K Most Traded Assets</h3><div class="toggle-buttons" data-toggle="assets"><button class="toggle-btn active" data-value="total">Total</button><button class="toggle-btn" data-value="buy">Buy</button><button class="toggle-btn" data-value="sell">Sell</button></div></div><div data-panel="assets-total" class="active">${renderAssets('total')}</div><div data-panel="assets-buy">${renderAssets('buy')}</div><div data-panel="assets-sell">${renderAssets('sell')}</div></section>
+  <section class="chart-card"><div class="card-header"><h3>Most Traded Assets</h3><div class="toggle-buttons" data-toggle="assets"><button class="toggle-btn active" data-value="total">Total</button><button class="toggle-btn" data-value="buy">Buy</button><button class="toggle-btn" data-value="sell">Sell</button></div></div><div data-panel="assets-total" class="active">${renderAssets('total')}</div><div data-panel="assets-buy">${renderAssets('buy')}</div><div data-panel="assets-sell">${renderAssets('sell')}</div></section>
   <script>
     document.querySelectorAll('[data-toggle]').forEach(function (toggle) {
       toggle.querySelectorAll('.toggle-btn').forEach(function (button) {
@@ -445,11 +445,11 @@ export class AnalyticsDashboard implements OnInit {
   // ---------------------------------------------------------------------------
   readonly topAssetsList = computed<Array<{ rank: number; symbol: string; value: number }>>(() => {
     const data = this.activeAnalyticsData();
-    if (!data || !data.top_5_most_traded_assets) return [];
+    if (!data || !data.top_10_most_traded_assets) return [];
 
     const assets = this.topAssetsMode() === 'total'
-      ? data.top_5_most_traded_assets
-      : data.top_5_most_traded_assets_by_side?.[this.topAssetsMode().toUpperCase() as 'BUY' | 'SELL'] ?? {};
+      ? data.top_10_most_traded_assets
+      : data.top_10_most_traded_assets_by_side?.[this.topAssetsMode().toUpperCase() as 'BUY' | 'SELL'] ?? {};
 
     return Object.entries(assets)
       .map(([symbol, value]) => ({ symbol, value: Number(value) }))
