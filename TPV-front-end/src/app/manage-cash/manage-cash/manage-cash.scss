@@ -1,9 +1,15 @@
+.manage-cash-page {
+    min-height: calc(100vh - 68px);
+    padding: 1.5rem clamp(1rem, 3vw, 2.25rem) 3rem;
+    background: linear-gradient(180deg, var(--color-page-start) 0%, var(--color-page) 100%);
+}
+
 .manage-cash-header {
     box-sizing: border-box;
     width: 100%;
-    background: #f5f7f4;
-    border-bottom: 1px solid #d9dde3;
-    padding: 1rem clamp(1rem, 3vw, 2rem);
+    background: transparent;
+    border-bottom: 0;
+    padding: 1.5rem clamp(1rem, 4vw, 4rem) 0;
 }
 
 .header-content {
@@ -18,7 +24,7 @@
 }
 
 .eyebrow {
-    color: #5e6c84;
+    color: var(--color-text-subtle);
     font-size: 0.825rem;
     font-weight: 700;
     letter-spacing: 0.03rem;
@@ -31,13 +37,13 @@
     font-size: 2.5rem;
     font-weight: 700;
     line-height: 1.1;
-    color: #1c2530;
+    color: var(--color-text);
 }
 
 .title-section p {
     margin: 0.25rem 0 0;
     font-size: 0.85rem;
-    color: #3f4a5a;
+    color: var(--color-text-muted);
 }
 
 .market-status-card {
@@ -45,8 +51,8 @@
     align-items: center;
     gap: 1rem;
 
-    background: #ffffff;
-    border: 1px solid #d9dde3;
+    background: var(--color-surface-solid);
+    border: 1px solid var(--color-border);
     border-radius: 10px;
     min-height: 3.4rem;
     max-width: 100%;
@@ -97,7 +103,7 @@
 .divider {
     width: 1px;
     height: 24px;
-    background: #d9dde3;
+    background: var(--color-border);
 }
 
 .last-updated {

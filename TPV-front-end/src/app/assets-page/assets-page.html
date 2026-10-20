@@ -1,28 +1,118 @@
 <section class="assets-page">
-	<header class="assets-search-panel">
-		<div>
-			<p class="assets-eyebrow">Assets</p>
-			<h1>Search for an asset</h1>
-			<p class="assets-lead">Look up a ticker and review the asset details inline.</p>
+	<app-page-header
+		eyebrow="Assets"
+		title="Explore assets"
+	/>
+
+	<div class="assets-discovery-row">
+	<section class="assets-search-panel command-panel">
+		<div class="assets-search-copy">
+			<p class="assets-eyebrow">Find an asset</p>
+			<h2>Search by ticker</h2>
 		</div>
+		<app-custom-slider
+			class="market-type-slider"
+			[leftValue]="'equity'"
+			[rightValue]="'crypto'"
+			leftLabel="Equities"
+			rightLabel="Crypto"
+			[value]="marketType"
+			[leftColor]="'#07253e'"
+			[rightColor]="'#0b3558'"
+			(valueChange)="setMarketType($event)"
+		></app-custom-slider>
 
 		<form class="assets-search-form" (ngSubmit)="submitSearch()">
-			<label class="sr-only" for="asset-ticker-input">Ticker symbol</label>
-			<input id="asset-ticker-input" name="ticker" [(ngModel)]="searchTicker" type="text" placeholder="Enter ticker symbol" autocomplete="off" />
-			<button type="submit">Search</button>
+			<label class="sr-only" for="asset-ticker-input">Ticker</label>
+			<span class="material-icons-outlined search-icon" aria-hidden="true">search</span>
+			<input class="field-control" id="asset-ticker-input" name="ticker" [(ngModel)]="searchTicker" type="text" autocomplete="off" />
+			<ng-container *ngIf="marketType === 'crypto'">
+				<span class="ticker-quote-separator">:</span>
+				<input class="field-control ticker-currency-input" id="asset-currency-input" name="currency" [(ngModel)]="cryptoCurrency" type="text" placeholder="USD" maxlength="3" autocomplete="off" />
+			</ng-container>
+			<button class="ticker-search-button" type="submit"><span class="material-icons-outlined" aria-hidden="true">search</span>Search</button>
 		</form>
 
 		<p *ngIf="searchError" class="assets-search-error">{{ searchError }}</p>
-	</header>
+	</section>
 
-	<ng-container *ngIf="activeTicker; else emptyState">
-		<app-asset-result [ticker]="activeTicker" (tradeButtonClicked)="openTradeModal($event)"></app-asset-result>
+	<section class="trending-assets command-panel" aria-labelledby="trending-assets-title">
+		<div class="section-heading">
+			<div>
+				<p class="assets-eyebrow">Market watch</p>
+				<h2 id="trending-assets-title">Popular symbols</h2>
+			</div>
+		</div>
+		<div class="trending-grid">
+			<button class="ticker-card" type="button" *ngFor="let asset of trendingAssets" (click)="selectPopular(asset.symbol)">
+				<span class="ticker-symbol">{{ asset.symbol }}</span>
+				<span class="ticker-name">{{ asset.name }}</span>
+				<span class="ticker-price">{{ asset.price }}</span>
+				<span class="ticker-change" [class.negative-change]="asset.negative">{{ asset.change }}</span>
+				<span class="material-icons-outlined ticker-arrow" aria-hidden="true">arrow_outward</span>
+			</button>
+		</div>
+	</section>
+	</div>
+
+	<div *ngIf="activeTicker" class="asset-content-row">
+	<ng-container>
+		<app-asset-result
+			[ticker]="activeTicker"
+			(tradeButtonClicked)="openTradeModal($event)"
+		></app-asset-result>
 	</ng-container>
 
-	<ng-template #emptyState>
-		<article class="asset-card assets-empty-state">
-			<h2>Ready when you are</h2>
-			<p>Search for a ticker above to load the asset details here.</p>
-		</article>
-	</ng-template>
+	<section *ngIf="activeTicker" class="asset-activity-panel command-panel" aria-labelledby="asset-activity-title">
+		<div class="asset-activity-panel__header">
+			<div>
+				<p class="assets-eyebrow">Your activity</p>
+				<h2 id="asset-activity-title">{{ activeTicker }} position and orders</h2>
+			</div>
+			<span>{{ securityOrders.length }} {{ securityOrders.length === 1 ? 'order' : 'orders' }}</span>
+		</div>
+		<div class="asset-activity-panel__summary">
+			<div>
+				<span>Current holding</span>
+				<strong>{{ (currentHolding?.numShares || 0) | number:'1.0-4' }} shares</strong>
+			</div>
+			<div>
+				<span>Status</span>
+				<strong>{{ currentHolding ? 'Position held' : 'No current position' }}</strong>
+			</div>
+		</div>
+		<p *ngIf="activityLoading()" class="asset-order-empty" role="status">Loading your activity...</p>
+		<p *ngIf="!activityLoading() && !securityOrders.length" class="asset-order-empty">No orders for this ticker yet.</p>
+		<div *ngIf="securityOrders.length" class="asset-order-table-wrap">
+			<table class="asset-order-table">
+				<thead>
+					<tr>
+						<th>Date</th>
+						<th>Side</th>
+						<th>Quantity</th>
+						<th>Price</th>
+						<th>Amount</th>
+						<th>Status</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr *ngFor="let order of visibleOrders">
+						<td>{{ order.createdAt | date:'mediumDate' }}</td>
+						<td><span class="order-side" [class.order-side--buy]="order.orderIntent === 'BUY'" [class.order-side--sell]="order.orderIntent === 'SELL'">{{ order.orderIntent }}</span></td>
+						<td>{{ (order.executionQuantity || order.quantity || 0) | number:'1.0-4' }}</td>
+						<td>{{ (order.executionPrice || order.orderPrice || 0) | currency:order.orderCurrency:'symbol':'1.2-2' }}</td>
+						<td class="order-amount">{{ orderAmount(order) | currency:order.orderCurrency:'symbol':'1.2-2' }}</td>
+						<td><span class="order-status">{{ order.status }}</span></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div *ngIf="securityOrders.length > ordersPerPage" class="asset-order-pagination">
+			<button type="button" class="button-secondary" (click)="previousOrderPage()" [disabled]="orderPage === 1">Previous</button>
+			<span>Page {{ orderPage }} of {{ orderPageCount }}</span>
+			<button type="button" class="button-secondary" (click)="nextOrderPage()" [disabled]="orderPage === orderPageCount">Next</button>
+		</div>
+	</section>
+	</div>
+
 </section>

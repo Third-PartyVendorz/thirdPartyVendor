@@ -15,6 +15,7 @@
 						<div>
 							<p class="asset-kicker">{{ currentAsset.exchange }} • {{ currentAsset.currency }}</p>
 							<h1>{{ currentAsset.name }}</h1>
+							<span class="asset-type-badge">{{ currentAsset.type }}</span>
 						</div>
 						<button (click)="onTradeButtonClick(currentAsset.symbol)" class="trade-button">
 							Trade
@@ -29,6 +30,14 @@
 							<span>({{ currentQuote.changePercent > 0 ? '+' : '' }}{{ currentQuote.changePercent | number:'1.2-2' }}%)</span>
 						</div>
 						<p class="asset-updated">Updated {{ currentQuote.asOf | date:'medium' }}</p>
+					</div>
+
+					<div class="asset-quote-strip" aria-label="Current quote details">
+						<div><span>Bid</span><strong>{{ currentQuote.bid | currency:currentQuote.currency:'symbol':'1.2-2' }}</strong></div>
+						<div><span>Ask</span><strong>{{ currentQuote.ask | currency:currentQuote.currency:'symbol':'1.2-2' }}</strong></div>
+						<div><span>Spread</span><strong>{{ (currentQuote.ask - currentQuote.bid) | currency:currentQuote.currency:'symbol':'1.2-2' }}</strong></div>
+						<div><span>Previous close</span><strong>{{ currentQuote.previousClose | currency:currentQuote.currency:'symbol':'1.2-2' }}</strong></div>
+						<div><span>Market state</span><strong>{{ currentQuote.marketState === 'unknown' ? 'Unavailable' : currentQuote.marketState }}</strong></div>
 					</div>
 				</header>
 
@@ -133,30 +142,8 @@
 					</div>
 				</article>
 
-				<aside class="asset-card asset-summary-card">
-					<div class="card-heading compact">
-						<div>
-							<p class="card-eyebrow">Asset</p>
-							<h2>About this {{ currentAsset.type }}</h2>
-						</div>
-					</div>
-
-					<dl class="summary-grid">
-						<div>
-							<dt>Name</dt>
-							<dd>{{ currentAsset.name }}</dd>
-						</div>
-						<div>
-							<dt>Exchange</dt>
-							<dd>{{ currentAsset.exchange }}</dd>
-						</div>
-						<div>
-							<dt>Currency</dt>
-							<dd>{{ currentAsset.currency }}</dd>
-						</div>
-					</dl>
-				</aside>
 			</div>
+
 			</ng-container>
 		</ng-container>
 	</div>

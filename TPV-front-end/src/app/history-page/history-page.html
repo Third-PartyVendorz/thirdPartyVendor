@@ -1,11 +1,8 @@
 <section class="history-page">
-	<header class="history-hero">
-		<div>
-			<p class="history-eyebrow">Activity log</p>
-			<h1>Order History</h1>
-			<p class="history-lead">Review past orders, execution status, and recent trading activity in one place.</p>
-		</div>
-
+	<app-page-header
+		eyebrow="Activity"
+		title="Order history"
+	>
 		<div class="history-actions">
 			<button 
 				type="button"
@@ -19,7 +16,7 @@
 			<button type="button" class="ghost-button" (click)="downloadCsv()">Download CSV</button>
 			<button type="button" class="primary-button" (click)="openNewOrder()">New order</button>
 		</div>
-	</header>
+	</app-page-header>
 
 	<section class="history-summary-grid" aria-label="Order summary metrics">
 		<article class="summary-card" *ngFor="let card of summaryCards">

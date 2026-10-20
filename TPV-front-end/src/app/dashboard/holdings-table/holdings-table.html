@@ -5,13 +5,7 @@
         <select #sortSelect id="mobile-sort" class="mobile-sort-dropdown" (change)="onSortChange(sortSelect.value)">
             <option value="">Default Order</option>
             <option value="ticker">Ticker</option>
-            <option value="companyName">Name</option>
             <option value="shares">Shares</option>
-            <option value="averageCost">Avg. Cost</option>
-            <option value="lastPrice">Last Price</option>
-            <option value="marketValue">Market Value</option>
-            <option value="gainLoss">Total Gain/Loss</option>
-            <option value="dailyChangePercent">Day Change</option>
         </select>
     </div>
 
@@ -20,14 +14,19 @@
         <table>
             <thead>
                 <tr>
-                    <th class="sortable" (click)="toggleSort('ticker')">
-                        Ticker {{ getSortIndicator('ticker') }}
+                    <th class="sortable">
+                        <button class="sort-trigger" type="button" (click)="toggleSort('ticker')" [attr.aria-label]="'Sort holdings by ticker'">
+                            Ticker
+                            <span class="sort-indicator" [class.sort-indicator--asc]="getSortState('ticker') === 'asc'" [class.sort-indicator--desc]="getSortState('ticker') === 'desc'" aria-hidden="true"><span></span><span></span></span>
+                        </button>
                     </th>
-                    <!-- <th class="sortable" (click)="toggleSort('companyName')">
-                        Name {{ getSortIndicator('companyName') }}
-                    </th> -->
-                    <th class="numeric sortable" (click)="toggleSort('shares')">
-                        Shares {{ getSortIndicator('shares') }}
+                    <th>Security</th>
+                    <th>Type</th>
+                    <th class="numeric sortable">
+                        <button class="sort-trigger" type="button" (click)="toggleSort('shares')" [attr.aria-label]="'Sort holdings by shares'">
+                            Shares
+                            <span class="sort-indicator" [class.sort-indicator--asc]="getSortState('shares') === 'asc'" [class.sort-indicator--desc]="getSortState('shares') === 'desc'" aria-hidden="true"><span></span><span></span></span>
+                        </button>
                     </th>
                     <!-- <th class="numeric sortable" (click)="toggleSort('averageCost')">
                         Avg. Cost {{ getSortIndicator('averageCost') }}
@@ -47,8 +46,10 @@
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let holding of holdings">
-                    <td data-label="Ticker">{{ holding.ticker }}</td>
+                    <tr *ngFor="let holding of displayedHoldings">
+                        <td data-label="Ticker"><a class="holding-ticker" [routerLink]="['/explore-assets']" [queryParams]="{ ticker: holding.ticker }">{{ holding.ticker }}</a></td>
+                    <td data-label="Security">{{ holding.security }}</td>
+                    <td data-label="Type">{{ holding.assetType }}</td>
                     <td class="numeric" data-label="Shares">{{ holding.numShares }}</td>
                     <!-- <td data-label="Name">{{ holding.companyName }}</td>
                     
@@ -74,13 +75,21 @@
                 <button (click)="toggleExpand(holding.ticker)" class="expand-button">
                     <span class="expand-icon">{{ isExpanded(holding.ticker) ? '▼' : '▶' }}</span>
                     <!-- {{ holding.companyName }}  -->
-                    ({{ holding.ticker }})
+                    (<a class="holding-ticker" [routerLink]="['/explore-assets']" [queryParams]="{ ticker: holding.ticker }">{{ holding.ticker }}</a>)
                 </button>
             </div>
             <div class="mobile-summary-card" *ngIf="isExpanded(holding.ticker)">
                 <div class="mobile-holdings-row">
                     <span class="mobile-holdings-label">Ticker</span>
                     <span class="mobile-holdings-value company-name">{{ holding.ticker }}</span>
+                </div>
+                <div class="mobile-holdings-row">
+                    <span class="mobile-holdings-label">Security</span>
+                    <span class="mobile-holdings-value company-name">{{ holding.security }}</span>
+                </div>
+                <div class="mobile-holdings-row">
+                    <span class="mobile-holdings-label">Type</span>
+                    <span class="mobile-holdings-value">{{ holding.assetType }}</span>
                 </div>
                 <div class="mobile-holdings-row">
                     <span class="mobile-holdings-label">Shares</span>

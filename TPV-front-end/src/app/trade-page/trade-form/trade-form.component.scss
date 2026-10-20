@@ -46,7 +46,7 @@
     flex-direction: column;
     gap: 1rem;
     padding-bottom: 0.75rem;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--color-border);
 }
 
 .trade-header__top {
@@ -61,7 +61,7 @@
     letter-spacing: 0.14em;
     font-size: 0.75rem;
     font-weight: 700;
-    color: #64748b;
+    color: var(--color-text-subtle);
 }
 
 .asset-hero__identity {
@@ -71,7 +71,7 @@
 
     h1 {
         margin: 0;
-        color: #0f172a;
+        color: var(--color-text);
         font-size: 1.25rem;
         line-height: 1.2;
     }
@@ -79,7 +79,7 @@
     .asset-kicker {
         margin: 0;
         font-size: 0.875rem;
-        color: #64748b;
+        color: var(--color-text-subtle);
     }
 }
 
@@ -89,7 +89,7 @@
     width: 3.25rem;
     height: 3.25rem;
     border-radius: 1rem;
-    background: linear-gradient(135deg, #033d6c, #0b5ca5);
+    background: linear-gradient(135deg, var(--color-brand), var(--color-brand-strong));
     color: #fff;
     font-size: 1rem;
     font-weight: 800;
@@ -112,7 +112,7 @@
 .price-value {
     font-size: 1.5rem;
     font-weight: 600;
-    color: #0f172a;
+    color: var(--color-text);
 }
 
 .price-change {
@@ -130,7 +130,7 @@
 
 .change-percent {
     font-weight: 400;
-    color: #64748b;
+    color: var(--color-text-subtle);
 }
 
 .buying-power-display {
@@ -141,7 +141,35 @@
     justify-content: space-between;
     align-items: center;
     padding-bottom: 0.8rem;
-    border-bottom: 1px solid #e4edf4;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.buying-power-value {
+    margin-left: auto;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.summary-row--order-total {
+    align-items: center;
+}
+
+.summary-row__amount {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.summary-row__minus {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.summary-rule {
+    width: 20%;
+    margin: 0.25rem 0 0.25rem auto;
+    border-top: 1px solid var(--color-text);
 }
 
 .trade-amount-form {
@@ -174,18 +202,18 @@
         flex: 1 1 0px; 
         box-sizing: border-box;
         padding: 0.8rem 0.85rem;
-        border: 1px solid rgba(3, 61, 108, 0.18);
-        border-radius: 7px;
-        background: #fff;
-        color: #0f172a;
+        border: 1px solid rgba(23, 105, 163, 0.2);
+        border-radius: var(--radius-control);
+        background: var(--color-surface-solid);
+        color: var(--color-text);
         font-size: 1rem;
         font-weight: 600;
         margin: 0;
 
         &:focus {
             outline: none;
-            border-color: #0b5ca5;
-            box-shadow: 0 0 0 4px rgba(11, 92, 165, 0.12);
+            border-color: var(--color-brand-strong);
+            box-shadow: 0 0 0 4px var(--color-focus);
         }
     }
 }
@@ -198,9 +226,9 @@
     flex-direction: column;
     gap: 0.25rem;
     padding: 0.55rem 0.8rem;
-    background: #f5f9fc;
-    border-radius: 8px;
-    border: 1px solid #dfeaf2;
+    background: #f1f6fa;
+    border-radius: var(--radius-control);
+    border: 1px solid var(--color-border);
 
     &--empty {
         display: none;
@@ -233,7 +261,7 @@
     gap: 0.5rem;
     width: 100%;
     padding: 0.82rem 1rem;
-    background: linear-gradient(135deg, #e9a629, #f0b740);
+    background: linear-gradient(135deg, var(--color-brand), var(--color-brand-strong));
     color: #fff;
     font-size: 0.95rem;
     font-weight: 700;
@@ -242,7 +270,7 @@
     border-radius: 8px;
     cursor: pointer;
     transition: filter 0.2s ease, box-shadow 0.2s ease;
-    box-shadow: 0 4px 12px rgba(233, 166, 41, 0.25);
+    box-shadow: var(--shadow-action);
     filter: brightness(1);
     align-self: center;
 
@@ -253,15 +281,15 @@
 
     &:hover {
         filter: brightness(0.88);
-        box-shadow: 0 6px 20px rgba(233, 166, 41, 0.35);
+        box-shadow: 0 6px 20px rgba(23, 105, 163, 0.3);
     }
 
     &:active {
-        box-shadow: 0 2px 8px rgba(233, 166, 41, 0.25);
+        box-shadow: 0 2px 8px rgba(23, 105, 163, 0.22);
     }
 
     &:focus-visible {
-        outline: 2px solid #0b5ca5;
+        outline: 3px solid var(--color-focus);
         outline-offset: 2px;
     }
 

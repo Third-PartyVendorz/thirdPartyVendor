@@ -11,7 +11,7 @@
             [(value)]="currentSide"
             style="justify-self: center;"
             ></app-custom-slider>
-            <span style="justify-self: right;">
+            <span class="buying-power-value">
                 Buying Power: {{ buyingPower | currency:currency:'symbol':'1.2-2' }}
             </span>
         </div>
@@ -60,6 +60,7 @@
                 @if (currentUnit === UnitType.DOLLARS) {
                     <input
                         #inputValue
+                        class="field-control"
                         id="trade-input-value"
                         type="text" 
                         inputmode="decimal" 
@@ -76,6 +77,7 @@
                     />
                 } @else {
                     <input
+                        class="field-control"
                         id="trade-input-value"
                         type="text" 
                         inputmode="decimal" 
@@ -88,7 +90,7 @@
         </div>
 
         @if (!showOrderSummaryPanel) {
-            <button (click)="onContinueToOrderSummary()" class="trade-button" style="justify-self: center" [disabled]="accountIsFrozen || isInvalidTrade()">
+            <button (click)="onContinueToOrderSummary()" class="trade-button" [disabled]="accountIsFrozen || isInvalidTrade()">
                 Continue to Order Summary
                 <span class="material-icons-outlined trade-button__icon">arrow_forward</span>
             </button>
@@ -188,17 +190,16 @@
                             <span class="summary-label">Current Buying Power</span>
                             <span class="summary-value">{{ buyingPower | currency:assetDetails?.quote?.currency:'symbol':'1.2-2' }}</span>
                         </div>
-						<div class="summary-row" style="display: flex; justify-content: space-between; align-items: center;">
+                        <div class="summary-row summary-row--order-total">
                             <span class="summary-label">Order Total</span>
-                            <div style="display: flex; align-items: center; gap: 12px;">
-                                <span style="font-weight: 600; font-size: 18px;">−</span>
-                                <div style="display: flex; flex-direction: column; align-items: flex-end;">
+                            <div class="summary-row__amount">
+                                <span class="summary-row__minus">−</span>
+                                <div>
                                     <span class="summary-value">{{ estimatedTotal | currency:assetDetails?.quote?.currency:'symbol':'1.2-2' }}</span>
-                                    
                                 </div>
                             </div>
                         </div>
-						<div style="width: 20%; border-top: 1px solid #333; margin-top: 4px; margin-left: auto;"></div>
+                        <div class="summary-rule"></div>
                         <div class="summary-row">
                             <span class="summary-label">Cash Remaining</span>
                             <span class="summary-value">{{ (buyingPower - estimatedTotal) | currency:assetDetails?.quote?.currency:'symbol':'1.2-2' }}</span>

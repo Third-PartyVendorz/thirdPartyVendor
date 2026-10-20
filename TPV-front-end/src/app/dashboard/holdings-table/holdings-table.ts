@@ -1,5 +1,6 @@
 import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule, CurrencyPipe, DecimalPipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { Holding } from './holding.model';
 
 type SortColumn = 'ticker' | 'companyName' | 'shares' | 'averageCost' | 'lastPrice' | 'marketValue' | 'gainLoss' | 'dailyChangePercent' | null;
@@ -7,7 +8,7 @@ type SortDirection = 'asc' | 'desc' | null;
 
 @Component({
   standalone: true,
-  imports: [CommonModule, CurrencyPipe, DecimalPipe],
+  imports: [CommonModule, CurrencyPipe, DecimalPipe, RouterLink],
   selector: 'app-holdings-table',
   styleUrl: './holdings-table.scss',
   templateUrl: './holdings-table.html',
@@ -34,6 +35,10 @@ export class HoldingsTable {
         case 'ticker':
           aValue = a.ticker;
           bValue = b.ticker;
+          break;
+        case 'shares':
+          aValue = a.numShares;
+          bValue = b.numShares;
           break;
         // case 'companyName':
         //   aValue = a.companyName;
@@ -107,6 +112,14 @@ export class HoldingsTable {
   getSortIndicator(column: SortColumn): string {
     if (this.sortColumn !== column) return '↕';
     return this.sortDirection === 'asc' ? '▲' : '▼';
+  }
+
+  getSortState(column: SortColumn): SortDirection | 'none' {
+    if (this.sortColumn !== column || !this.sortDirection) {
+      return 'none';
+    }
+
+    return this.sortDirection;
   }
 
   toggleExpand(ticker: string): void {

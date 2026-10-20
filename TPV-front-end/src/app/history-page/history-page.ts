@@ -5,6 +5,7 @@ import { finalize } from 'rxjs';
 import { OrderResponse } from '../dto/OrderResponse';
 import { MessageService } from '../services/message.service';
 import { OrderService } from '../services/order.service';
+import { PageHeader } from '../shared/page-header/page-header';
 
 type OrderHistoryEntry = {
   orderId: number;
@@ -32,7 +33,7 @@ type HistoryFilter = 'All orders' | 'Filled' | 'Pending' | 'Cancelled';
 @Component({
   selector: 'app-history-page',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, PageHeader],
   templateUrl: './history-page.html',
   styleUrl: './history-page.scss',
 })

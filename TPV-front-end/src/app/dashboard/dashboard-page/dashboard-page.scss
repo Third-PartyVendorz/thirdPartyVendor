@@ -1,5 +1,12 @@
 .dashboard {
-    margin: 10px;
+    display: grid;
+    align-content: start;
+    gap: 1.25rem;
+    min-height: calc(100vh - 68px);
+    padding: 1.5rem clamp(1rem, 3vw, 2.25rem) 2rem;
+    background:
+        radial-gradient(circle at top left, rgba(85, 196, 189, 0.12), transparent 30%),
+        linear-gradient(180deg, var(--color-page-start) 0%, var(--color-page) 100%);
 }
 
 // .bottom-row {

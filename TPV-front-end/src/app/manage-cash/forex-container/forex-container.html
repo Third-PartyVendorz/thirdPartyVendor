@@ -1,15 +1,6 @@
-<main class="manage-cash-page">
-    <section class="forex-container" aria-labelledby="forex-title">
+<section class="forex-container" aria-labelledby="forex-title">
         <div class="forex-content">
-    <section class="forex-hero">
-        <div>
-            <p class="eyebrow">Currency exchange</p>
-            <h1 id="forex-title">Move money across markets.</h1>
-            <p class="hero-copy">Exchange available cash between currencies at a live indicative rate.</p>
-        </div>
-    </section>
-
-    <section class="currency-search" aria-label="Search currencies">
+    <section class="currency-search command-panel" aria-label="Search currencies">
         <div class="currency-info-control">
             <button
                 class="currency-info-button"
@@ -27,14 +18,14 @@
         </div>
         <label for="from-currency">
             <span>From currency</span>
-            <input id="from-currency" type="text" maxlength="3" autocomplete="off" [(ngModel)]="fromCurrencyInput" (keyup.enter)="searchCurrencies()" [attr.aria-invalid]="!!searchError" />
+            <input class="field-control" id="from-currency" type="text" maxlength="3" autocomplete="off" [(ngModel)]="fromCurrencyInput" (keyup.enter)="searchCurrencies()" [attr.aria-invalid]="!!searchError" />
         </label>
         <button class="search-switch" type="button" (click)="switchDirection()" [attr.aria-label]="'Switch ' + baseCurrency + ' and ' + quoteCurrency">
             <span class="material-icons-outlined" aria-hidden="true">swap_horiz</span>
         </button>
         <label for="to-currency">
             <span>To currency</span>
-            <input id="to-currency" type="text" maxlength="3" autocomplete="off" [(ngModel)]="toCurrencyInput" (keyup.enter)="searchCurrencies()" [attr.aria-invalid]="!!searchError" />
+            <input class="field-control" id="to-currency" type="text" maxlength="3" autocomplete="off" [(ngModel)]="toCurrencyInput" (keyup.enter)="searchCurrencies()" [attr.aria-invalid]="!!searchError" />
         </label>
         <button type="button" class="search-button" (click)="searchCurrencies()">
             <span class="material-icons-outlined" aria-hidden="true">search</span>
@@ -43,9 +34,8 @@
         @if (searchError) {
             <p class="search-error" role="alert">{{ searchError }}</p>
         }
+        <p class="currency-search-hint"><span class="material-icons-outlined" aria-hidden="true">tips_and_updates</span>Use three-letter codes such as GBP, USD, or EUR.</p>
     </section>
-
-
 
     @if (quoteLoading()) {
         <p class="quote-loading" role="status">Loading exchange rate...</p>
@@ -214,9 +204,9 @@
             }
         </section>
     }
+
         </div>
     </section>
-</main>
 
 @if (showFrozenAccountModal()) {
     <app-frozen-account-modal action="exchange currencies" (dismissed)="showFrozenAccountModal.set(false)" />

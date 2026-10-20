@@ -7,10 +7,12 @@ import { PortfolioGraphics } from '../portfolio-graphics/portfolio-graphics';
 import { HoldingService } from '../../services/holding.service';
 import { AuthService } from '../../services/auth.service';
 import { Holding } from '../holdings-table/holding.model';
+import { PageHeader } from '../../shared/page-header/page-header';
+import { RouterLink } from '@angular/router';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, Navbar, PortfolioSummary, HoldingsTable, PortfolioGraphics],
+  imports: [CommonModule, Navbar, PortfolioSummary, HoldingsTable, PortfolioGraphics, PageHeader, RouterLink],
   selector: 'app-dashboard-page',
   styleUrl: './dashboard-page.scss',
   templateUrl: './dashboard-page.html',
