@@ -73,7 +73,7 @@ Stuff to do:
 
 - Clean up everything and ensure that it is production ready
 
-
+- Form on custom analytics job needs to be reactive to screen change 
 
 
 
@@ -82,5 +82,5 @@ Stuff to do:
 
 
 UPDATE users
-SET role = 'ADMIN'
+SET role = 'ANALYST'
 WHERE user_id = 4;
