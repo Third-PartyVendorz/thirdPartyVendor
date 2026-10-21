@@ -68,26 +68,28 @@ public class OrderService {
 
         Order savedOrder = orderRepository.save(newOrder);
 
-        orderExecutionService.executeOrder(savedOrder.getId(), userId);
+        if (MarketHoursService.isOpen()) {
+            orderExecutionService.executeOrder(savedOrder.getId(), userId);
+            savedOrder = orderRepository.findById(savedOrder.getId())
+                .orElseThrow(() -> new OrderNotFoundException("Order not found"));
+        }
 
-        Order executedOrder = orderRepository.findById(savedOrder.getId())
-            .orElseThrow(() -> new OrderNotFoundException("Order not found"));
-        Trade execution = tradeRepository.findByOrderId(executedOrder.getId()).stream()
+        Trade execution = tradeRepository.findByOrderId(savedOrder.getId()).stream()
             .findFirst()
             .orElse(null);
         
         return new OrderResponse(
-            executedOrder.getId(),
-            executedOrder.getUserId(),
-            executedOrder.getTicker(),
-            executedOrder.getOrderIntent(),
-            executedOrder.getQuantity(),
-            executedOrder.getOrderPrice(),
+            savedOrder.getId(),
+            savedOrder.getUserId(),
+            savedOrder.getTicker(),
+            savedOrder.getOrderIntent(),
+            savedOrder.getQuantity(),
+            savedOrder.getOrderPrice(),
             execution != null ? execution.getExecutionPrice() : null,
             execution != null ? execution.getExecutionQuantity() : null,
-            executedOrder.getStatus(),
-            executedOrder.getCreatedAt(),
-            executedOrder.getOrderCurrency()
+            savedOrder.getStatus(),
+            savedOrder.getCreatedAt(),
+            savedOrder.getOrderCurrency()
         );
     }
 
