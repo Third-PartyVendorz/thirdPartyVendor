@@ -13,30 +13,6 @@ provider "aws" {
 	secret_key = var.aws_secret_key
 }
 
-#data "aws_caller_identity" "current" {}
-
-#output "aws_account_id" {
-#	value = data.aws_caller_identity.current.account_id
-#}
-
-#output "aws_caller_arn" {
-#	value = data.aws_caller_identity.current.arn
-#}
-
-#resource "aws_iam_policy" "link_test" {
-#	name        = "third-party-vendor-link-test"
-#	description = "Minimal policy for validating AWS Terraform linkage"
-
-#	policy = jsonencode({
-#		Version = "2012-10-17"
-#		Statement = [{
-#			Effect   = "Allow"
-#			Action   = "sts:GetCallerIdentity"
-#			Resource = "*"
-#		}]
-#	})
-#}
-
 data "aws_region" "current" {}
 
 module "networking" {
@@ -44,3 +20,51 @@ module "networking" {
 	cidr   = ["10.0.0.0/16"]
 	name   = "TPV"
 }
+
+module "spring-ecr" {
+	source = "./modules/ecr"
+	name   = "spring-ecr-repo"
+}
+
+module "flask-ecr" {
+	source = "./modules/ecr"
+	name   = "flask-ecr-repo"
+}
+
+module "ecs_cluster" {
+  source = "./modules/ecs/cluster"
+  name   = "tpv-ecs-cluster"
+}
+
+module "target_group_server" {
+  source              = "./modules/alb"
+  create_target_group = true
+  name                = "tpv-alb-target-group"
+  port                = 8080
+  protocol            = "HTTP"
+  vpc                 = module.networking.aws_vpc
+  tg_type             = "ip"
+# health_check_path   = "/status"
+# health_check_port   = 80
+}
+
+module "security_group_alb_server" {
+  source              = "./modules/security-group"
+  name                = "alb-tpv-server"
+  description         = "Controls access to the server ALB"
+  vpc_id              = module.networking.aws_vpc
+  cidr_blocks_ingress = ["0.0.0.0/0"]
+  ingress_port        = 80
+}
+
+module "alb_server" {
+  source         = "./modules/alb"
+  create_alb     = true
+  name           = "tpv-ser"
+  subnets        = [module.networking.public_subnets[0], module.networking.public_subnets[1]]
+  security_group = module.security_group_alb_server.sg_id
+  target_group   = module.target_group_server.arn_tg
+}
+
+
+

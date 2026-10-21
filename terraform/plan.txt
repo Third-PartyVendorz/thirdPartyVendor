@@ -39,3 +39,37 @@ Jenkins Pipelines:
     7. Push static files to live S3 bucket
     8. Invalidate previous CloudFront cache
 
+
+
+
+
+
+
+
+
+
+
+
+#data "aws_caller_identity" "current" {}
+
+#output "aws_account_id" {
+#	value = data.aws_caller_identity.current.account_id
+#}
+
+#output "aws_caller_arn" {
+#	value = data.aws_caller_identity.current.arn
+#}
+
+#resource "aws_iam_policy" "link_test" {
+#	name        = "third-party-vendor-link-test"
+#	description = "Minimal policy for validating AWS Terraform linkage"
+
+#	policy = jsonencode({
+#		Version = "2012-10-17"
+#		Statement = [{
+#			Effect   = "Allow"
+#			Action   = "sts:GetCallerIdentity"
+#			Resource = "*"
+#		}]
+#	})
+#}

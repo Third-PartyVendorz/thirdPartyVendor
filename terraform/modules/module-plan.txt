@@ -9,6 +9,8 @@ Then go to services that are just AWS internal
 Backend services that live in VPC
     - ECS and RDS
 
+ALB
+
 External services that client interacts wih
     - S3
     - Cloudfront
