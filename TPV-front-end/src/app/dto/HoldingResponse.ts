@@ -4,4 +4,6 @@ export interface HoldingResponse {
     ticker: string;
     assetType: string;
     numShares: number;
+    costBasis?: number;
+    realizedGainLoss?: number;
 }

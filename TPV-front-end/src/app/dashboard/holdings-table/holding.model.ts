@@ -13,6 +13,9 @@ export interface Holding {
     changePercent?: number;
     // Calculated fields
     marketValue?: number;
+    costBasis?: number;
+    realizedGainLoss?: number;
+    unrealizedGainLoss?: number;
     gainLoss?: number;
     gainLossPercent?: number;
     dailyChangePercent?: number;

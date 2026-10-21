@@ -38,9 +38,9 @@
                     <th class="numeric sortable" (click)="toggleSort('marketValue')">
                         Market Value {{ getSortIndicator('marketValue') }}
                     </th>
-                    <!-- <th class="numeric sortable" (click)="toggleSort('gainLoss')">
-                        Total Gain/Loss {{ getSortIndicator('gainLoss') }}
-                    </th> -->
+                    <th class="numeric">
+                        Total Gain/Loss
+                    </th>
                     <th class="numeric sortable" (click)="toggleSort('dailyChangePercent')">
                         Day Change {{ getSortIndicator('dailyChangePercent') }}
                     </th>
@@ -62,12 +62,18 @@
                     <td class="numeric" data-label="Shares">{{ holding.numShares }}</td>
                     <td class="numeric" data-label="Current Price">{{ holding.price !== undefined ? (holding.price | currency) : 'N/A' }}</td>
                     <td class="numeric" data-label="Market Value">{{ holding.marketValue !== undefined ? (holding.marketValue | currency) : 'N/A' }}</td>
-                    <!-- <td class="numeric change" data-label="Total Gain/Loss" [class.positive]="(holding.gainLoss ?? 0) > 0" [class.negative]="(holding.gainLoss ?? 0) < 0">
-                        <div>{{ holding.gainLoss !== undefined ? ((holding.gainLoss > 0 ? '+' : '') + (holding.gainLoss | currency)) : 'N/A' }}</div>
-                        <small *ngIf="holding.gainLossPercent !== undefined">({{holding.gainLossPercent > 0 ? '+' : ''}}{{ holding.gainLossPercent | number:'1.2-2' }}%)</small>
-                    </td> -->
+                    <td class="numeric change" data-label="Total Gain/Loss" [class.positive]="(holding.gainLoss ?? 0) > 0" [class.negative]="(holding.gainLoss ?? 0) < 0">
+                        <ng-container *ngIf="holding.gainLoss !== undefined; else unavailableGainLoss">
+                            <span class="change-amount">{{ holding.gainLoss > 0 ? '▲' : '▼' }}{{ holding.gainLoss > 0 ? '+' : '' }}{{ holding.gainLoss | currency }}</span>
+                            <span class="change-percent" *ngIf="holding.gainLossPercent !== undefined">({{ holding.gainLossPercent | number:'1.2-2' }}%)</span>
+                        </ng-container>
+                        <ng-template #unavailableGainLoss>N/A</ng-template>
+                    </td>
                     <td class="numeric" data-label="Day Change" [class.positive]="(holding.dailyChangePercent ?? 0) > 0" [class.negative]="(holding.dailyChangePercent ?? 0) < 0">
-                        <span *ngIf="holding.dailyChangePercent !== undefined">{{ holding.dailyChangePercent > 0 ? '▲' : holding.dailyChangePercent < 0 ? '▼' : '' }}{{ holding.change | currency }} ({{ holding.dailyChangePercent | number:'1.2-2' }}%)</span>
+                        <ng-container *ngIf="holding.dailyChangePercent !== undefined">
+                            <span class="change-amount">{{ holding.dailyChangePercent > 0 ? '▲' : holding.dailyChangePercent < 0 ? '▼' : '' }}{{ holding.change | currency }}</span>
+                            <span class="change-percent">({{ holding.dailyChangePercent | number:'1.2-2' }}%)</span>
+                        </ng-container>
                         <span *ngIf="holding.dailyChangePercent === undefined">N/A</span>
                     </td>
                 </tr>
@@ -118,13 +124,13 @@
                     <span class="mobile-holdings-label">Market Value</span>
                     <span class="mobile-holdings-value">{{ holding.marketValue | currency }}</span>
                 </div>
-                <!-- <div class="mobile-holdings-row" *ngIf="holding.gainLoss !== undefined">
+                <div class="mobile-holdings-row" *ngIf="holding.gainLoss !== undefined">
                     <span class="mobile-holdings-label">Total Gain/Loss</span>
                     <span class="mobile-holdings-value" [class.positive]="(holding.gainLoss ?? 0) > 0" [class.negative]="(holding.gainLoss ?? 0) < 0">
-                        {{ (holding.gainLoss ?? 0) > 0 ? '+' : '' }}{{ holding.gainLoss | currency }}<br/>
-                        <small *ngIf="holding.gainLossPercent !== undefined">({{holding.gainLossPercent > 0 ? '+' : ''}}{{ holding.gainLossPercent | number:'1.2-2' }}%)</small>
+                        <span class="change-amount">{{ holding.gainLoss > 0 ? '▲' : '▼' }}{{ holding.gainLoss > 0 ? '+' : '' }}{{ holding.gainLoss | currency }}</span>
+                        <span class="change-percent" *ngIf="holding.gainLossPercent !== undefined">({{ holding.gainLossPercent | number:'1.2-2' }}%)</span>
                     </span>
-                </div> -->
+                </div>
                 <div class="mobile-holdings-row" *ngIf="holding.dailyChangePercent !== undefined">
                     <span class="mobile-holdings-label">Day Change</span>
                     <span class="mobile-holdings-value" [class.positive]="holding.dailyChangePercent > 0" [class.negative]="holding.dailyChangePercent < 0">

@@ -157,6 +157,11 @@ td {
     font-weight: 600;
 }
 
+.change-amount,
+.change-percent {
+    display: block;
+}
+
 .positive {
     color: #139141;
 }

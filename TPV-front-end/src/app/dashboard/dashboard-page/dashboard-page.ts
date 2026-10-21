@@ -51,7 +51,9 @@ export class DashboardPage implements OnInit {
         security: response.security,
         ticker: response.ticker,
         assetType: response.assetType,
-        numShares: response.numShares
+        numShares: response.numShares,
+        costBasis: response.costBasis ?? 0,
+        realizedGainLoss: response.realizedGainLoss ?? 0
       }))),
       switchMap((holdings: Holding[]) => {
         // Create observables for all market quote AND asset info requests
@@ -112,8 +114,11 @@ export class DashboardPage implements OnInit {
                 // Calculate derived fields if averageCost is available
                 if (holding.price) {
                   holding.marketValue = holding.numShares * marketData.price;
-                  // holding.gainLoss = holding.marketValue - (holding.numShares * holding.averageCost);
-                  // holding.gainLossPercent = (holding.gainLoss / (holding.numShares * holding.averageCost)) * 100;
+                  holding.unrealizedGainLoss = holding.marketValue - (holding.costBasis ?? 0);
+                  holding.gainLoss = (holding.realizedGainLoss ?? 0) + holding.unrealizedGainLoss;
+                  holding.gainLossPercent = (holding.costBasis ?? 0) > 0
+                    ? (holding.gainLoss / (holding.costBasis ?? 0)) * 100
+                    : undefined;
                 }
               }
               

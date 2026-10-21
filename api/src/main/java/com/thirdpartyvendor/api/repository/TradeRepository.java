@@ -8,4 +8,6 @@ import com.thirdpartyvendor.api.entity.Trade;
 
 public interface TradeRepository extends JpaRepository<Trade, Long> {
     List<Trade> findByOrderId(Long orderId);
+
+    List<Trade> findByOrderIdIn(List<Long> orderIds);
 }
