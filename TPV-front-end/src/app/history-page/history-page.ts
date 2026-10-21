@@ -254,6 +254,9 @@ export class HistoryPage implements OnInit {
   }
 
   private resolveNetAmount(order: OrderResponse): number {
+    if (order.executionPrice !== null && order.executionQuantity !== null) {
+      return order.executionPrice * order.executionQuantity;
+    }
     return order.orderPrice ?? 0;
   }
 
