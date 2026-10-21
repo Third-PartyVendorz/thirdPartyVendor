@@ -270,14 +270,21 @@
                 <div class="order-success-modal">
                     <span class="material-icons-outlined success-icon">check_circle</span>
                     <div class="success-content">
-                        <p class="success-title">{{ tradeActionLabel }} executed successfully</p>
-                        <p class="success-subtitle">Your trade is complete and your account has been updated.</p>
+                        @if (submittedOrderResponse.status === 'FILLED') {
+                            <p class="success-title">{{ tradeActionLabel }} executed successfully</p>
+                            <p class="success-subtitle">Your trade is complete and your account has been updated.</p>
+                        } @else {
+                            <p class="success-title">Order submitted</p>
+                            <p class="success-subtitle">Your order is pending and will execute when the market opens.</p>
+                        }
                         <div class="order-confirmation">
                             <p><strong>Asset:</strong> {{ submittedOrderResponse.ticker }}</p>
                             <p><strong>Status:</strong> {{ submittedOrderResponse.status }}</p>
-                            <p><strong>Quantity:</strong> {{ executedQuantity }} shares</p>
-                            <p><strong>Price:</strong> {{ executedTotal | currency:submittedOrderResponse.orderCurrency:'symbol':'1.2-2' }}</p>
-                            <p><strong>Price per share:</strong> {{ executedPrice | currency:submittedOrderResponse.orderCurrency:'symbol':'1.2-2' }}</p>
+                            @if (submittedOrderResponse.status === 'FILLED') {
+                                <p><strong>Quantity:</strong> {{ executedQuantity }} shares</p>
+                                <p><strong>Price:</strong> {{ executedTotal | currency:submittedOrderResponse.orderCurrency:'symbol':'1.2-2' }}</p>
+                                <p><strong>Price per share:</strong> {{ executedPrice | currency:submittedOrderResponse.orderCurrency:'symbol':'1.2-2' }}</p>
+                            }
                         </div>
                         <button (click)="navigateToDashboard()" class="dashboard-button">
                             Go to Dashboard
