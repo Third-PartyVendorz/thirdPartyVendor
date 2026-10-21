@@ -77,7 +77,7 @@ public class HoldingsService {
     }
 
     private Map<Long, Order> getExecutedOrders(Long userId) {
-        return orderRepository.findByUserIdAndStatus(userId, Order.OrderStatus.EXECUTED).stream()
+        return orderRepository.findByUserIdAndStatus(userId, Order.OrderStatus.FILLED).stream()
             .collect(Collectors.toMap(Order::getId, Function.identity()));
     }
 
