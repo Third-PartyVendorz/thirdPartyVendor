@@ -22,6 +22,6 @@ public class Watchlist {
 	private Long userId;
 
 	@Id
-	@Column(name = "ticker", nullable = false, length = 20)
+	@Column(name = "ticker", nullable = false)
 	private String ticker;
 }
