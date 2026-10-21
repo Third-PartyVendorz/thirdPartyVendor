@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, signal, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AssetResultComponent, AssetTradeDetails } from '../asset-result/asset-result';
 
 @Component({
@@ -13,10 +13,22 @@ import { AssetResultComponent, AssetTradeDetails } from '../asset-result/asset-r
 })
 export class AssetsPage {
 	private router = inject(Router);
+	private route = inject(ActivatedRoute);
 
 	searchTicker = '';
 	activeTicker = '';
 	searchError = '';
+
+	constructor() {
+		this.route.queryParamMap.subscribe(params => {
+			const ticker = params.get('ticker')?.trim().toUpperCase();
+			if (ticker) {
+				this.searchTicker = ticker;
+				this.activeTicker = ticker;
+				this.searchError = '';
+			}
+		});
+	}
 
 	submitSearch(): void {
 		const ticker = this.searchTicker.trim().toUpperCase();

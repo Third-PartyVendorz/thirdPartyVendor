@@ -1,6 +1,6 @@
 UPDATE users
 SET role = UPPER(role)
-WHERE Role IS NOT NULL  
+WHERE role IS NOT NULL
     AND role <> UPPER(role);
 
 INSERT INTO users (
