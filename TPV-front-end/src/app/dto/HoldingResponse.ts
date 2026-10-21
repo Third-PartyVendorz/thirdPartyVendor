@@ -1,4 +1,5 @@
 export interface HoldingResponse {
+    userId: number;
     security: string;
     ticker: string;
     assetType: string;

@@ -1,5 +1,6 @@
 import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule, CurrencyPipe, DecimalPipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { Holding } from './holding.model';
 
 type SortColumn = 'ticker' | 'companyName' | 'assetType' | 'shares' | 'price' | 'marketValue' | 'dailyChangePercent' | null;
@@ -7,7 +8,7 @@ type SortDirection = 'asc' | 'desc' | null;
 
 @Component({
   standalone: true,
-  imports: [CommonModule, CurrencyPipe, DecimalPipe],
+  imports: [CommonModule, CurrencyPipe, DecimalPipe, RouterLink],
   selector: 'app-holdings-table',
   styleUrl: './holdings-table.scss',
   templateUrl: './holdings-table.html',

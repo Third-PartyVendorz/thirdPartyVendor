@@ -5,13 +5,16 @@ import { Navbar } from '../../navbar/navbar';
 import { HoldingsTable } from '../holdings-table/holdings-table';
 import { PortfolioGraphics } from '../portfolio-graphics/portfolio-graphics';
 import { HoldingService } from '../../services/holding.service';
-import { AuthService } from '../../services/auth.service';
 import { Holding } from '../holdings-table/holding.model';
+import { AuthService } from '../../services/auth.service';
+import { TradeService } from '../../trade-page/trade.service';
+// import { Trade } from '../../trade-page/'
 import { MarketApiService } from '../../services/marketApi.service';
-import { switchMap, forkJoin, catchError } from 'rxjs';
+import { switchMap, forkJoin, catchError, map } from 'rxjs';
 import { of } from 'rxjs';
 import { MarketQuoteAPIResponse } from '../../dto/MarketQuoteAPIResponse';
 import { MarketSymbolAPIResponse } from '../../dto/MarketSymbolAPIResponse';
+import { HoldingResponse } from '../../dto/HoldingResponse';
 
 @Component({
   standalone: true,
@@ -43,6 +46,13 @@ export class DashboardPage implements OnInit {
     this.cdr.markForCheck();
     
     this.holdingService.fetchHoldingsFromAPI().pipe(
+      map((holdingResponses: HoldingResponse[]): Holding[] => holdingResponses.map(response => ({
+        userId: response.userId,
+        security: response.security,
+        ticker: response.ticker,
+        assetType: response.assetType,
+        numShares: response.numShares
+      }))),
       switchMap((holdings: Holding[]) => {
         // Create observables for all market quote AND asset info requests
         const quoteRequests: { [key: string]: any } = {};
@@ -112,7 +122,6 @@ export class DashboardPage implements OnInit {
                 holding.companyName = assetResponse.data.name;
               }
             });
-
             return of(holdings);
           })
         );
