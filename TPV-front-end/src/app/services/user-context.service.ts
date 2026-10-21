@@ -16,6 +16,7 @@ export class UserContextService {
 
     try {
       const parsedUserContext = JSON.parse(storedUserContext) as Partial<UserContext>;
+      const role = parsedUserContext.role;
 
       if (
         !parsedUserContext.userId ||
@@ -24,7 +25,7 @@ export class UserContextService {
         !parsedUserContext.phoneNumber ||
         !parsedUserContext.email ||
         !parsedUserContext.dateOfBirth ||
-        (parsedUserContext.role !== 'USER' && parsedUserContext.role !== 'ADMIN')
+        (role !== 'USER' && role !== 'ADMIN' && role !== 'ANALYST')
       ) {
         return null;
       }
@@ -36,7 +37,7 @@ export class UserContextService {
         phoneNumber: parsedUserContext.phoneNumber,
         email: parsedUserContext.email,
         dateOfBirth: new Date(parsedUserContext.dateOfBirth),
-        role: parsedUserContext.role,
+        role,
       };
     } catch {
       return null;

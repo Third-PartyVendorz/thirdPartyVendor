@@ -72,7 +72,7 @@ class OrderServiceTest {
         order2.setTicker("TSLA");
         order2.setOrderIntent(Order.OrderIntent.SELL);
         order2.setOrderPrice(BigDecimal.valueOf(500.0));
-        order2.setStatus(Order.OrderStatus.EXECUTED);
+        order2.setStatus(Order.OrderStatus.FILLED);
         order2.setOrderCurrency("USD");
 
         Trade trade = new Trade();

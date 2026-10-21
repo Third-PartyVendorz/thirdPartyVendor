@@ -173,6 +173,32 @@
 					</div>
 				</div>
 			</article>
+
+			<article class="sidebar-card cash-activity-card">
+				<div class="panel-header">
+					<div>
+						<p class="panel-kicker">Cash activity</p>
+						<h2>Recent deposits & withdrawals</h2>
+					</div>
+				</div>
+
+				<div *ngIf="isLoadingCashTransactions" class="cash-activity-state">Loading cash activity...</div>
+				<div *ngIf="!isLoadingCashTransactions && recentCashTransactions.length === 0" class="cash-activity-state">
+					No deposits or withdrawals yet.
+				</div>
+				<div *ngIf="!isLoadingCashTransactions && recentCashTransactions.length > 0" class="cash-activity-list">
+					<div class="cash-activity-item" *ngFor="let transaction of recentCashTransactions">
+						<div>
+							<strong>{{ formatCashTransactionType(transaction.type) }}</strong>
+							<span>{{ transaction.currencyCode }} · {{ transaction.createdAt | date:'MMM d, y, h:mm a' }}</span>
+						</div>
+						<strong [class.deposit-amount]="transaction.type === 'DEPOSIT'"
+							[class.withdrawal-amount]="transaction.type === 'WITHDRAW'">
+							{{ formatCashTransactionAmount(transaction) }}
+						</strong>
+					</div>
+				</div>
+			</article>
 		</aside>
 	</section>
 </section>
