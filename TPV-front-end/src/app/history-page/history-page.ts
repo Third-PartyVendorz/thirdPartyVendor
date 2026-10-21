@@ -243,7 +243,7 @@ export class HistoryPage implements OnInit {
   }
 
   private mapStatus(status: OrderResponse['status']): OrderHistoryEntry['status'] {
-    if (status === 'EXECUTED') {
+    if (status === 'FILLED') {
       return 'Filled';
     }
 
@@ -255,6 +255,9 @@ export class HistoryPage implements OnInit {
   }
 
   private resolveNetAmount(order: OrderResponse): number {
+    if (order.executionPrice !== null && order.executionQuantity !== null) {
+      return order.executionPrice * order.executionQuantity;
+    }
     return order.orderPrice ?? 0;
   }
 

@@ -30,7 +30,7 @@ public class Order {
 
     public enum OrderStatus {
         PENDING,
-        EXECUTED,
+        FILLED,
         CANCELLED
     }
 

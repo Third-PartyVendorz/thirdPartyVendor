@@ -22,6 +22,7 @@ import com.thirdpartyvendor.api.error.UserExceptions.EmailAlreadyInUseException;
 import com.thirdpartyvendor.api.error.UserExceptions.PasswordException;
 import com.thirdpartyvendor.api.error.UserExceptions.UserNotFoundException;
 import com.thirdpartyvendor.api.service.OrderExecutionService.OrderExecutionException;
+import com.thirdpartyvendor.api.error.WatchlistExceptions.WatchlistLimitException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -98,6 +99,14 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(InsufficientCashException.class)
 	public ResponseEntity<ApiErrorResponse> handleConflictException(
 		InsufficientCashException exception,
+		HttpServletRequest request
+	) {
+		return buildResponse(HttpStatus.CONFLICT, exception.getMessage(), request.getRequestURI());
+	}
+
+	@ExceptionHandler(WatchlistLimitException.class)
+	public ResponseEntity<ApiErrorResponse> handleWatchlistLimitException(
+		WatchlistLimitException exception,
 		HttpServletRequest request
 	) {
 		return buildResponse(HttpStatus.CONFLICT, exception.getMessage(), request.getRequestURI());
