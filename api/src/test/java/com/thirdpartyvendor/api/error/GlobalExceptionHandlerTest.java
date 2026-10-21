@@ -16,6 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.thirdpartyvendor.api.error.AuthExceptions.ForbiddenException;
 import com.thirdpartyvendor.api.error.OrderExceptions.BadOrderException;
+import com.thirdpartyvendor.api.error.WatchlistExceptions.WatchlistLimitException;
 
 class GlobalExceptionHandlerTest {
 
@@ -68,6 +69,16 @@ class GlobalExceptionHandlerTest {
 			.andExpect(jsonPath("$.path").value("/errors/bad-order"));
 	}
 
+	@Test
+	void handlesWatchlistLimitViolationAsConflict() throws Exception {
+		mockMvc.perform(get("/errors/watchlist-limit"))
+			.andExpect(status().isConflict())
+			.andExpect(jsonPath("$.status").value(409))
+			.andExpect(jsonPath("$.error").value("Conflict"))
+			.andExpect(jsonPath("$.message").value("A user may have at most 25 watchlist entries"))
+			.andExpect(jsonPath("$.path").value("/errors/watchlist-limit"));
+	}
+
 	@RestController
 	@RequestMapping("/errors")
 	static class TestErrorController {
@@ -90,6 +101,11 @@ class GlobalExceptionHandlerTest {
 		@GetMapping("/bad-order")
 		void badOrderError() {
 			throw new BadOrderException("Order currency is required");
+		}
+
+		@GetMapping("/watchlist-limit")
+		void watchlistLimitError() {
+			throw new WatchlistLimitException();
 		}
 	}
 }

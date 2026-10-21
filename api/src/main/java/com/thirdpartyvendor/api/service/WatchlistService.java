@@ -6,6 +6,7 @@ import java.util.Locale;
 import org.springframework.stereotype.Service;
 
 import com.thirdpartyvendor.api.entity.Watchlist;
+import com.thirdpartyvendor.api.error.WatchlistExceptions.WatchlistLimitException;
 import com.thirdpartyvendor.api.repository.WatchlistRepository;
 
 @Service
@@ -24,6 +25,10 @@ public class WatchlistService {
 	}
 
 	public List<String> addToWatchlist(Long userId, String ticker) {
+		if (watchlistRepository.countByUserId(userId) >= 25) {
+			throw new WatchlistLimitException();
+		}
+
 		Watchlist watchlistEntry = new Watchlist();
 		watchlistEntry.setUserId(userId);
 		watchlistEntry.setTicker(normalizeTicker(ticker));

@@ -5,6 +5,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
 
@@ -66,6 +67,18 @@ class WatchlistServiceTest {
 		assertEquals(List.of(), watchlistService.removeFromWatchlist(userId, List.of(" aapl ", "tsla")));
 		verify(watchlistRepository).deleteByUserIdAndTickerIn(userId, List.of("AAPL", "TSLA"));
 		verify(watchlistRepository).findTop25ByUserIdOrderByTickerAsc(userId);
+	}
+
+	@Test
+	void rejectsAddingWhenUserAlreadyHas25Entries() {
+		Long userId = 1L;
+		when(watchlistRepository.countByUserId(userId)).thenReturn(25L);
+
+		assertThrows(
+			com.thirdpartyvendor.api.error.WatchlistExceptions.WatchlistLimitException.class,
+			() -> watchlistService.addToWatchlist(userId, "AAPL")
+		);
+		verify(watchlistRepository).countByUserId(userId);
 	}
 
 	private Watchlist watchlistEntry(Long userId, String ticker) {

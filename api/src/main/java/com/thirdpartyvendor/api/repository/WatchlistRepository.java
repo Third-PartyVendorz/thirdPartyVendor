@@ -11,5 +11,7 @@ public interface WatchlistRepository extends JpaRepository<Watchlist, WatchlistI
 
 	List<Watchlist> findTop25ByUserIdOrderByTickerAsc(Long userId);
 
+	long countByUserId(Long userId);
+
 	void deleteByUserIdAndTickerIn(Long userId, List<String> tickers);
 }
