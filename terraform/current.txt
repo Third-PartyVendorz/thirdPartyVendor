@@ -1,0 +1,12 @@
+VPC
+
+Private Subnets
+    - ECS
+    - RDS
+
+Private subnets need:
+    - Interface and Gateway Private Link endpoints for accessing ECR and S3
+    - NAT gateway to access external API for finance data
+
+Public Subnets
+    - ALB

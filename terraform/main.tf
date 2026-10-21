@@ -37,8 +37,10 @@ provider "aws" {
 #	})
 #}
 
-#module "networking" {
-#  source = "./modules/networking"
-#  cidr   = ["10.0.0.0/16"]
-#  name   = "TPV"
-#}
+data "aws_region" "current" {}
+
+module "networking" {
+	source = "./modules/networking"
+	cidr   = ["10.0.0.0/16"]
+	name   = "TPV"
+}
