@@ -31,11 +31,6 @@ module "flask-ecr" {
 	name   = "flask-ecr-repo"
 }
 
-module "ecs_cluster" {
-  source = "./modules/ecs/cluster"
-  name   = "tpv-ecs-cluster"
-}
-
 module "target_group_server" {
   source              = "./modules/alb"
   create_target_group = true
@@ -66,5 +61,36 @@ module "alb_server" {
   target_group   = module.target_group_server.arn_tg
 }
 
+module "ecs_cluster" {
+  source = "./modules/ecs/cluster"
+  name   = "tpv-ecs-cluster"
+}
+
+#Create the execution role
+#Attach the execution role to the task definition
+#Create security group for ecs Service
+#Create ecs service and attach everything
+#Also need to attach the load balancer
+
+module "ecs_task_execution_role" {
+  source           = "./modules/iam"
+  name             = "tpv-ecs-task-execution-role"
+  create_ecs_role  = true
+}
+
+#Need 2 task definitions for final product but will just use 1 for now to prove all works
+#Will just start with spring API
 
 
+module "ecs_task_definition_spring" {
+  source             = "./modules/ecs/task-definition"
+  name               = "tpv-td-server"
+  container_name     = var.container_name["server"]
+  execution_role_arn = module.ecs_role.arn_role
+  task_role_arn      = module.ecs_role.arn_role_ecs_task_role
+  cpu                = "256"
+  memory             = "512"
+  docker_repo        = module.ecr_server.ecr_repository_url
+  region             = var.aws_region
+  container_port     = var.port_app_server
+}
