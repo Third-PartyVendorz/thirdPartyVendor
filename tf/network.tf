@@ -10,8 +10,6 @@ tags = {
 }
 
 # ----- Get region and available azs in region -----
-data "aws_region" "current" {}
-
 data "aws_availability_zones" "az_availables" {
   state = "available"
 }
@@ -79,7 +77,7 @@ resource "aws_security_group" "endpoint" {
 resource "aws_vpc_endpoint" "ecr_api" {
   vpc_id              = aws_vpc.vpc.id
   vpc_endpoint_type   = "Interface"
-  service_name        = "com.amazonaws.${data.aws_region.current.region}.ecr.api"
+  service_name        = "com.amazonaws.${var.region}.ecr.api"
   subnet_ids          = aws_subnet.private[*].id
   security_group_ids  = [aws_security_group.endpoint.id]
   private_dns_enabled = true
@@ -88,7 +86,7 @@ resource "aws_vpc_endpoint" "ecr_api" {
 resource "aws_vpc_endpoint" "ecr_dkr" {
   vpc_id              = aws_vpc.vpc.id
   vpc_endpoint_type   = "Interface"
-  service_name        = "com.amazonaws.${data.aws_region.current.region}.ecr.dkr"
+  service_name        = "com.amazonaws.${var.region}.ecr.dkr"
   subnet_ids          = aws_subnet.private[*].id
   security_group_ids  = [aws_security_group.endpoint.id]
   private_dns_enabled = true
@@ -97,7 +95,7 @@ resource "aws_vpc_endpoint" "ecr_dkr" {
 resource "aws_vpc_endpoint" "gateway_endpoints" {
   vpc_id              = aws_vpc.vpc.id
   vpc_endpoint_type   = "Gateway"
-  service_name        = "com.amazonaws.${data.aws_region.current.region}.s3"
+  service_name        = "com.amazonaws.${var.region}.s3"
 
   route_table_ids = [
     aws_route_table.private_rt.id
