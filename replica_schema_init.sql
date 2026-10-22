@@ -6,6 +6,7 @@ CREATE TABLE orders (
     -- either quantity or order_price must be provided based on if user chooses shares or dollar amount.
     quantity NUMERIC(15, 4),
     order_price NUMERIC(15, 4),
+    instrument_price_at_order NUMERIC(15, 4),
     -- enum
     status VARCHAR(20) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
