@@ -3,7 +3,7 @@
 
 	<div *ngIf="notFound() && !loading()" class="asset-not-found">
 		<article class="asset-card asset-status-card error">Asset not found. Please check the ticker symbol and try again.</article>
-		<p class="asset-status-message">Use the search bar above to try another ticker.</p>
+		<p class="asset-status-message">Go back to search to try another ticker.</p>
 	</div>
 
 	<div *ngIf="!loading()">
@@ -20,6 +20,25 @@
 						<button (click)="onTradeButtonClick(currentAsset.symbol)" class="trade-button">
 							Trade
 							<span class="material-icons-outlined trade-button__icon">compare_arrows</span>
+						</button>
+						<button
+							*ngIf="!isWatchlisted"
+							(click)="watchlistButtonClicked.emit()"
+							class="watchlist-button"
+							type="button"
+						>
+							<span class="material-icons-outlined" aria-hidden="true">bookmark_add</span>
+							Add to watchlist
+						</button>
+						<button
+							*ngIf="isWatchlisted"
+							(click)="watchlistRemoveClicked.emit()"
+							class="watchlist-button watchlist-button--saved"
+							type="button"
+							title="Remove from watchlist"
+						>
+							<span class="material-icons-outlined" aria-hidden="true">bookmark</span>
+							In watchlist
 						</button>
 					</div>
 

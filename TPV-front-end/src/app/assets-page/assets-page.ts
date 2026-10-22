@@ -8,11 +8,45 @@ import { PageHeader } from '../shared/page-header/page-header';
 import { Holding } from '../dashboard/holdings-table/holding.model';
 import { HoldingService } from '../services/holding.service';
 import { OrderService } from '../services/order.service';
+import { WatchlistService } from '../services/watchlist.service';
+import { MessageService } from '../services/message.service';
+import { MarketApiService } from '../services/marketApi.service';
 import { OrderResponse } from '../dto/OrderResponse';
+	import { MarketQuoteData } from '../dto/MarketQuoteAPIResponse';
 import { forkJoin, of } from 'rxjs';
 import { catchError, distinctUntilChanged, map, retry, startWith, timeout } from 'rxjs/operators';
 import { CustomSliderComponent } from '../shared/custom-slider/custom-slider';
 import { MarketStatus } from '../shared/market-status/market-status';
+
+type WatchlistAsset = {
+	symbol: string;
+	name: string;
+	price: number | null;
+	change: number | null;
+	changePercent: number | null;
+	currency: string;
+	marketState: string;
+};
+
+const RECENT_SEARCHES_KEY = 'tpv.recentAssetSearches';
+const RECENT_SEARCHES_LIMIT = 5;
+
+function readRecentSearches(): string[] {
+	try {
+		const stored: unknown = JSON.parse(localStorage.getItem(RECENT_SEARCHES_KEY) ?? '[]');
+		return Array.isArray(stored) ? stored.filter((ticker): ticker is string => typeof ticker === 'string').slice(0, RECENT_SEARCHES_LIMIT) : [];
+	} catch {
+		return [];
+	}
+}
+
+function storeRecentSearches(tickers: string[]): void {
+	try {
+		localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(tickers));
+	} catch {
+		// Storage may be blocked; the list then lasts only for this page load.
+	}
+}
 
 @Component({
 	standalone: true,
@@ -27,13 +61,17 @@ export class AssetsPage implements OnInit {
 	private destroyRef = inject(DestroyRef);
 	private holdingService = inject(HoldingService);
 	private orderService = inject(OrderService);
+	private watchlistService = inject(WatchlistService);
+	private marketApiService = inject(MarketApiService);
+	private messageService = inject(MessageService);
 
-	readonly trendingAssets = [
-		{ symbol: 'NVDA', name: 'NVIDIA', price: '$182.41', change: '+3.84%', negative: false },
-		{ symbol: 'AAPL', name: 'Apple', price: '$342.94', change: '-0.15%', negative: true },
-		{ symbol: 'MSFT', name: 'Microsoft', price: '$518.62', change: '+1.26%', negative: false },
-		{ symbol: 'TSLA', name: 'Tesla', price: '$412.76', change: '+2.09%', negative: false },
-	];
+	readonly watchlistAssets = signal<WatchlistAsset[]>([]);
+	readonly watchlistLoading = signal(false);
+	readonly watchlistSaving = signal(false);
+	readonly watchlistError = signal('');
+	readonly watchlistLimit = 25;
+	readonly recentSearches = signal<string[]>(readRecentSearches());
+	private selectedWatchlist = new Set<string>();
 
 	searchTicker = '';
 	cryptoCurrency = 'USD';
@@ -59,6 +97,7 @@ export class AssetsPage implements OnInit {
 	}
 
 	ngOnInit(): void {
+		this.loadWatchlist();
 		this.route.queryParamMap
 			.pipe(
 				map((params) => params.get('ticker')),
@@ -69,6 +108,79 @@ export class AssetsPage implements OnInit {
 			.subscribe((ticker) => {
 				this.applyTickerFromParams(ticker);
 			});
+	}
+
+	private loadWatchlist(): void {
+		this.watchlistLoading.set(true);
+		this.watchlistError.set('');
+		this.watchlistService.getWatchlist()
+			.pipe(
+				catchError(() => {
+					this.watchlistError.set('Your watchlist could not be loaded.');
+					return of([] as string[]);
+				}),
+				takeUntilDestroyed(this.destroyRef),
+			)
+			.subscribe((symbols) => {
+				this.selectedWatchlist = new Set([...this.selectedWatchlist].filter((symbol) => symbols.includes(symbol)));
+				this.loadWatchlistAssets(symbols);
+			});
+	}
+
+	private loadWatchlistAssets(symbols: string[]): void {
+		if (!symbols.length) {
+			this.watchlistAssets.set([]);
+			this.watchlistLoading.set(false);
+			return;
+		}
+
+		// Restore this request when live watchlist quotes are ready for this screen.
+		// const quotesRequest = this.marketApiService.fetchQuotes(symbols);
+		const quotesRequest = of({
+			data: Object.fromEntries(symbols.map((symbol, index) => [symbol, this.createMockQuote(symbol, index)])),
+		});
+
+		quotesRequest
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe((quotes) => {
+				this.watchlistAssets.set(symbols.map((symbol) => this.toWatchlistAsset(symbol, quotes.data[symbol] ?? null)));
+				this.watchlistLoading.set(false);
+			}, () => {
+				this.watchlistError.set('Your watchlist quotes could not be loaded.');
+				this.watchlistAssets.set(symbols.map((symbol) => this.toWatchlistAsset(symbol)));
+				this.watchlistLoading.set(false);
+			});
+	}
+
+	private createMockQuote(symbol: string, index: number): MarketQuoteData {
+		const price = 84 + ((index * 37) % 190) + 0.42;
+		const changePercent = index % 4 === 1 ? -0.84 : 0.62 + (index % 3) * 0.41;
+
+		return {
+			symbol,
+			price,
+			bid: price - 0.08,
+			ask: price + 0.08,
+			spreadBps: 2,
+			currency: 'USD',
+			change: price * (changePercent / 100),
+			changePercent,
+			previousClose: price - price * (changePercent / 100),
+			asOf: new Date().toISOString(),
+			marketState: 'open',
+		};
+	}
+
+	private toWatchlistAsset(symbol: string, quote: MarketQuoteData | null = null): WatchlistAsset {
+		return {
+			symbol,
+			name: symbol,
+			price: quote?.price ?? null,
+			change: quote?.change ?? null,
+			changePercent: quote?.changePercent ?? null,
+			currency: quote?.currency || 'USD',
+			marketState: quote?.marketState || 'unavailable',
+		};
 	}
 
 	private applyTickerFromParams(value: string | null | undefined): void {
@@ -130,6 +242,115 @@ export class AssetsPage implements OnInit {
 		this.submitSearch();
 	}
 
+	clearActiveAsset(): void {
+		if (this.activityRetryTimer) {
+			clearTimeout(this.activityRetryTimer);
+		}
+		this.activeTicker = '';
+		this.activityTicker = '';
+		this.searchError = '';
+		this.router.navigate([], { relativeTo: this.route, queryParams: {} });
+	}
+
+	isWatchlisted(symbol: string): boolean {
+		return this.watchlistAssets().some((asset) => asset.symbol === symbol);
+	}
+
+	isWatchlistSelected(symbol: string): boolean {
+		return this.selectedWatchlist.has(symbol);
+	}
+
+	allWatchlistSelected(): boolean {
+		return this.watchlistAssets().length > 0 && this.selectedWatchlist.size === this.watchlistAssets().length;
+	}
+
+	someWatchlistSelected(): boolean {
+		return this.selectedWatchlist.size > 0 && !this.allWatchlistSelected();
+	}
+
+	toggleWatchlistSelection(symbol: string): void {
+		if (this.selectedWatchlist.has(symbol)) {
+			this.selectedWatchlist.delete(symbol);
+		} else {
+			this.selectedWatchlist.add(symbol);
+		}
+	}
+
+	toggleAllWatchlistSelection(): void {
+		if (this.allWatchlistSelected()) {
+			this.selectedWatchlist.clear();
+			return;
+		}
+
+		this.selectedWatchlist = new Set(this.watchlistAssets().map((asset) => asset.symbol));
+	}
+
+	removeSelectedWatchlist(): void {
+		const symbols = [...this.selectedWatchlist];
+		if (!symbols.length) {
+			return;
+		}
+
+		this.saveWatchlist(this.watchlistService.removeFromWatchlist(symbols));
+	}
+
+	addActiveToWatchlist(): void {
+		if (!this.activeTicker || this.isWatchlisted(this.activeTicker)) {
+			return;
+		}
+
+		if (this.watchlistAtLimit()) {
+			this.messageService.setErrorMessage(`Your watchlist is full (${this.watchlistLimit}/${this.watchlistLimit}). Remove an asset to save another.`);
+			return;
+		}
+
+		this.saveWatchlist(this.watchlistService.addToWatchlist(this.activeTicker));
+	}
+
+	removeActiveFromWatchlist(): void {
+		if (!this.activeTicker || !this.isWatchlisted(this.activeTicker)) {
+			return;
+		}
+
+		this.removeSymbolFromWatchlist(this.activeTicker);
+	}
+
+	removeSymbolFromWatchlist(symbol: string): void {
+		this.saveWatchlist(this.watchlistService.removeFromWatchlist([symbol]));
+	}
+
+	watchlistCount(): number {
+		return this.watchlistAssets().length;
+	}
+
+	watchlistAtLimit(): boolean {
+		return this.watchlistCount() >= this.watchlistLimit;
+	}
+
+	watchlistFillPercent(): number {
+		return Math.min(100, (this.watchlistCount() / this.watchlistLimit) * 100);
+	}
+
+	private saveWatchlist(request: ReturnType<WatchlistService['getWatchlist']>): void {
+		this.watchlistSaving.set(true);
+		request
+			.pipe(
+				catchError((error) => {
+					this.messageService.setErrorMessage(error?.error?.message ?? 'Your watchlist could not be updated.');
+					return of(null);
+				}),
+				takeUntilDestroyed(this.destroyRef),
+			)
+			.subscribe((symbols) => {
+				if (symbols) {
+					this.watchlistError.set('');
+					this.selectedWatchlist.clear();
+					this.loadWatchlistAssets(symbols);
+				}
+				this.watchlistSaving.set(false);
+			});
+	}
+
 	private buildTicker(): string {
 		const symbol = this.searchTicker.trim().toUpperCase();
 		if (this.marketType === 'crypto') {
@@ -148,11 +369,23 @@ export class AssetsPage implements OnInit {
 		this.beginActivityLoad(ticker);
 	}
 
+	rememberRecentSearch(ticker: string): void {
+		const next = [ticker, ...this.recentSearches().filter((recent) => recent !== ticker)].slice(0, RECENT_SEARCHES_LIMIT);
+		this.recentSearches.set(next);
+		storeRecentSearches(next);
+	}
+
+	clearRecentSearches(): void {
+		this.recentSearches.set([]);
+		storeRecentSearches([]);
+	}
+
 	onAssetFound(ticker: string): void {
 		if (this.activeTicker !== ticker) {
 			return;
 		}
 
+		this.rememberRecentSearch(ticker);
 		this.activityTicker = ticker;
 		this.loadUserActivity(ticker);
 	}

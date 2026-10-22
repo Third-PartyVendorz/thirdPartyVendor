@@ -1,71 +1,172 @@
-<section class="assets-page">
+<section class="assets-page" [class.has-active-asset]="activeTicker">
 	<app-page-header
 		eyebrow="Assets"
 		title="Explore assets"
+		description="Research markets, compare history, and keep the assets you care about close."
 	>
 		<app-market-status />
 	</app-page-header>
 
-	<div class="assets-discovery-row">
-	<section class="assets-search-panel command-panel">
-		<div class="assets-search-copy">
-			<p class="assets-eyebrow">Find an asset</p>
-			<h2>Search by ticker</h2>
-		</div>
-		<app-custom-slider
-			class="market-type-slider"
-			[leftValue]="'equity'"
-			[rightValue]="'crypto'"
-			leftLabel="Equities"
-			rightLabel="Crypto"
-			[value]="marketType"
-			[leftColor]="'#07253e'"
-			[rightColor]="'#0b3558'"
-			(valueChange)="setMarketType($event)"
-		></app-custom-slider>
+	<ng-template #watchlistCapacity>
+		<span
+			class="watchlist-capacity"
+			[attr.title]="'Saved assets: ' + watchlistCount() + ' of ' + watchlistLimit"
+		>
+			<span class="watchlist-capacity__count"><strong>{{ watchlistCount() }}</strong>/{{ watchlistLimit }}</span>
+			<span class="watchlist-capacity__track" aria-hidden="true"><span [style.width.%]="watchlistFillPercent()"></span></span>
+		</span>
+	</ng-template>
 
-		<form class="assets-search-form" (ngSubmit)="submitSearch()">
-			<label class="sr-only" for="asset-ticker-input">Ticker</label>
-			<span class="material-icons-outlined search-icon" aria-hidden="true">search</span>
-			<input class="field-control" id="asset-ticker-input" name="ticker" [(ngModel)]="searchTicker" type="text" autocomplete="off" />
-			<ng-container *ngIf="marketType === 'crypto'">
-				<span class="ticker-quote-separator">:</span>
-				<input class="field-control ticker-currency-input" id="asset-currency-input" name="currency" [(ngModel)]="cryptoCurrency" type="text" placeholder="USD" maxlength="3" autocomplete="off" />
-			</ng-container>
-			<button class="ticker-search-button" type="submit"><span class="material-icons-outlined" aria-hidden="true">search</span>Search</button>
-		</form>
-
-		<p *ngIf="searchError" class="assets-search-error">{{ searchError }}</p>
-	</section>
-
-	<section class="trending-assets command-panel" aria-labelledby="trending-assets-title">
-		<div class="section-heading">
-			<div>
-				<p class="assets-eyebrow">Market watch</p>
-				<h2 id="trending-assets-title">Popular symbols</h2>
+	<ng-template #watchlistContent>
+		<div class="watchlist-header">
+			<p class="assets-eyebrow">Saved assets</p>
+			<div class="watchlist-title-row">
+				<h2 class="watchlist-title">Your watchlist</h2>
+				<ng-container *ngTemplateOutlet="watchlistCapacity"></ng-container>
 			</div>
 		</div>
-		<div class="trending-grid">
-			<button class="ticker-card" type="button" *ngFor="let asset of trendingAssets" (click)="selectPopular(asset.symbol)">
-				<span class="ticker-symbol">{{ asset.symbol }}</span>
-				<span class="ticker-name">{{ asset.name }}</span>
-				<span class="ticker-price">{{ asset.price }}</span>
-				<span class="ticker-change" [class.negative-change]="asset.negative">{{ asset.change }}</span>
-				<span class="material-icons-outlined ticker-arrow" aria-hidden="true">arrow_outward</span>
-			</button>
+
+		<p *ngIf="watchlistError()" class="watchlist-feedback watchlist-feedback--error" role="alert">{{ watchlistError() }}</p>
+		<p *ngIf="watchlistLoading()" class="watchlist-feedback" role="status">Loading your watchlist...</p>
+		<div *ngIf="!watchlistLoading() && !watchlistAssets().length" class="watchlist-empty-state">
+			<span class="material-icons-outlined" aria-hidden="true">bookmark_add</span>
+			<div>
+				<strong>Your watchlist is empty</strong>
+				<p>Open an asset and use Add to watchlist to save it here.</p>
+			</div>
 		</div>
+
+		<ng-container *ngIf="!watchlistLoading() && watchlistAssets().length">
+			<div class="watchlist-toolbar">
+				<label class="select-all-control">
+					<input
+						type="checkbox"
+						[checked]="allWatchlistSelected()"
+						[indeterminate]="someWatchlistSelected()"
+						(change)="toggleAllWatchlistSelection()"
+					/>
+					<span>Select all</span>
+				</label>
+				<button
+					class="button-secondary watchlist-remove-button"
+					type="button"
+					[disabled]="!someWatchlistSelected() && !allWatchlistSelected() || watchlistSaving()"
+					(click)="removeSelectedWatchlist()"
+				>
+					<span class="material-icons-outlined" aria-hidden="true">remove_circle_outline</span>
+					Remove selected
+				</button>
+			</div>
+
+			<ul class="watchlist-list">
+				<li class="watchlist-item" *ngFor="let asset of watchlistAssets()" [class.is-active]="asset.symbol === activeTicker">
+					<label class="watchlist-select" [attr.aria-label]="'Select ' + asset.symbol">
+						<input type="checkbox" [checked]="isWatchlistSelected(asset.symbol)" (change)="toggleWatchlistSelection(asset.symbol)" />
+					</label>
+					<button
+						class="watchlist-open"
+						type="button"
+						[attr.aria-current]="asset.symbol === activeTicker ? 'true' : null"
+						(click)="selectPopular(asset.symbol)"
+					>
+						<span class="ticker-symbol">{{ asset.symbol }}</span>
+						<span class="watchlist-price">{{ asset.price !== null ? (asset.price | currency:asset.currency:'symbol':'1.2-2') : 'N/A' }}</span>
+						<span *ngIf="asset.changePercent !== null" class="watchlist-change" [class.negative-change]="asset.changePercent < 0">{{ asset.changePercent > 0 ? '+' : '' }}{{ asset.changePercent | number:'1.2-2' }}%</span>
+					</button>
+					<button
+						class="watchlist-remove"
+						type="button"
+						[disabled]="watchlistSaving()"
+						[attr.aria-label]="'Remove ' + asset.symbol + ' from watchlist'"
+						title="Remove from watchlist"
+						(click)="removeSymbolFromWatchlist(asset.symbol)"
+					>
+						<span class="material-icons-outlined" aria-hidden="true">close</span>
+					</button>
+				</li>
+			</ul>
+		</ng-container>
+	</ng-template>
+
+	<div *ngIf="!activeTicker" class="assets-discovery-row">
+	<div class="explore-entry-column">
+		<section class="assets-search-panel command-panel">
+			<div class="assets-search-copy">
+				<p class="assets-eyebrow">Find an asset</p>
+				<h2>Search by ticker</h2>
+			</div>
+			<app-custom-slider
+				class="market-type-slider"
+				[leftValue]="'equity'"
+				[rightValue]="'crypto'"
+				leftLabel="Equities"
+				rightLabel="Crypto"
+				[value]="marketType"
+				[leftColor]="'#07253e'"
+				[rightColor]="'#0b3558'"
+				(valueChange)="setMarketType($event)"
+			></app-custom-slider>
+
+			<form class="assets-search-form" (ngSubmit)="submitSearch()">
+				<label class="sr-only" for="asset-ticker-input">Ticker</label>
+				<span class="material-icons-outlined search-icon" aria-hidden="true">search</span>
+				<input class="field-control" id="asset-ticker-input" name="ticker" [(ngModel)]="searchTicker" type="text" autocomplete="off" />
+				<ng-container *ngIf="marketType === 'crypto'">
+					<span class="ticker-quote-separator">:</span>
+					<input class="field-control ticker-currency-input" id="asset-currency-input" name="currency" [(ngModel)]="cryptoCurrency" type="text" placeholder="USD" maxlength="3" autocomplete="off" />
+				</ng-container>
+				<button class="ticker-search-button" type="submit"><span class="material-icons-outlined" aria-hidden="true">search</span>Search</button>
+			</form>
+
+			<p *ngIf="searchError" class="assets-search-error">{{ searchError }}</p>
+
+			<section class="recent-searches" aria-labelledby="recent-searches-title">
+				<div class="recent-searches__header">
+					<p id="recent-searches-title" class="assets-eyebrow">Recent searches</p>
+					<button *ngIf="recentSearches().length" class="recent-searches__clear" type="button" (click)="clearRecentSearches()">Clear</button>
+				</div>
+				<div *ngIf="recentSearches().length; else noRecentSearches" class="recent-searches__chips">
+					<button *ngFor="let ticker of recentSearches()" class="recent-search-chip" type="button" (click)="selectPopular(ticker)">{{ ticker }}</button>
+				</div>
+				<ng-template #noRecentSearches>
+					<p class="recent-searches__empty">No recent searches yet.</p>
+				</ng-template>
+			</section>
+		</section>
+
+		</div>
+
+	<section class="watchlist-panel command-panel" aria-label="Watchlist">
+		<ng-container *ngTemplateOutlet="watchlistContent"></ng-container>
 	</section>
+	</div>
+
+	<div *ngIf="activeTicker" class="asset-view-bar">
+		<button class="button-secondary asset-back-button" type="button" (click)="clearActiveAsset()">
+			<span class="material-icons-outlined" aria-hidden="true">arrow_back</span>
+			Back to search
+		</button>
 	</div>
 
 	<div *ngIf="activeTicker" class="asset-content-row">
 	<ng-container>
+		<div class="asset-research-column">
 		<app-asset-result
 			[ticker]="activeTicker"
+			[isWatchlisted]="isWatchlisted(activeTicker)"
 			(assetFound)="onAssetFound($event)"
 			(tickerNotFound)="onTickerNotFound($event)"
 			(tradeButtonClicked)="openTradeModal($event)"
+			(watchlistButtonClicked)="addActiveToWatchlist()"
+			(watchlistRemoveClicked)="removeActiveFromWatchlist()"
 		></app-asset-result>
+		</div>
 	</ng-container>
+
+	<aside class="asset-side-column">
+	<section class="watchlist-panel watchlist-panel--compact command-panel" aria-label="Watchlist">
+		<ng-container *ngTemplateOutlet="watchlistContent"></ng-container>
+	</section>
 
 	<section *ngIf="activityTicker === activeTicker" class="asset-activity-panel command-panel" aria-labelledby="asset-activity-title">
 		<div class="asset-activity-panel__header">
@@ -117,6 +218,7 @@
 			<button type="button" class="button-secondary" (click)="nextOrderPage()" [disabled]="orderPage === orderPageCount">Next</button>
 		</div>
 	</section>
+	</aside>
 	</div>
 
 </section>
