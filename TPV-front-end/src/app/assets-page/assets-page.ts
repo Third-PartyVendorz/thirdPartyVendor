@@ -134,41 +134,63 @@ export class AssetsPage implements OnInit {
 			return;
 		}
 
-		// Restore this request when live watchlist quotes are ready for this screen.
-		// const quotesRequest = this.marketApiService.fetchQuotes(symbols);
-		const quotesRequest = of({
-			data: Object.fromEntries(symbols.map((symbol, index) => [symbol, this.createMockQuote(symbol, index)])),
-		});
-
-		quotesRequest
-			.pipe(takeUntilDestroyed(this.destroyRef))
+		this.marketApiService.fetchQuotes(symbols)
+			.pipe(
+				catchError((error: unknown) => of(this.partialQuotesFromError(error) ?? { data: {} } as const)),
+				takeUntilDestroyed(this.destroyRef),
+			)
 			.subscribe((quotes) => {
-				this.watchlistAssets.set(symbols.map((symbol) => this.toWatchlistAsset(symbol, quotes.data[symbol] ?? null)));
-				this.watchlistLoading.set(false);
-			}, () => {
-				this.watchlistError.set('Your watchlist quotes could not be loaded.');
-				this.watchlistAssets.set(symbols.map((symbol) => this.toWatchlistAsset(symbol)));
+				const quoteBySymbol = this.quotesBySymbol(quotes);
+				const missingQuotes = symbols.some((symbol) => !quoteBySymbol.get(symbol.toUpperCase()));
+				this.watchlistError.set(missingQuotes ? 'Some watchlist quotes could not be loaded.' : '');
+				this.watchlistAssets.set(symbols.map((symbol) => this.toWatchlistAsset(symbol, quoteBySymbol.get(symbol.toUpperCase()) ?? null)));
 				this.watchlistLoading.set(false);
 			});
 	}
 
-	private createMockQuote(symbol: string, index: number): MarketQuoteData {
-		const price = 84 + ((index * 37) % 190) + 0.42;
-		const changePercent = index % 4 === 1 ? -0.84 : 0.62 + (index % 3) * 0.41;
+	private quotesBySymbol(response: unknown): Map<string, MarketQuoteData> {
+		const result = new Map<string, MarketQuoteData>();
+		let payload = response;
 
-		return {
-			symbol,
-			price,
-			bid: price - 0.08,
-			ask: price + 0.08,
-			spreadBps: 2,
-			currency: 'USD',
-			change: price * (changePercent / 100),
-			changePercent,
-			previousClose: price - price * (changePercent / 100),
-			asOf: new Date().toISOString(),
-			marketState: 'open',
-		};
+		if (typeof payload === 'object' && payload !== null && !Array.isArray(payload) && 'data' in payload) {
+			payload = payload.data;
+		}
+		if (typeof payload === 'object' && payload !== null && !Array.isArray(payload) && 'quotes' in payload) {
+			payload = payload.quotes;
+		}
+
+		if (Array.isArray(payload)) {
+			for (const item of payload) {
+				if (typeof item !== 'object' || item === null || !('symbol' in item) || typeof item.symbol !== 'string') {
+					continue;
+				}
+
+				const quote = 'quote' in item ? item.quote : null;
+				if (typeof quote === 'object' && quote !== null && 'price' in quote) {
+					result.set(item.symbol.toUpperCase(), quote as MarketQuoteData);
+				}
+			}
+
+			return result;
+		}
+
+		if (typeof payload === 'object' && payload !== null) {
+			for (const [symbol, value] of Object.entries(payload)) {
+				if (typeof value === 'object' && value !== null && 'price' in value) {
+					result.set(symbol.toUpperCase(), value as MarketQuoteData);
+				}
+			}
+		}
+
+		return result;
+	}
+
+	private partialQuotesFromError(error: unknown): unknown | null {
+		if (typeof error !== 'object' || error === null || !('error' in error)) {
+			return null;
+		}
+
+		return error.error;
 	}
 
 	private toWatchlistAsset(symbol: string, quote: MarketQuoteData | null = null): WatchlistAsset {
