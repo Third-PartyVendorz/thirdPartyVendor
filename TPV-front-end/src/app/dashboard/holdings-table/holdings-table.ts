@@ -40,6 +40,10 @@ export class HoldingsTable {
           aValue = a.companyName || '';
           bValue = b.companyName || '';
           break;
+        case 'assetType':
+          aValue = a.assetType || 0;
+          bValue = b.assetType || 0;
+          break;
         case 'shares':
           aValue = a.numShares;
           bValue = b.numShares;
@@ -52,10 +56,6 @@ export class HoldingsTable {
           aValue = a.marketValue || 0;
           bValue = b.marketValue || 0;
           break;
-        // case 'gainLoss':
-        //   aValue = a.gainLoss || 0;
-        //   bValue = b.gainLoss || 0;
-        //   break;
         case 'dailyChangePercent':
           aValue = a.dailyChangePercent || 0;
           bValue = b.dailyChangePercent || 0;

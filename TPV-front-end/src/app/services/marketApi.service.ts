@@ -3,6 +3,7 @@ import { HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { MarketQuoteAPIResponse } from '../dto/MarketQuoteAPIResponse';
+import { MarketCacheQuotesAPIResponse } from '../dto/MarketCacheQuotesAPIResponse';
 import { MarketSymbolAPIResponse } from '../dto/MarketSymbolAPIResponse';
 import { MarketHistoricalAPIResponse } from '../dto/MarketHistoricalAPIResponse';
 
@@ -24,6 +25,17 @@ export class MarketApiService {
       headers: {
         'X-Api-Key': this.FAUXNANCE_API_KEY
       }
+    });
+  }
+
+  fetchCacheQuotes(tickers: string[]): Observable<MarketCacheQuotesAPIResponse> {
+    const params = new HttpParams().set('symbols', tickers.join(','));
+
+    return this.http.get<MarketCacheQuotesAPIResponse>(`${this.FAUXNANCE_API_URL}/quotes`, {
+      headers: {
+        'X-Api-Key': this.FAUXNANCE_API_KEY
+      },
+      params
     });
   }
 
