@@ -22,7 +22,7 @@
                     @for (holding of holdings; track holding.currencyCode) {
                         <tr>
                             <td class="currency">{{ holding.currencyCode }}</td>
-                            <td class="numeric">{{ holding.balance | number:'1.2-6' }} {{ holding.currencyCode }}</td>
+                            <td class="numeric">{{ holding.balance | number:'1.2' }} {{ holding.currencyCode }}</td>
                         </tr>
                     }
                 </tbody>
