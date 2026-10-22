@@ -8,20 +8,6 @@ pipeline {
 	}
 
 	stages {
-		stage('Destroy infrastructure') {
-			steps {
-				withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) {
-					dir('mock-deploy/tf') {
-						sh '''
-							terraform init
-							terraform destroy -auto-approve
-						'''
-					}
-				}
-			}
-		}
-
-		/*
 		stage('Provision ECR') {
 			steps {
 				withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) {
@@ -78,6 +64,5 @@ pipeline {
 				}
 			}
 		}
-		*/
 	}
 }
