@@ -21,6 +21,10 @@ export class TradeService {
     return this.http.get<CashHoldingResponse>(`${environment.apiBaseUrl}/cashHoldings/${currencyCode}`);
   }
 
+  getCashHoldings(): Observable<CashHoldingResponse[]> {
+    return this.http.get<CashHoldingResponse[]>(`${environment.apiBaseUrl}/cashHoldings`);
+  }
+
   postCashTransaction(request: CashTransactionRequest): Observable<CashHoldingResponse> {
     return this.http.post<CashHoldingResponse>(`${environment.apiBaseUrl}/cashHoldings`, request);
   }

@@ -1,0 +1,32 @@
+<section class="forex-card" aria-labelledby="forex-holdings-title">
+    <div class="card-header">
+        <h2 id="forex-holdings-title">Foreign Exchange Holdings</h2>
+    </div>
+
+    @if (isLoading) {
+        <p class="state-message">Loading your forex holdings...</p>
+    } @else if (errorMessage) {
+        <p class="state-message error" role="alert">{{ errorMessage }}</p>
+    } @else if (holdings.length === 0) {
+        <p class="state-message">You do not currently hold any foreign currency.</p>
+    } @else {
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Currency</th>
+                        <th class="numeric">Balance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (holding of holdings; track holding.currencyCode) {
+                        <tr>
+                            <td class="currency">{{ holding.currencyCode }}</td>
+                            <td class="numeric">{{ holding.balance | number:'1.2-6' }} {{ holding.currencyCode }}</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>
