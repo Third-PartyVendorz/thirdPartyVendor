@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Holding } from '../dashboard/holdings-table/holding.model';
+import { HoldingResponse } from '../dto/HoldingResponse';
 import { environment } from '../../environments/environment.local';
 import { AuthService } from './auth.service';
 
@@ -14,8 +14,8 @@ export class HoldingService {
         private authService: AuthService
     ) {}
 
-    fetchHoldingsFromAPI(): Observable<Holding[]> {
-        return this.http.get<Holding[]>(
+    fetchHoldingsFromAPI(): Observable<HoldingResponse[]> {
+        return this.http.get<HoldingResponse[]>(
             `${environment.apiBaseUrl}/holdings`,
         );
     }

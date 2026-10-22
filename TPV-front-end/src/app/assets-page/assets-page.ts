@@ -1,9 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, signal, inject } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
-import { ActivatedRoute } from '@angular/router';
-import { DestroyRef, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AssetResultComponent, AssetTradeDetails } from '../asset-result/asset-result';
 import { PageHeader } from '../shared/page-header/page-header';
@@ -84,6 +82,17 @@ export class AssetsPage implements OnInit {
 		}
 		this.activeTicker = ticker;
 		this.activityTicker = '';
+	}
+
+	constructor() {
+		this.route.queryParamMap.subscribe(params => {
+			const ticker = params.get('ticker')?.trim().toUpperCase();
+			if (ticker) {
+				this.searchTicker = ticker;
+				this.activeTicker = ticker;
+				this.searchError = '';
+			}
+		});
 	}
 
 	submitSearch(): void {

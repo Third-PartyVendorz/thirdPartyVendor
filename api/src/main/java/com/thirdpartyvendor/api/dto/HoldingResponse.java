@@ -7,5 +7,7 @@ public record HoldingResponse (
     String security,
     String ticker,
     String assetType,
-    BigDecimal numShares
+    BigDecimal numShares,
+    BigDecimal costBasis,
+    BigDecimal realizedGainLoss
 ) {}

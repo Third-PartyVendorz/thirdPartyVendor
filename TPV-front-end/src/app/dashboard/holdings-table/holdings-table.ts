@@ -3,7 +3,7 @@ import { CommonModule, CurrencyPipe, DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Holding } from './holding.model';
 
-type SortColumn = 'ticker' | 'companyName' | 'shares' | 'averageCost' | 'lastPrice' | 'marketValue' | 'gainLoss' | 'dailyChangePercent' | null;
+type SortColumn = 'ticker' | 'companyName' | 'assetType' | 'shares' | 'price' | 'marketValue' | 'dailyChangePercent' | null;
 type SortDirection = 'asc' | 'desc' | null;
 
 @Component({
@@ -36,38 +36,34 @@ export class HoldingsTable {
           aValue = a.ticker;
           bValue = b.ticker;
           break;
+        case 'companyName':
+          aValue = a.companyName || '';
+          bValue = b.companyName || '';
+          break;
+        case 'assetType':
+          aValue = a.assetType || '';
+          bValue = b.assetType || '';
+          break;
         case 'shares':
           aValue = a.numShares;
           bValue = b.numShares;
           break;
-        // case 'companyName':
-        //   aValue = a.companyName;
-        //   bValue = b.companyName;
-        //   break;
-        // case 'shares':
-        //   aValue = a.shares;
-        //   bValue = b.shares;
-        //   break;
-        // case 'averageCost':
-        //   aValue = a.averageCost;
-        //   bValue = b.averageCost;
-        //   break;
-        // case 'lastPrice':
-        //   aValue = a.lastPrice;
-        //   bValue = b.lastPrice;
-        //   break;
-        // case 'marketValue':
-        //   aValue = a.marketValue;
-        //   bValue = b.marketValue;
-        //   break;
+        case 'price':
+          aValue = a.price || 0;
+          bValue = b.price || 0;
+          break;
+        case 'marketValue':
+          aValue = a.marketValue || 0;
+          bValue = b.marketValue || 0;
+          break;
         // case 'gainLoss':
-        //   aValue = a.gainLoss;
-        //   bValue = b.gainLoss;
+        //   aValue = a.gainLoss || 0;
+        //   bValue = b.gainLoss || 0;
         //   break;
-        // case 'dailyChangePercent':
-        //   aValue = a.dailyChangePercent;
-        //   bValue = b.dailyChangePercent;
-        //   break;
+        case 'dailyChangePercent':
+          aValue = a.dailyChangePercent || 0;
+          bValue = b.dailyChangePercent || 0;
+          break;
         default:
           return 0;
       }
@@ -150,11 +146,11 @@ export class HoldingsTable {
     switch (column) {
       case 'ticker': return 'Ticker';
       case 'companyName': return 'Name';
+      case 'assetType': return 'Asset Type'
       case 'shares': return 'Shares';
-      case 'averageCost': return 'Avg. Cost';
-      case 'lastPrice': return 'Last Price';
+      case 'price': return 'Current Price';
       case 'marketValue': return 'Market Value';
-      case 'gainLoss': return 'Total Gain/Loss';
+      // case 'gainLoss': return 'Total Gain/Loss';
       case 'dailyChangePercent': return 'Day Change';
       default: return 'Sort by';
     }
