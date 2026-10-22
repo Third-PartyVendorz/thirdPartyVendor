@@ -47,6 +47,12 @@ Jenkins Pipelines:
 
 
 
+secrets.auto.tfvars --> treat as .env
+
+variables.tf --> load in all env variables, secrets, and parameters
+
+main.tf --> Main driver file
+
 
 
 
@@ -73,3 +79,14 @@ Jenkins Pipelines:
 #		}]
 #	})
 #}
+
+
+
+
+
+secrets.auto.tfvars --> treat as .env
+
+variables.tf --> load in all env variables, secrets, and parameters
+
+main.tf --> Main driver file
+
