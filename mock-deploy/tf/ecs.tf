@@ -10,6 +10,7 @@ data "template_file" "task_def_template" {
         fargate_cpu = "256"
         fargate_memory = "512"
         aws_region = var.region
+        log_group_name = aws_cloudwatch_log_group.tpv_spring_logs.name
         app_port = var.spring_port
     }
 }

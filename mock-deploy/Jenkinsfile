@@ -62,7 +62,7 @@ pipeline {
 						ALB_HOST=$(terraform output -raw alb_hostname)
 						API_URL="http://${ALB_HOST}:8080/"
 						echo "API URL: ${API_URL}"
-						curl --fail --show-error --silent --retry 50 --retry-connrefused --retry-delay 10 --connect-timeout 10 --max-time 30 "${API_URL}"
+						curl --fail --show-error --silent --retry 10 --retry-connrefused --retry-delay 10 --connect-timeout 10 --max-time 30 "${API_URL}"
 						echo
 					'''
 				}
