@@ -40,5 +40,16 @@ pipeline {
 				}
 			}
 		}
+
+		stage('Show API URL') {
+			steps {
+				dir('tf') {
+					sh '''
+						ALB_HOST=$(terraform output -raw alb_hostname)
+						echo "API URL: http://${ALB_HOST}:8080/"
+					'''
+				}
+			}
+		}
 	}
 }
