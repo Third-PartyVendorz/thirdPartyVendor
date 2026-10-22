@@ -14,7 +14,6 @@ import com.thirdpartyvendor.api.repository.HoldingRepository;
 import com.thirdpartyvendor.api.repository.OrderRepository;
 import com.thirdpartyvendor.api.repository.TradeRepository;
 
-import ch.qos.logback.classic.model.processor.LoggerModelHandler;
 import jakarta.transaction.Transactional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -54,8 +53,8 @@ public class OrderExecutionService {
             throw new OrderExecutionException("Order does not belong to the current user");
         }
 
-        if (order.getStatus() == Order.OrderStatus.CANCELLED) {
-            throw new OrderExecutionException("Cancelled orders cannot be executed");
+        if (order.getStatus() != Order.OrderStatus.PENDING) {
+            throw new OrderExecutionException("Only pending orders can be executed");
         }
 
         MarketQuoteAPIResponse quoteResponse = marketDataAPIClient.fetchQuote(order.getTicker());
