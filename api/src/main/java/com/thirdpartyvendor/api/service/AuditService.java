@@ -77,15 +77,14 @@ public class AuditService {
         AppUser client = findClient(order.getUserId());
         Trade execution = tradeRepository.findByOrderId(order.getId()).stream().findFirst().orElse(null);
         BigDecimal calculatedQuantity = calculateQuantity(order, execution);
-        String orderValue = formatPrice(order.getOrderPrice(), order.getOrderCurrency());
-        String priceDetail = execution != null
-            ? "Execution price: " + formatPrice(execution.getExecutionPrice(), execution.getTradeCurrency())
-            : order.getOrderPrice() != null
-                ? "Order value: " + orderValue
-                : "Price: Not recorded";
+        String submittedPrice = "Instrument price at order: " + formatPrice(order.getInstrumentPriceAtOrder(), order.getOrderCurrency());
+        String executionPrice = execution == null
+            ? null
+            : "Execution price: " + formatPrice(execution.getExecutionPrice(), execution.getTradeCurrency());
+        String priceDetail = executionPrice == null ? submittedPrice : submittedPrice + "; " + executionPrice;
         String summary = calculatedQuantity != null
             ? order.getOrderIntent() + " order recorded for " + calculatedQuantity + " " + order.getTicker() + " at " + priceDetail + "."
-            : order.getOrderIntent() + " order value of " + orderValue + " recorded for " + order.getTicker() + ".";
+            : order.getOrderIntent() + " order value of " + formatPrice(order.getOrderPrice(), order.getOrderCurrency()) + " recorded for " + order.getTicker() + ".";
         String status = switch (order.getStatus()) {
             case PENDING -> "Pending";
             case FILLED -> "Filled";
@@ -106,7 +105,8 @@ public class AuditService {
                 calculatedQuantity == null
                     ? "Quantity: Not yet determined"
                     : (order.getQuantity() == null ? "Calculated quantity: " : "Requested quantity: ") + calculatedQuantity,
-                priceDetail
+                submittedPrice,
+                executionPrice == null ? "Execution price: Not recorded" : executionPrice
             ),
             priceDetail,
             "No cash or holdings impact recorded at order creation"
@@ -143,9 +143,12 @@ public class AuditService {
             List.of(
                 "Related order: " + trade.getOrderId(),
                 "Execution quantity: " + trade.getExecutionQuantity() + " " + trade.getTicker(),
-                "Execution currency: " + (trade.getTradeCurrency() == null ? "Not recorded" : trade.getTradeCurrency())
+                "Execution currency: " + (trade.getTradeCurrency() == null ? "Not recorded" : trade.getTradeCurrency()),
+                "Instrument price at order: " + formatPrice(order.getInstrumentPriceAtOrder(), order.getOrderCurrency()),
+                "Execution price: " + formatPrice(trade.getExecutionPrice(), trade.getTradeCurrency())
             ),
-            "Execution price: " + trade.getExecutionPrice() + currency,
+            "Instrument price at order: " + formatPrice(order.getInstrumentPriceAtOrder(), order.getOrderCurrency())
+                + "; Execution price: " + trade.getExecutionPrice() + currency,
             "Execution recorded; cash and holdings settlement must be reconciled from the related account records"
         );
     }

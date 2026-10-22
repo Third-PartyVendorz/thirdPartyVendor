@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { PortfolioSummary } from '../portfolio-summary/portfolio-summary';
 import { Navbar } from '../../navbar/navbar';
 import { HoldingsTable } from '../holdings-table/holdings-table';
+import { ForexHoldings } from '../forex-holdings/forex-holdings';
 import { PortfolioGraphics } from '../portfolio-graphics/portfolio-graphics';
 import { HoldingService } from '../../services/holding.service';
 import { Holding } from '../holdings-table/holding.model';
@@ -15,7 +16,7 @@ import { HoldingResponse } from '../../dto/HoldingResponse';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, Navbar, PortfolioSummary, HoldingsTable, PortfolioGraphics],
+  imports: [CommonModule, Navbar, PortfolioSummary, HoldingsTable, ForexHoldings, PortfolioGraphics],
   selector: 'app-dashboard-page',
   styleUrl: './dashboard-page.scss',
   templateUrl: './dashboard-page.html',
