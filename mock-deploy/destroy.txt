@@ -1,9 +1,0 @@
-  set -a
-  source mock-deploy/.env
-  set +a
-
-  aws sts get-caller-identity
-
-  cd mock-deploy/tf
-  terraform init
-  terraform destroy -auto-approve

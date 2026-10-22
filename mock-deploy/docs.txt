@@ -1,0 +1,5 @@
+Install AWs Credentials Plugin on Jenkins:
+
+Add AWS credentials there
+
+Destroy everything through jenkins, because it creates an isolated tf state there so your local will not know what changes you have made there
