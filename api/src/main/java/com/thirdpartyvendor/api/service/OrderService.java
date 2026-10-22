@@ -55,14 +55,18 @@ public class OrderService {
 
     public OrderResponse createOrder(CreateOrderRequest createOrderRequest, Long userId) {
         orderValidator.validateCreateOrder(createOrderRequest, userId);
-        validateOrderFunds(createOrderRequest, userId);
+        String ticker = normalizeTicker(createOrderRequest.ticker());
+        MarketQuoteAPIResponse quoteResponse = marketDataAPIClient.fetchQuote(ticker);
+        BigDecimal instrumentPriceAtOrder = quoteResponse.data().price().setScale(4, RoundingMode.HALF_UP);
+        validateOrderFunds(createOrderRequest, userId, instrumentPriceAtOrder);
 
         Order newOrder = new Order();
         newOrder.setUserId(userId);
-        newOrder.setTicker(normalizeTicker(createOrderRequest.ticker()));
+        newOrder.setTicker(ticker);
         newOrder.setOrderIntent(createOrderRequest.orderIntent());
         newOrder.setQuantity(createOrderRequest.quantity());
         newOrder.setOrderPrice(createOrderRequest.orderPrice());
+        newOrder.setInstrumentPriceAtOrder(instrumentPriceAtOrder);
         newOrder.setStatus(OrderStatus.PENDING);
         newOrder.setOrderCurrency(normalizeCurrency(createOrderRequest.orderCurrency()));
 
@@ -93,10 +97,7 @@ public class OrderService {
         );
     }
 
-    private void validateOrderFunds(CreateOrderRequest request, Long userId) {
-        MarketQuoteAPIResponse quoteResponse = marketDataAPIClient.fetchQuote(normalizeTicker(request.ticker()));
-        BigDecimal quotePrice = quoteResponse.data().price().setScale(4, RoundingMode.HALF_UP);
-
+    private void validateOrderFunds(CreateOrderRequest request, Long userId, BigDecimal quotePrice) {
         if (request.orderIntent() == Order.OrderIntent.BUY) {
             BigDecimal tradeAmount = resolveTradeAmount(request.quantity(), request.orderPrice(), quotePrice);
             cashHoldingsService.ensureSufficientCash(normalizeCurrency(request.orderCurrency()), tradeAmount, userId);
