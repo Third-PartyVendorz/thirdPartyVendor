@@ -21,7 +21,7 @@ import { HoldingResponse } from '../../dto/HoldingResponse';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, Navbar, PortfolioSummary, HoldingsTable, ForexHoldings, PortfolioGraphics],
+  imports: [CommonModule, Navbar, PortfolioSummary, HoldingsTable, ForexHoldings, PortfolioGraphics, PageHeader],
   selector: 'app-dashboard-page',
   styleUrl: './dashboard-page.scss',
   templateUrl: './dashboard-page.html',
