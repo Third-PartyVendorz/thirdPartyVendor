@@ -54,13 +54,31 @@ pipeline {
 			}
 		}
 
-		stage('Show API URL') {
+		stage('Verify API') {
 			steps {
 				dir('mock-deploy/tf') {
 					sh '''
 						ALB_HOST=$(terraform output -raw alb_hostname)
-						echo "API URL: http://${ALB_HOST}:8080/"
+						API_URL="http://${ALB_HOST}:8080/"
+						echo "API URL: ${API_URL}"
+						curl --fail --show-error --silent --retry 12 --retry-delay 10 --connect-timeout 10 "${API_URL}"
+						echo
 					'''
+				}
+			}
+		}
+	}
+
+	post {
+		always {
+			stage('Destroy infrastructure') {
+				withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) {
+					dir('mock-deploy/tf') {
+						sh '''
+							terraform init
+							terraform destroy -auto-approve -var="spring_image=${IMAGE_TAG}"
+						'''
+					}
 				}
 			}
 		}
