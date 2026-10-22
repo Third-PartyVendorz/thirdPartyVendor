@@ -27,7 +27,7 @@ resource "aws_security_group" "ecs_security" {
         protocol    = "tcp"
         from_port   = var.spring_port
         to_port     = var.spring_port
-        cidr_blocks = [aws_security_group.alb_security.id]
+        security_groups = [aws_security_group.alb_security.id]
     }
 
     egress {
