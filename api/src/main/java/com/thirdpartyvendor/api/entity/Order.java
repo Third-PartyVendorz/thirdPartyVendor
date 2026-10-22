@@ -55,6 +55,9 @@ public class Order {
     @Column(name = "order_price", precision = 15, scale = 4)
     private BigDecimal orderPrice;
 
+    @Column(name = "instrument_price_at_order", precision = 15, scale = 4)
+    private BigDecimal instrumentPriceAtOrder;
+
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
