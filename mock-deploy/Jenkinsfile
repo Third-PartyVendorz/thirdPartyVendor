@@ -8,6 +8,19 @@ pipeline {
 	}
 
 	stages {
+		stage('Provision ECR') {
+			steps {
+				withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) {
+					dir('mock-deploy/tf') {
+						sh '''
+							terraform init
+							terraform apply -auto-approve -target=aws_ecr_repository.spring_repository
+						'''
+					}
+				}
+			}
+		}
+
 		stage('Build image') {
 			steps {
 				sh 'docker build -t ${ECR_REPOSITORY}:${IMAGE_TAG} mock-deploy/mock-api'
