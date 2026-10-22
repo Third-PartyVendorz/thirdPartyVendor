@@ -71,14 +71,12 @@ pipeline {
 
 	post {
 		always {
-			stage('Destroy infrastructure') {
-				withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) {
-					dir('mock-deploy/tf') {
-						sh '''
-							terraform init
-							terraform destroy -auto-approve -var="spring_image=${IMAGE_TAG}"
-						'''
-					}
+			withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) {
+				dir('mock-deploy/tf') {
+					sh '''
+						terraform init
+						terraform destroy -auto-approve -var="spring_image=${IMAGE_TAG}"
+					'''
 				}
 			}
 		}
