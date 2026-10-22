@@ -1,0 +1,44 @@
+pipeline {
+	agent any
+
+	environment {
+		AWS_REGION = 'us-east-2'
+		ECR_REPOSITORY = 'spring-ecr-repository'
+		IMAGE_TAG = "${env.BUILD_NUMBER}"
+	}
+
+	stages {
+		stage('Build image') {
+			steps {
+				sh 'docker build -t ${ECR_REPOSITORY}:${IMAGE_TAG} mock-api'
+			}
+		}
+
+		stage('Push image') {
+			steps {
+				withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) {
+					sh '''
+						ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+						REGISTRY="${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+						aws ecr get-login-password --region "${AWS_REGION}" | docker login --username AWS --password-stdin "${REGISTRY}"
+						docker tag "${ECR_REPOSITORY}:${IMAGE_TAG}" "${REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}"
+						docker push "${REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}"
+					'''
+				}
+			}
+		}
+
+		stage('Deploy infrastructure') {
+			steps {
+				withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) {
+					dir('tf') {
+						sh '''
+							terraform init
+							terraform apply -auto-approve -var="spring_image=${IMAGE_TAG}"
+						'''
+					}
+				}
+			}
+		}
+	}
+}
