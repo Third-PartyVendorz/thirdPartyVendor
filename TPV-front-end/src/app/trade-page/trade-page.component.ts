@@ -1,7 +1,7 @@
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { Component, signal, DestroyRef, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AssetResultComponent, AssetTradeDetails } from '../asset-result/asset-result';
 import { TradeFormComponent } from './trade-form/trade-form.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -13,7 +13,7 @@ import { MarketStatus } from '../shared/market-status/market-status';
 
 @Component({
 	standalone: true,
-	imports: [CommonModule, FormsModule, CurrencyPipe, DatePipe, AssetResultComponent, TradeFormComponent, FrozenAccountModal, PageHeader, CustomSliderComponent, MarketStatus],
+	imports: [CommonModule, FormsModule, CurrencyPipe, DatePipe, AssetResultComponent, TradeFormComponent, FrozenAccountModal, PageHeader, CustomSliderComponent, MarketStatus, RouterLink],
 	selector: 'app-trade-page',
 	styleUrl: './trade-page.component.scss',
 	templateUrl: './trade-page.component.html',

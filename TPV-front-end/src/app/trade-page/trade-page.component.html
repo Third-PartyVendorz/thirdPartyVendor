@@ -60,6 +60,14 @@
 		<ng-container *ngIf="assetDetails() as details">
 			<div class="trade-workspace">
 				<div class="stock-info-compact">
+					<a
+						class="asset-details-link"
+						[routerLink]="['/explore-assets']"
+						[queryParams]="{ ticker: details.symbol }"
+					>
+						<span class="material-icons-outlined" aria-hidden="true">open_in_new</span>
+						View more details
+					</a>
 					<div class="stock-identity">
 						<div class="info-badge">{{ details.symbol }}</div>
 						<div>
