@@ -235,6 +235,35 @@ export class AssetResultComponent implements OnInit {
 		return candles.find((candle) => candle.volume > 0) ?? this.latestCandle;
 	}
 
+	get rangeGainLoss(): number | null {
+		const candles = this.displayedCandles;
+		if (candles.length < 2) {
+			return null;
+		}
+
+		return candles[candles.length - 1].adjclose - candles[0].adjclose;
+	}
+
+	get rangeGainLossPercent(): number | null {
+		const gainLoss = this.rangeGainLoss;
+		const startValue = this.displayedCandles[0]?.adjclose;
+		if (gainLoss === null || !startValue) {
+			return null;
+		}
+
+		return (gainLoss / startValue) * 100;
+	}
+
+	get rangeDayLabel(): string {
+		const labels: Record<HistoricalRange, string> = {
+			'7d': '7-day',
+			'30d': '30-day',
+			'1y': '1-year',
+		};
+
+		return labels[this.selectedRange()];
+	}
+
 	get historicalRangeLabel(): string {
 		const candles = this.displayedCandles;
 		if (candles.length === 0) {
