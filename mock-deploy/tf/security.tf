@@ -49,7 +49,8 @@ resource "aws_security_group" "rds_security" {
         protocol    = "tcp"
         from_port   = var.primary_db_port
         to_port     = var.primary_db_port
-        security_groups = [aws_security_group.alb_security.id]
+        #security_groups = [aws_security_group.alb_security.id]
+        cidr_blocks = ["0.0.0.0/0"]
     }
 
     egress {
