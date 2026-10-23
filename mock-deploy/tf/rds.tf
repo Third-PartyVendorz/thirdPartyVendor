@@ -43,7 +43,7 @@ resource "aws_db_instance" "rds_replica" {
     replicate_source_db             = aws_db_instance.rds_primary.identifier
     instance_class                  = "db.t3.micro"
     storage_type                    = "gp3"
-    port                            = var.primary_db_port
+    port                            = var.replica_db_port
     # A same-Region read replica inherits the source DB subnet group.
     vpc_security_group_ids          = [aws_security_group.rds_security.id]
     parameter_group_name            = aws_db_parameter_group.pg_logical.name
