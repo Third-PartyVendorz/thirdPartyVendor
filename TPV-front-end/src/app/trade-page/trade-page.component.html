@@ -36,20 +36,39 @@
 	</section>
 
 	<section class="trending-assets command-panel" aria-labelledby="trade-trending-assets-title">
-		<div class="section-heading">
-			<div>
-				<p class="assets-eyebrow">Market watch</p>
-				<h2 id="trade-trending-assets-title">Popular symbols</h2>
-			</div>
+		<div class="trending-heading">
+			<p class="assets-eyebrow">Market watch · Last 24 hours</p>
+			<h2 id="trade-trending-assets-title">Trending symbols</h2>
 		</div>
-		<div class="trending-grid">
-			<button class="ticker-card" type="button" *ngFor="let asset of watchlist" (click)="selectPopular(asset.symbol)">
-				<span class="ticker-symbol">{{ asset.symbol }}</span>
-				<span class="ticker-name">{{ asset.name }}</span>
-				<span class="ticker-price">{{ asset.price }}</span>
-				<span class="ticker-change" [class.negative-change]="asset.negative">{{ asset.change }}</span>
-				<span class="material-icons-outlined ticker-arrow" aria-hidden="true">arrow_outward</span>
-			</button>
+		<div class="trending-body">
+			<p *ngIf="trendingLoading()">Loading trending symbols...</p>
+			<p *ngIf="trendingError()">{{ trendingError() }}</p>
+			<p *ngIf="!trendingLoading() && !trendingError() && !trendingTickers().length">No orders in the last 24 hours.</p>
+			<table class="trending-table" *ngIf="trendingTickers().length">
+				<thead>
+					<tr>
+						<th>Rank</th>
+						<th>Symbol</th>
+						<th>Orders</th>
+						<th>Price</th>
+						<th>Change</th>
+						<th><span class="visually-hidden">Actions</span></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr *ngFor="let asset of trendingTickers(); let i = index">
+						<td class="rank">{{ i + 1 }}</td>
+						<td class="ticker-symbol">{{ asset.symbol }}</td>
+						<td>{{ asset.orderCount }}</td>
+						<td>{{ asset.price !== null ? (asset.price | currency:asset.currency:'symbol':'1.2-2') : '--' }}</td>
+						<td class="ticker-change" [class.negative-change]="asset.changePercent !== null && asset.changePercent < 0">{{ asset.changePercent === null ? '--' : ((asset.changePercent > 0 ? '+' : '') + (asset.changePercent | number:'1.2-2') + '%') }}</td>
+						<td class="ticker-actions">
+							<a class="ticker-action" [routerLink]="['/explore-assets']" [queryParams]="{ ticker: asset.symbol }">Explore</a>
+							<button class="ticker-action" type="button" (click)="selectPopular(asset.symbol)">Trade</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>
 		</div>
 	</section>
 	</div>

@@ -3,7 +3,9 @@ export interface MarketQuoteAPIResponse {
 }
 
 export interface MarketQuoteBatchAPIResponse {
-  data: Record<string, MarketQuoteData | null>;
+  data: {
+    quotes: { symbol: string; stale?: boolean; quote: MarketQuoteData | null }[];
+  };
 }
 
 export interface MarketQuoteData {

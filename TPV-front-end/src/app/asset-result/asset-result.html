@@ -67,6 +67,13 @@
 						<div class="card-heading">
 							<div>
 								<p class="card-eyebrow">History</p>
+								<p *ngIf="hasHistoricalData" class="range-gain-loss" [class.positive]="(rangeGainLoss ?? 0) > 0" [class.negative]="(rangeGainLoss ?? 0) < 0">
+									<ng-container *ngIf="rangeGainLoss !== null; else noRangeGainLoss">
+										{{ rangeGainLoss > 0 ? '+' : '' }}{{ rangeGainLoss | currency:currentQuote.currency:'symbol':'1.2-2' }}
+										({{ (rangeGainLossPercent ?? 0) > 0 ? '+' : '' }}{{ rangeGainLossPercent | number:'1.2-2' }}%) over {{ rangeDayLabel }} period
+									</ng-container>
+									<ng-template #noRangeGainLoss>N/A</ng-template>
+								</p>
 							</div>
 							<div class="chart-range chart-controls">
 								<div class="interval-picker" role="group" aria-label="Historical range">
