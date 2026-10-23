@@ -40,5 +40,5 @@ variable "primary_db_port" {default = 5432}
 
 variable "replica_db_port" {default = 5433}
 
-variable "database_username" {default = "test"}
-variable "database_password" {default = "test"}
+variable "database_username" {default = "test1234567"}
+variable "database_password" {default = "test1234567"}
