@@ -1,1 +1,51 @@
 @use '../../navbar/navbar';
+
+.role-actions {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+}
+
+@media (min-width: 981px) {
+	.role-actions {
+		grid-column: 3;
+		justify-self: end;
+	}
+}
+
+.logout-button {
+	border: 0;
+	background: transparent;
+	color: #ffffff;
+	cursor: pointer;
+	font: inherit;
+	padding: 4px 0;
+}
+
+.logout-button:hover {
+	color: #F8B776;
+}
+
+.mobile-nav button.nav-link {
+	width: 100%;
+	border: 0;
+	background: transparent;
+	color: #ffffff;
+	cursor: pointer;
+	font: inherit;
+	text-align: left;
+}
+
+.mobile-nav button.nav-link:hover {
+	color: #F8B776;
+}
+
+@media (max-width: 980px) {
+	.role-actions {
+		display: flex;
+	}
+
+	.mobile-menu-button {
+		display: none;
+	}
+}

@@ -2,40 +2,13 @@
   <div class="brand-name">
     <h1>Third Party Vendor</h1>
   </div>
-  <nav class="desktop-nav">
-    <ul>
-      <li routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }"><a class="nav-link" routerLink="/analytics">Analytics Dashboard</a></li>
-    </ul>
-  </nav>
-  <div class="profile-menu">
-    <div class="profile-actions">
-      @if (accountIsFrozen) {
-        <span class="frozen-warning" role="status" tabindex="0" aria-label="Account frozen">
-          <span class="material-icons-outlined" aria-hidden="true">error_outline</span>
-          <span class="frozen-warning__tooltip" role="tooltip">Your account is frozen</span>
-        </span>
-      }
-      <button class="profile-button" type="button" (click)="toggleProfileMenu($event)" [attr.aria-expanded]="isProfileMenuOpen" aria-haspopup="menu" aria-label="Open profile menu">
-        <img src="/profile-icon.jpg" alt="Profile Icon">
-      </button>
-    </div>
-    <div class="profile-dropdown" *ngIf="isProfileMenuOpen" role="menu">
-      <span role="menuitem">Analyst</span>
-      <button type="button" role="menuitem" (click)="logout()">Logout</button>
-    </div>
+  <div class="role-actions">
+    @if (accountIsFrozen) {
+      <span class="frozen-warning" role="status" tabindex="0" aria-label="Account frozen">
+        <span class="material-icons-outlined" aria-hidden="true">error_outline</span>
+        <span class="frozen-warning__tooltip" role="tooltip">Your account is frozen</span>
+      </span>
+    }
+    <button class="logout-button" type="button" (click)="logout()">Logout</button>
   </div>
-  <button class="mobile-menu-button" (click)="isMenuOpen = !isMenuOpen">
-    ☰
-  </button>
-</div>
-
-<div class="mobile-nav" *ngIf="isMenuOpen" (click)="$event.stopPropagation()">
-  <a class="nav-link" routerLink="/analytics" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">Analytics Dashboard</a>
-  @if (accountIsFrozen) {
-    <span class="frozen-warning frozen-warning--mobile" role="status" tabindex="0" aria-label="Account frozen">
-      <span class="material-icons-outlined" aria-hidden="true">error_outline</span>
-      <span class="frozen-warning__tooltip" role="tooltip">Your account is frozen</span>
-    </span>
-  }
-  <button class="nav-link" type="button" (click)="logout()">Logout</button>
 </div>
