@@ -24,3 +24,29 @@ OR
 Terraform for lambda function that initializes the main db
 
 Terraform for lambda function that creates subscription on replica tables
+
+
+
+
+export RDSHOST="pg-primary.cd4mqi4gczvk.us-east-2.rds.amazonaws.com" 
+psql "host=$RDSHOST port=5432 dbname=tpv_primary user=test1234567 sslmode=verify-full sslrootcert=./global-bundle.pem"
+
+
+
+
+
+
+Create 2 independent db instances that live in same subnet
+
+Set up pu/sub manually with sql
+
+
+
+
+To test principle:
+
+For now only initialize a single db instance
+
+try connecting from jenkins
+
+echo some type of validation or running a SQL query

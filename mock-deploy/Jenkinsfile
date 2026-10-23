@@ -54,6 +54,26 @@ pipeline {
 			}
 		}
 
+		stage('Test RDS connection') {
+			steps {
+				withCredentials([usernamePassword(credentialsId: 'rds-credentials', usernameVariable: 'RDSUSER', passwordVariable: 'PGPASSWORD')]) {
+					dir('mock-deploy/tf') {
+						sh '''
+							export RDSHOST="$(terraform output -raw rds_hostname)"
+							export PGCONNECT_TIMEOUT=10
+							curl --fail --show-error --silent --location \
+								--connect-timeout 10 --max-time 60 \
+								https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem \
+								-o global-bundle.pem
+							psql "host=$RDSHOST port=5432 dbname=tpv_primary user=$RDSUSER sslmode=verify-full sslrootcert=./global-bundle.pem" \
+								--no-password --no-psqlrc --set=ON_ERROR_STOP=1 \
+								--command='SELECT current_database(), current_user;'
+						'''
+					}
+				}
+			}
+		}
+
 		stage('Verify API') {
 			steps {
 				sleep time: 5, unit: 'MINUTES'
