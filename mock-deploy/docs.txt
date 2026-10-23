@@ -2,6 +2,13 @@ Install AWs Credentials Plugin on Jenkins:
 
 Add AWS credentials there
 
+The RDS connection test runs psql from the postgres:16 Docker image; the
+Jenkins agent does not need a locally installed PostgreSQL client. It needs
+Docker access and permission to pull the image. The test uses Linux host
+networking and mounts the downloaded RDS CA bundle read-only, so Docker must
+run on the same host as the Jenkins workspace (not a remote Docker daemon).
+PGPASSWORD is passed through the environment, not as a command-line value.
+
 Destroy everything through jenkins, because it creates an isolated tf state there so your local will not know what changes you have made there
 
 

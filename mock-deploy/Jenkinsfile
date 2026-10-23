@@ -65,7 +65,11 @@ pipeline {
 								--connect-timeout 10 --max-time 60 \
 								https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem \
 								-o global-bundle.pem
-							psql "host=$RDSHOST port=5432 dbname=tpv_primary user=$RDSUSER sslmode=verify-full sslrootcert=./global-bundle.pem" \
+							docker run --rm --network host \
+								--env PGPASSWORD --env PGCONNECT_TIMEOUT \
+								--mount "type=bind,source=$PWD/global-bundle.pem,target=/certs/global-bundle.pem,readonly" \
+								postgres:17 \
+								psql "host=$RDSHOST port=5432 dbname=tpv_primary user=$RDSUSER sslmode=verify-full sslrootcert=/certs/global-bundle.pem" \
 								--no-password --no-psqlrc --set=ON_ERROR_STOP=1 \
 								--command='SELECT current_database(), current_user;'
 						'''
