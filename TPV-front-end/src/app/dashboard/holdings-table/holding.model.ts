@@ -4,6 +4,7 @@ export interface Holding {
     userId: number;
     security: string;
     assetType: string;
+    currency: string;
     // Market data (fetched from MarketApiService)
     lastPrice?: number;
     companyName?: string;

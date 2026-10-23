@@ -8,12 +8,14 @@
 
     @media (max-width: 1024px) {
         border: none;
+        background: transparent;
         box-shadow: none;
     }
 }
 
 .card-header {
     padding: 1rem 1.5rem;
+    background:#ffffff;
     border-bottom: 1px solid #e5e7eb;
     display: flex;
     align-items: center;
@@ -405,22 +407,32 @@ td {
     }
 }
 
+.mobile-change-value {
+    display: flex;
+    justify-content: flex-end;
+    align-items: baseline;
+    gap: 0.35rem;
+    min-width: 0;
+
+    .change-amount,
+    .change-percent {
+        display: inline;
+        white-space: nowrap;
+    }
+}
+
+@media (max-width: 360px) {
+    .mobile-change-value {
+        flex-wrap: wrap;
+        column-gap: 0.25rem;
+        row-gap: 0.1rem;
+    }
+}
+
 .mobile-holdings-value.company-name {
     font-size: 1.05rem;
     font-weight: 600;
     color: #123f74;
-}
-
-.table-footer {
-    padding: 1rem 1.5rem;
-    border-top: 1px solid #e5e7eb;
-    background: #f9fafb;
-    display: flex;
-    justify-content: center;
-
-    @media (max-width: 1024px) {
-        padding: 0.75rem 1rem;
-    }
 }
 
 .load-more-btn {

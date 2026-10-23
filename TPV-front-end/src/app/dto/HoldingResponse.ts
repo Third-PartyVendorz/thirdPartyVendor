@@ -5,5 +5,6 @@ export interface HoldingResponse {
     assetType: string;
     numShares: number;
     costBasis?: number;
+    currency: string;
     realizedGainLoss?: number;
 }

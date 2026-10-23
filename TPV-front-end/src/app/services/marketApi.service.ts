@@ -8,8 +8,6 @@ import { MarketHistoricalAPIResponse } from '../dto/MarketHistoricalAPIResponse'
 
 import { environment } from '../../environments/environment.local';
 
-
-
 @Injectable({
   providedIn: 'root'
 })

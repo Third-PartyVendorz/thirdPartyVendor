@@ -4,9 +4,21 @@
     gap: 1.25rem;
     min-height: calc(100vh - 68px);
     padding: 1.5rem clamp(1rem, 3vw, 2.25rem) 2rem;
+    box-sizing: border-box;
     background:
         radial-gradient(circle at top left, rgba(85, 196, 189, 0.12), transparent 30%),
         linear-gradient(180deg, var(--color-page-start) 0%, var(--color-page) 100%);
+}
+
+.dashboard > app-page-header,
+.dashboard > .top-row,
+.dashboard > app-forex-holdings,
+.dashboard > .bottom-row {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
 }
 
 // .bottom-row {

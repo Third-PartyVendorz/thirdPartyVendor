@@ -1,7 +1,7 @@
 .forex-card {
     background: #ffffff;
     border: 1px solid #e5e7eb;
-    margin: 0.5rem;
+    margin: 0;
     border-radius: 12px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
     overflow: hidden;
@@ -80,7 +80,6 @@ td {
 
 @media (max-width: 1024px) {
     .forex-card {
-        border: none;
         box-shadow: none;
     }
 
