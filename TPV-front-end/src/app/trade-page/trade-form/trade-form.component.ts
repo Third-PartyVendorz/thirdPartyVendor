@@ -98,7 +98,7 @@ export class TradeFormComponent implements OnInit, OnChanges {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response) => {
-          this.buyingPower = response.balance;
+          this.buyingPower = response.buyingPower;
           this.hasCurrency = response.balance > 0;
           this.cdr.markForCheck();
         },
@@ -291,14 +291,14 @@ export class TradeFormComponent implements OnInit, OnChanges {
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: (response) => {
-            if (response.balance < this.buyingPowerAtOrderSummaryOpen) {
-              this.buyingPower = response.balance;
+            if (response.buyingPower < this.buyingPowerAtOrderSummaryOpen) {
+              this.buyingPower = response.buyingPower;
               this.showBuyingPowerChangedModal = true;
               this.cdr.markForCheck();
               return;
             }
 
-            if (response.balance < this.estimatedTotal) {
+            if (response.buyingPower < this.estimatedTotal) {
               this.closeOrderSummaryPanel();
             } else {
               this.submitOrder();

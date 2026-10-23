@@ -1,18 +1,24 @@
 package com.thirdpartyvendor.api.service;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.thirdpartyvendor.api.client.MarketDataAPIClient;
+import com.thirdpartyvendor.api.dto.MarketQuoteAPIResponse;
+import com.thirdpartyvendor.api.entity.Holding;
 import com.thirdpartyvendor.api.entity.Order;
+import com.thirdpartyvendor.api.entity.Trade;
 import com.thirdpartyvendor.api.repository.HoldingRepository;
 import com.thirdpartyvendor.api.repository.OrderRepository;
 import com.thirdpartyvendor.api.repository.TradeRepository;
@@ -20,15 +26,18 @@ import com.thirdpartyvendor.api.repository.TradeRepository;
 class OrderExecutionServiceTest {
 
     private OrderRepository orderRepository;
+    private HoldingRepository holdingRepository;
+    private TradeRepository tradeRepository;
+    private CashHoldingsService cashHoldingsService;
     private MarketDataAPIClient marketDataAPIClient;
     private OrderExecutionService orderExecutionService;
 
     @BeforeEach
     void setUp() {
         orderRepository = mock(OrderRepository.class);
-        HoldingRepository holdingRepository = mock(HoldingRepository.class);
-        TradeRepository tradeRepository = mock(TradeRepository.class);
-        CashHoldingsService cashHoldingsService = mock(CashHoldingsService.class);
+        holdingRepository = mock(HoldingRepository.class);
+        tradeRepository = mock(TradeRepository.class);
+        cashHoldingsService = mock(CashHoldingsService.class);
         marketDataAPIClient = mock(MarketDataAPIClient.class);
 
         orderExecutionService = new OrderExecutionService(
@@ -43,7 +52,7 @@ class OrderExecutionServiceTest {
     @Test
     void executeOrderRejectsFilledOrder() {
         Order order = orderWithStatus(Order.OrderStatus.FILLED);
-        when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
+        when(orderRepository.findByIdForUpdate(order.getId())).thenReturn(Optional.of(order));
 
         assertThrows(
             OrderExecutionService.OrderExecutionException.class,
@@ -56,7 +65,7 @@ class OrderExecutionServiceTest {
     @Test
     void executeOrderRejectsCancelledOrder() {
         Order order = orderWithStatus(Order.OrderStatus.CANCELLED);
-        when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
+        when(orderRepository.findByIdForUpdate(order.getId())).thenReturn(Optional.of(order));
 
         assertThrows(
             OrderExecutionService.OrderExecutionException.class,
@@ -64,6 +73,45 @@ class OrderExecutionServiceTest {
         );
 
         verify(marketDataAPIClient, never()).fetchQuote(order.getTicker());
+    }
+
+    @Test
+    void executeOrderRemainsPendingWhenPriceIncreaseExceedsAvailableBuyingPower() {
+        Order order = orderWithStatus(Order.OrderStatus.PENDING);
+        order.setOrderIntent(Order.OrderIntent.BUY);
+        order.setOrderCurrency("USD");
+        order.setQuantity(new BigDecimal("1.0000"));
+        order.setReservedCash(new BigDecimal("100.000000"));
+        when(orderRepository.findByIdForUpdate(order.getId())).thenReturn(Optional.of(order));
+        when(marketDataAPIClient.fetchQuote(order.getTicker())).thenReturn(new MarketQuoteAPIResponse(
+            new MarketQuoteAPIResponse.Data(
+                "AAPL",
+                new BigDecimal("110.0000"),
+                null,
+                null,
+                null,
+                "USD",
+                null,
+                null,
+                null,
+                null,
+                null
+            ),
+            null
+        ));
+        when(cashHoldingsService.settleReservedCash(
+            "USD",
+            order.getReservedCash(),
+            new BigDecimal("110.000000"),
+            order.getUserId()
+        )).thenReturn(false);
+
+        orderExecutionService.executeOrder(order.getId(), order.getUserId());
+
+        assertEquals(Order.OrderStatus.PENDING, order.getStatus());
+        verify(holdingRepository, never()).save(any(Holding.class));
+        verify(tradeRepository, never()).save(any(Trade.class));
+        verify(orderRepository, never()).save(order);
     }
 
     private Order orderWithStatus(Order.OrderStatus status) {

@@ -55,6 +55,9 @@ public class Order {
     @Column(name = "order_price", precision = 15, scale = 4)
     private BigDecimal orderPrice;
 
+    @Column(name = "reserved_cash", precision = 20, scale = 6)
+    private BigDecimal reservedCash;
+
     @Column(name = "instrument_price_at_order", precision = 15, scale = 4)
     private BigDecimal instrumentPriceAtOrder;
 

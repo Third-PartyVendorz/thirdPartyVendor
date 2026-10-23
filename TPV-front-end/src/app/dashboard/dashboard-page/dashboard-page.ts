@@ -14,6 +14,7 @@ import { of } from 'rxjs';
 import { MarketQuoteBatchAPIResponse } from '../../dto/MarketQuoteAPIResponse';
 import { MarketSymbolAPIResponse } from '../../dto/MarketSymbolAPIResponse';
 import { HoldingResponse } from '../../dto/HoldingResponse';
+import { TradeService } from '../../trade-page/trade.service';
 
 @Component({
   standalone: true,
@@ -25,17 +26,34 @@ import { HoldingResponse } from '../../dto/HoldingResponse';
 })
 export class DashboardPage implements OnInit {
   holdings: Holding[] = [];
+  cashBalance = 0;
   isLoading: boolean = false;
   errorMessage: string | null = null;
 
   constructor(
     private holdingService: HoldingService,
     private cdr: ChangeDetectorRef,
-    private marketApiService: MarketApiService
+    private marketApiService: MarketApiService,
+    private tradeService: TradeService
   ) {}
 
   ngOnInit(): void {
+    this.loadCashBalance();
     this.loadHoldings();
+  }
+
+  private loadCashBalance(): void {
+    this.tradeService.getCashHoldingByCurrencyCode('USD').subscribe({
+      next: (response) => {
+        this.cashBalance = response.balance;
+        this.cdr.markForCheck();
+      },
+      error: (error) => {
+        console.error('Error loading USD cash holding:', error);
+        this.cashBalance = 0;
+        this.cdr.markForCheck();
+      },
+    });
   }
 
   loadHoldings(): void {

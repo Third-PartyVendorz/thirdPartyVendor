@@ -6,7 +6,7 @@
         </div>
 
         <div class="balance-block">
-            <span class="balance-label">Available</span>
+            <span class="balance-label">Cash balance</span>
             @if (balanceLoading()) {
                 <span class="balance">Loading...</span>
             } @else {
@@ -54,13 +54,13 @@
 
         @if (withdrawalExceedsBalance) {
             <p class="field-error" role="alert">
-                You can withdraw up to {{ availableBalance() | currency }}.
+                The withdrawal exceeds your available cash.
             </p>
         }
 
         <div class="summary" aria-label="Transaction summary">
             <div class="summary-row">
-                <span>Available cash balance</span>
+                <span>Cash balance</span>
                 <strong>{{ availableBalance() | currency }}</strong>
             </div>
 

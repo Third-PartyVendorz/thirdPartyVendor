@@ -155,6 +155,7 @@ class OrderServiceTest {
 
         assertEquals(newOrder.getId(), result.orderId());
         verify(orderRepository).save(any(Order.class));
+        verify(cashHoldingsService).reserveCash("USD", new BigDecimal("1000.000000"), userId);
         verify(marketDataAPIClient).fetchQuote("AAPL");
     }
 
@@ -235,7 +236,7 @@ class OrderServiceTest {
         order.setId(1L);
         order.setUserId(10L);
         order.setStatus(Order.OrderStatus.PENDING);
-        when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
+        when(orderRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(order));
 
         assertThrows(ForbiddenException.class, () -> orderService.cancelOrder(1L, 20L));
 
@@ -248,12 +249,16 @@ class OrderServiceTest {
         Order order = new Order();
         order.setId(1L);
         order.setUserId(10L);
+        order.setOrderIntent(Order.OrderIntent.BUY);
+        order.setOrderCurrency("USD");
+        order.setReservedCash(new BigDecimal("125.000000"));
         order.setStatus(Order.OrderStatus.PENDING);
-        when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
+        when(orderRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(order));
 
         OrderResponse result = orderService.cancelOrder(1L, 10L);
 
         assertEquals(Order.OrderStatus.CANCELLED, result.status());
+        verify(cashHoldingsService).releaseReservedCash("USD", new BigDecimal("125.000000"), 10L);
         verify(orderRepository).save(order);
     }
 
@@ -265,7 +270,7 @@ class OrderServiceTest {
             order.setId(1L);
             order.setUserId(10L);
             order.setStatus(status);
-            when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
+            when(orderRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(order));
 
             assertThrows(BadOrderException.class, () -> orderService.cancelOrder(1L, 10L));
         }

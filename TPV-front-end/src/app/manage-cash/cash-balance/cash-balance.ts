@@ -19,6 +19,7 @@ export class CashBalance implements OnInit {
   transactionType: cashTransactionType = 'DEPOSIT';
   amount: number | null = null;
   availableBalance = signal(0);
+  buyingPower = signal(0);
   balanceLoading = signal(true);
   balanceError = signal(false);
   transactionSubmitting = signal(false);
@@ -28,11 +29,13 @@ export class CashBalance implements OnInit {
     this.tradeService.getCashHoldingByCurrencyCode('USD').subscribe({
       next: (response) => {
         this.availableBalance.set(response.balance);
+        this.buyingPower.set(response.buyingPower);
         this.balanceLoading.set(false);
       },
       error: (error) => {
         console.error('Error retrieving cash holding:', error);
         this.availableBalance.set(0);
+        this.buyingPower.set(0);
         this.balanceLoading.set(false);
         this.balanceError.set(true);
       },
@@ -48,7 +51,7 @@ export class CashBalance implements OnInit {
   }
 
   get withdrawalExceedsBalance(): boolean {
-    return this.transactionType === 'WITHDRAW' && (this.amount ?? 0) > this.availableBalance();
+    return this.transactionType === 'WITHDRAW' && (this.amount ?? 0) > this.buyingPower();
   }
 
   submitTransaction(): void {
@@ -70,6 +73,7 @@ export class CashBalance implements OnInit {
     }).subscribe({
       next: (response) => {
         this.availableBalance.set(response.balance);
+        this.buyingPower.set(response.buyingPower);
         this.amount = 0;
         this.transactionSubmitting.set(false);
         this.messageService.setSuccessMessage(

@@ -58,7 +58,7 @@ describe('TradeFormComponent', () => {
 
   beforeEach(async () => {
     tradeService = {
-      getCashHoldingByCurrencyCode: vi.fn(() => of({ balance: 1_000 })),
+      getCashHoldingByCurrencyCode: vi.fn(() => of({ balance: 1_000, buyingPower: 1_000 })),
       getQuantitySharesOwned: vi.fn(() => of({ numShares: 5 })),
       postOrder: vi.fn(() => of(orderResponse)),
     };

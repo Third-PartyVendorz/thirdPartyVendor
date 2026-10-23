@@ -55,8 +55,8 @@ export class ForexContainer implements OnInit {
   exchangeConfirmed = signal(false);
   exchangeSubmitting = signal(false);
   showFrozenAccountModal = signal(false);
-  cashBalance = signal<number | null>(null);
-  cashBalanceAtReview: number | null = null;
+  buyingPower = signal<number | null>(null);
+  buyingPowerAtReview: number | null = null;
   executionError = '';
   selectedRange = signal<ForexHistoricalRange>('1y');
   readonly rangeOptions = [
@@ -82,7 +82,7 @@ export class ForexContainer implements OnInit {
   }
 
   get hasCashValidationError(): boolean {
-    const balance = this.cashBalance();
+    const balance = this.buyingPower();
     return balance !== null && (balance <= 0 || this.sellAmountValue > balance);
   }
 
@@ -91,7 +91,7 @@ export class ForexContainer implements OnInit {
   }
 
   get cashValidationMessage(): string {
-    const balance = this.cashBalance();
+    const balance = this.buyingPower();
     if (balance === null) return '';
     if (balance <= 0) return `You don't own any ${this.baseCurrency}.`;
     if (this.sellAmountValue > balance) {
@@ -188,7 +188,7 @@ export class ForexContainer implements OnInit {
         this.exchangeConfirmed.set(false);
         this.exchangeError = '';
         this.executionError = '';
-        this.cashBalanceAtReview = null;
+        this.buyingPowerAtReview = null;
         const fromCurrency = this.normalizeCurrency(params['from']);
         const toCurrency = this.normalizeCurrency(params['to']);
 
@@ -288,13 +288,13 @@ export class ForexContainer implements OnInit {
       .subscribe({
         next: (response) => {
           const amount = this.sellAmountValue;
-          if (this.cashBalanceAtReview !== null && response.balance < this.cashBalanceAtReview) {
-            this.exchangeError = 'Your cash balance changed while reviewing this exchange. Please review it again.';
+          if (this.buyingPowerAtReview !== null && response.buyingPower < this.buyingPowerAtReview) {
+            this.exchangeError = 'Your available funds changed while reviewing this exchange. Please review it again.';
             return;
           }
 
-          if (response.balance < amount) {
-            this.exchangeError = `You only have ${response.balance.toFixed(2)} ${this.baseCurrency} available.`;
+          if (response.buyingPower < amount) {
+            this.exchangeError = `Insufficient available funds in ${this.baseCurrency}.`;
             return;
           }
 
@@ -310,7 +310,7 @@ export class ForexContainer implements OnInit {
     this.showConfirmation.set(false);
     this.exchangeConfirmed.set(false);
     this.executionError = '';
-    this.cashBalanceAtReview = null;
+    this.buyingPowerAtReview = null;
   }
 
   selectPair(baseCurrency: string, quoteCurrency: string): void {
@@ -414,13 +414,13 @@ export class ForexContainer implements OnInit {
   }
 
   private loadCashBalance(): void {
-    this.cashBalance.set(null);
+    this.buyingPower.set(null);
 
     this.tradeService.getCashHoldingByCurrencyCode(this.baseCurrency)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (response) => this.cashBalance.set(response.balance),
-        error: () => this.cashBalance.set(null),
+        next: (response) => this.buyingPower.set(response.buyingPower),
+        error: () => this.buyingPower.set(null),
       });
   }
 
@@ -429,13 +429,13 @@ export class ForexContainer implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response) => {
-          if (response.balance < this.sellAmountValue) {
-            this.exchangeError = `You only have ${response.balance.toFixed(2)} ${this.baseCurrency} available.`;
+          if (response.buyingPower < this.sellAmountValue) {
+            this.exchangeError = `Insufficient available funds in ${this.baseCurrency}.`;
             return;
           }
 
-          this.cashBalance.set(response.balance);
-          this.cashBalanceAtReview = response.balance;
+          this.buyingPower.set(response.buyingPower);
+          this.buyingPowerAtReview = response.buyingPower;
           this.showConfirmation.set(true);
           this.exchangeConfirmed.set(false);
         },

@@ -33,6 +33,9 @@ public class CashHolding {
     
     @Column(name = "balance", nullable = false, precision = 20, scale = 6)
     private BigDecimal balance;
+
+    @Column(name = "buying_power", nullable = false, precision = 20, scale = 6)
+    private BigDecimal buyingPower;
     
     @Column(name = "last_updated")
     private LocalDateTime lastUpdated;

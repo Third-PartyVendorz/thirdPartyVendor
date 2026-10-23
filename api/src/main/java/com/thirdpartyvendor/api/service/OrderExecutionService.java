@@ -45,7 +45,7 @@ public class OrderExecutionService {
 
     @Transactional
     public void executeOrder(Long orderId, Long userId) {
-        Order order = orderRepository.findById(orderId)
+        Order order = orderRepository.findByIdForUpdate(orderId)
             .orElseThrow(() -> new OrderExecutionException("Order not found"));
 
         if (!order.getUserId().equals(userId)) {
@@ -64,15 +64,27 @@ public class OrderExecutionService {
         BigDecimal tradeAmount = resolveTradeAmount(order, executionQuantity, executionPrice);
 
         if (order.getOrderIntent() == Order.OrderIntent.BUY) {
-            cashHoldingsService.ensureSufficientCash(order.getOrderCurrency(), tradeAmount, userId);
+            boolean cashSettled = cashHoldingsService.settleReservedCash(
+                order.getOrderCurrency(),
+                order.getReservedCash(),
+                tradeAmount,
+                userId
+            );
+            if (!cashSettled) {
+                logger.info("Order {} remains pending because additional buying power is unavailable", orderId);
+                return;
+            }
+        } else {
+            cashHoldingsService.ensureCashHoldingExists(order.getOrderCurrency(), userId);
         }
 
         Holding holding = loadExecutionHolding(order, userId);
 
         applyHoldingChange(order, holding, executionQuantity);
 
-        cashHoldingsService.ensureCashHoldingExists(order.getOrderCurrency(), userId);
-        applyCashChange(order, userId, tradeAmount);
+        if (order.getOrderIntent() == Order.OrderIntent.SELL) {
+            cashHoldingsService.updateCashHolding(order.getOrderCurrency(), tradeAmount, userId);
+        }
 
         Trade trade = new Trade();
         trade.setOrderId(order.getId());
@@ -144,15 +156,6 @@ public class OrderExecutionService {
 
         holding.setNumShares(remainingShares);
         holdingRepository.save(holding);
-    }
-
-    private void applyCashChange(Order order, Long userId, BigDecimal tradeAmount) {
-        if (order.getOrderIntent() == Order.OrderIntent.BUY) {
-            cashHoldingsService.updateCashHolding(order.getOrderCurrency(), tradeAmount.negate(), userId);
-            return;
-        }
-
-        cashHoldingsService.updateCashHolding(order.getOrderCurrency(), tradeAmount, userId);
     }
 
     public static class OrderExecutionException extends RuntimeException {

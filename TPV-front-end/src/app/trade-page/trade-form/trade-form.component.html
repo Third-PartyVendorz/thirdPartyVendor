@@ -11,9 +11,6 @@
             [(value)]="currentSide"
             style="justify-self: center;"
             ></app-custom-slider>
-            <span class="buying-power-value">
-                Buying Power: {{ buyingPower | currency:currency:'symbol':'1.2-2' }}
-            </span>
         </div>
 
                 @if (hasCurrency === false && currentSide === TradeSide.BUY) {
@@ -185,10 +182,6 @@
 
                 @if (currentSide === TradeSide.BUY) {
                     <div class="summary-section">
-                        <div class="summary-row">
-                            <span class="summary-label">Current Buying Power</span>
-                            <span class="summary-value">{{ buyingPower | currency:assetDetails?.quote?.currency:'symbol':'1.2-2' }}</span>
-                        </div>
                         <div class="summary-row summary-row--order-total">
                             <span class="summary-label">Order Total</span>
                             <div class="summary-row__amount">
@@ -198,12 +191,6 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="summary-rule"></div>
-                        <div class="summary-row">
-                            <span class="summary-label">Cash Remaining</span>
-                            <span class="summary-value">{{ (buyingPower - estimatedTotal) | currency:assetDetails?.quote?.currency:'symbol':'1.2-2' }}</span>
-                        </div>
-                        
                     </div>
                     <div class="divider"></div>
                     <div class="summary-section">
@@ -314,12 +301,11 @@
     <div class="modal-overlay" (click)="closeBuyingPowerChangedModal()">
         <div class="modal-content" (click)="$event.stopPropagation()">
             <div class="modal-header">
-                <h3>Shares Updated</h3>
+                <h3>Cash Availability Changed</h3>
                 <span class="material-icons-outlined modal-close" (click)="closeBuyingPowerChangedModal()">close</span>
             </div>
             <div class="modal-body">
-                <p>Your buying power has changed since you opened this order.</p>
-                <p><strong>Updated buying power: {{ buyingPower | currency:assetDetails?.quote?.currency:'symbol':'1.2-2' }}</strong></p>
+                <p>Your available funds have changed since you opened this order.</p>
                 <p>Please review your order and try again.</p>
             </div>
             <div class="modal-footer">
@@ -335,7 +321,7 @@
     <div class="modal-overlay" (click)="closeSharesOwnedChangedModal()">
         <div class="modal-content" (click)="$event.stopPropagation()">
             <div class="modal-header">
-                <h3>Buying Power Updated</h3>
+                <h3>Shares Updated</h3>
                 <span class="material-icons-outlined modal-close" (click)="closeSharesOwnedChangedModal()">close</span>
             </div>
             <div class="modal-body">

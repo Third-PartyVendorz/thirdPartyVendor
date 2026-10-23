@@ -1,4 +1,5 @@
 export interface CashHoldingResponse {
-    currencyCode: String;
+    currencyCode: string;
     balance: number;
+    buyingPower: number;
 }

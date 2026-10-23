@@ -147,9 +147,6 @@
                     </div>
                     <span class="material-icons-outlined" aria-hidden="true">trending_up</span>
                 </div>
-                @if (cashBalance() !== null) {
-                    <p class="cash-availability">Available {{ baseCurrency }}: <strong>{{ cashBalance() | currency:baseCurrency:'symbol':'1.2-2' }}</strong></p>
-                }
                 @if (accountIsFrozen) {
                     <p class="exchange-validation-error" role="alert">You cannot continue because your account is frozen.</p>
                 }

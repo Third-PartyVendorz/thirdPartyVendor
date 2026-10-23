@@ -6,7 +6,7 @@
         <a class="button-primary" routerLink="/trade">Execute trade <span aria-hidden="true">↗</span></a>
     </app-page-header>
     <div class="top-row">
-        <app-portfolio-summary/>
+        <app-portfolio-summary [cashBalance]="cashBalance" />
     </div>
     <app-forex-holdings/>
     <div class="bottom-row">

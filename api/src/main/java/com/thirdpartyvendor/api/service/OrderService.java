@@ -7,6 +7,7 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.thirdpartyvendor.api.client.MarketDataAPIClient;
 import com.thirdpartyvendor.api.dto.CreateOrderRequest;
@@ -54,6 +55,7 @@ public class OrderService {
         this.tradeRepository = tradeRepository;
     }
 
+    @Transactional
     public OrderResponse createOrder(CreateOrderRequest createOrderRequest, Long userId) {
         orderValidator.validateCreateOrder(createOrderRequest, userId);
         String ticker = normalizeTicker(createOrderRequest.ticker());
@@ -70,6 +72,16 @@ public class OrderService {
         newOrder.setInstrumentPriceAtOrder(instrumentPriceAtOrder);
         newOrder.setStatus(OrderStatus.PENDING);
         newOrder.setOrderCurrency(normalizeCurrency(createOrderRequest.orderCurrency()));
+
+        if (newOrder.getOrderIntent() == Order.OrderIntent.BUY) {
+            BigDecimal reservedCash = resolveTradeAmount(
+                createOrderRequest.quantity(),
+                createOrderRequest.orderPrice(),
+                instrumentPriceAtOrder
+            );
+            cashHoldingsService.reserveCash(newOrder.getOrderCurrency(), reservedCash, userId);
+            newOrder.setReservedCash(reservedCash);
+        }
 
         Order savedOrder = orderRepository.save(newOrder);
 
@@ -164,8 +176,9 @@ public class OrderService {
         );
     }
 
+    @Transactional
     public OrderResponse cancelOrder(Long orderId, Long userId) {
-        Order order = orderRepository.findById(orderId)
+        Order order = orderRepository.findByIdForUpdate(orderId)
             .orElseThrow(() -> new OrderNotFoundException("Order not found"));
 
         if (!order.getUserId().equals(userId)) {
@@ -174,6 +187,14 @@ public class OrderService {
 
         if (order.getStatus() != OrderStatus.PENDING) {
             throw new BadOrderException("Only pending orders can be cancelled.");
+        }
+
+        if (order.getOrderIntent() == Order.OrderIntent.BUY) {
+            cashHoldingsService.releaseReservedCash(
+                order.getOrderCurrency(),
+                order.getReservedCash(),
+                userId
+            );
         }
 
         order.setStatus(OrderStatus.CANCELLED);
