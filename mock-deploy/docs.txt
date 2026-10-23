@@ -13,6 +13,14 @@ Plan:
 
 Write terraform to set up rds instances ensuring that read replica is implemented
 
+Can initialize the schema via jenkins --> Opt for this version seems more simple
+
+- Jenkins step a initialize the schema and publication 
+
+- Jenkins step b to set up the subscription and indexes on the replica
+
+OR
+
 Terraform for lambda function that initializes the main db
 
 Terraform for lambda function that creates subscription on replica tables
