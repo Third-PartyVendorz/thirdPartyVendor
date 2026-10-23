@@ -128,6 +128,7 @@
 							<th>Total</th>
 							<th>Status</th>
 							<th>Venue</th>
+							<th>Actions</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -149,6 +150,17 @@
 								<span [ngClass]="['status-badge', entry.statusClass]">{{ entry.status }}</span>
 							</td>
 							<td>{{ entry.venue }}</td>
+							<td>
+								<button
+									*ngIf="entry.status === 'Pending'"
+									type="button"
+									class="cancel-order-button"
+									(click)="requestOrderCancellation(entry)"
+									[disabled]="isCancelling(entry.orderId)"
+								>
+									{{ isCancelling(entry.orderId) ? 'Cancelling...' : 'Cancel' }}
+								</button>
+							</td>
 						</tr>
 					</tbody>
 				</table>
@@ -198,4 +210,39 @@
 			</article>
 		</aside>
 	</section>
+
+	<div *ngIf="pendingCancellation() as entry" class="cancel-dialog-backdrop" (click)="dismissCancellation()">
+		<section
+			class="cancel-dialog"
+			role="alertdialog"
+			aria-modal="true"
+			aria-labelledby="cancel-dialog-title"
+			aria-describedby="cancel-dialog-message"
+			(click)="$event.stopPropagation()"
+		>
+			<p class="cancel-dialog__eyebrow">Cancel pending order</p>
+			<h2 id="cancel-dialog-title">Cancel {{ entry.ticker }}?</h2>
+			<p id="cancel-dialog-message">
+			Your {{ entry.side.toLowerCase() }} order will be cancelled and will not execute.
+			</p>
+			<div class="cancel-dialog__actions">
+				<button
+					type="button"
+					class="cancel-dialog__keep"
+					(click)="dismissCancellation()"
+					[disabled]="isCancelling(entry.orderId)"
+				>
+					Keep order
+				</button>
+				<button
+					type="button"
+					class="cancel-dialog__confirm"
+					(click)="confirmCancellation()"
+					[disabled]="isCancelling(entry.orderId)"
+				>
+					{{ isCancelling(entry.orderId) ? 'Cancelling...' : 'Cancel order' }}
+				</button>
+			</div>
+		</section>
+	</div>
 </section>

@@ -18,6 +18,7 @@ import com.thirdpartyvendor.api.entity.Order.OrderStatus;
 import com.thirdpartyvendor.api.entity.Trade;
 import com.thirdpartyvendor.api.error.AuthExceptions.ForbiddenException;
 import com.thirdpartyvendor.api.error.CashExceptions.InsufficientCashException;
+import com.thirdpartyvendor.api.error.OrderExceptions.BadOrderException;
 import com.thirdpartyvendor.api.error.OrderExceptions.OrderNotFoundException;
 import com.thirdpartyvendor.api.repository.HoldingRepository;
 import com.thirdpartyvendor.api.repository.OrderRepository;
@@ -169,6 +170,10 @@ public class OrderService {
 
         if (!order.getUserId().equals(userId)) {
             throw new ForbiddenException("Only the associated user can modify this order.");
+        }
+
+        if (order.getStatus() != OrderStatus.PENDING) {
+            throw new BadOrderException("Only pending orders can be cancelled.");
         }
 
         order.setStatus(OrderStatus.CANCELLED);

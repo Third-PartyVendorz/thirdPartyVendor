@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { finalize } from 'rxjs';
 import { OrderResponse } from '../dto/OrderResponse';
@@ -55,6 +55,8 @@ export class HistoryPage implements OnInit {
 
   selectedFilter: HistoryFilter = 'All orders';
   isLoadingOrders = false;
+  readonly pendingCancellation = signal<OrderHistoryEntry | null>(null);
+  private readonly cancellingOrderIds = new Set<number>();
   private allHistoryEntries: OrderHistoryEntry[] = [];
   recentCashTransactions: CashTransactionResponse[] = [];
   isLoadingCashTransactions = false;
@@ -178,6 +180,54 @@ export class HistoryPage implements OnInit {
 
   selectFilter(filter: HistoryFilter): void {
     this.selectedFilter = filter;
+  }
+
+  isCancelling(orderId: number): boolean {
+    return this.cancellingOrderIds.has(orderId);
+  }
+
+  requestOrderCancellation(entry: OrderHistoryEntry): void {
+    if (entry.status !== 'Pending' || this.isCancelling(entry.orderId)) {
+      return;
+    }
+
+    this.pendingCancellation.set(entry);
+  }
+
+  dismissCancellation(): void {
+    const entry = this.pendingCancellation();
+    if (entry && this.isCancelling(entry.orderId)) {
+      return;
+    }
+
+    this.pendingCancellation.set(null);
+  }
+
+  confirmCancellation(): void {
+    const entry = this.pendingCancellation();
+    if (!entry || entry.status !== 'Pending' || this.isCancelling(entry.orderId)) {
+      return;
+    }
+
+    this.cancellingOrderIds.add(entry.orderId);
+    this.orderService.cancelOrder(entry.orderId)
+      .pipe(finalize(() => {
+        this.cancellingOrderIds.delete(entry.orderId);
+        this.pendingCancellation.set(null);
+        this.cdr.markForCheck();
+      }))
+      .subscribe({
+        next: (order) => {
+          entry.status = this.mapStatus(order.status);
+          entry.statusClass = this.getStatusClass(entry.status);
+          this.messageService.setSuccessMessage(`${entry.ticker} order cancelled.`);
+          this.cdr.markForCheck();
+        },
+        error: (error) => {
+          this.messageService.setErrorMessage(error?.error?.message ?? 'Unable to cancel order.');
+          this.cdr.markForCheck();
+        },
+      });
   }
 
   downloadCsv(): void {
