@@ -11,24 +11,22 @@ import { AuthService } from '../../services/auth.service';
   styleUrl: './admin-navbar.scss',
 })
 export class AdminNavbar {
-  isProfileMenuOpen = false;
+  isMenuOpen = false;
 
   constructor(private authService: AuthService) {}
+
+  get accountIsFrozen(): boolean {
+    return this.authService.isFrozen();
+  }
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
     const target = event.target as HTMLElement;
     const navbar = (event.currentTarget as Document).querySelector('app-admin-navbar');
-    if (navbar && !navbar.contains(target)) this.isProfileMenuOpen = false;
-  }
-
-  toggleProfileMenu(event: MouseEvent): void {
-    event.stopPropagation();
-    this.isProfileMenuOpen = !this.isProfileMenuOpen;
+    if (navbar && !navbar.contains(target)) this.isMenuOpen = false;
   }
 
   logout(): void {
-    this.isProfileMenuOpen = false;
     this.authService.logout().subscribe({
       error: () => this.authService.markSessionExpired(),
     });
