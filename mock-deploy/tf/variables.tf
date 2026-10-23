@@ -28,4 +28,16 @@ variable "spring_image" {
     type        = string
     default     = "latest"
 }
+
+
 # ----------
+
+
+
+# ----- Database Variables -----
+
+variable "primary_db_port" {default = 5432}
+
+
+variable "database_username" {default = "test"}
+variable "database_password" {default = "test"}

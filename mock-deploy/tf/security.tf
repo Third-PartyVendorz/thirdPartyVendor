@@ -39,3 +39,24 @@ resource "aws_security_group" "ecs_security" {
 }
 
 
+
+resource "aws_security_group" "rds_security" {
+    name        = "rds-security"
+    description = "Controls access to the rds instance, ensure we only get traffic from alb"
+    vpc_id      = aws_vpc.vpc.id
+
+    ingress {
+        protocol    = "tcp"
+        from_port   = var.primary_db_port
+        to_port     = var.primary_db_port
+        security_groups = [aws_security_group.alb_security.id]
+    }
+
+    egress {
+        protocol    = "-1"
+        from_port   = 0
+        to_port     = 0
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+}
+
