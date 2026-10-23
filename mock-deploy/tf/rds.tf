@@ -1,10 +1,10 @@
 resource "aws_rds_cluster_parameter_group" "pg_logical" {
     name = "tpv-postgres17-replication"
-    family = "postgres17"
+    family = "aurora-postgresql17"
     description = "RDS parameter group to enable logical replication"
 
     parameter {
-        name = "rds.logical_relpication"
+        name = "rds.logical_replication"
 
         # This is wehere we actually specify logical I believe
         value = "1"
