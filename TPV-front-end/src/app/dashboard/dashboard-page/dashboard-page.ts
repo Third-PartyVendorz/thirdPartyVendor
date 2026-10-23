@@ -50,7 +50,8 @@ export class DashboardPage implements OnInit {
         assetType: response.assetType,
         numShares: response.numShares,
         costBasis: response.costBasis ?? 0,
-        realizedGainLoss: response.realizedGainLoss ?? 0
+        realizedGainLoss: response.realizedGainLoss ?? 0,
+        currency: response.currency
       }))),
       switchMap((holdings: Holding[]) => {
         const tickers = [...new Set(holdings.map(holding => holding.ticker))];
@@ -92,10 +93,16 @@ export class DashboardPage implements OnInit {
                 .filter((entry): entry is [string, MarketSymbolAPIResponse] => entry[1] !== null)
                 .map(([ticker, response]) => [ticker, response.data.name])
             );
+            const assetTypesByTicker = new Map(
+              Object.entries(assets)
+                .filter((entry): entry is [string, MarketSymbolAPIResponse] => entry[1] !== null)
+                .map(([ticker, response]) => [ticker, response.data.type])
+            );
 
             holdings.forEach(holding => {
               const marketData = quotesByTicker.get(holding.ticker);
               holding.companyName = companyNamesByTicker.get(holding.ticker) ?? (holding.security || undefined);
+              holding.assetType = assetTypesByTicker.get(holding.ticker) ?? holding.assetType;
 
               if (marketData) {
                 holding.price = marketData.price;

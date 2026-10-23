@@ -349,6 +349,28 @@ td {
     }
 }
 
+.mobile-change-value {
+    display: flex;
+    justify-content: flex-end;
+    align-items: baseline;
+    gap: 0.35rem;
+    min-width: 0;
+
+    .change-amount,
+    .change-percent {
+        display: inline;
+        white-space: nowrap;
+    }
+}
+
+@media (max-width: 360px) {
+    .mobile-change-value {
+        flex-wrap: wrap;
+        column-gap: 0.25rem;
+        row-gap: 0.1rem;
+    }
+}
+
 .mobile-holdings-value.company-name {
     font-size: 1.05rem;
     font-weight: 600;
