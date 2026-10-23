@@ -1,155 +1,35 @@
-.manage-cash-header {
-    box-sizing: border-box;
-    width: 100%;
-    background: #f5f7f4;
-    border-bottom: 1px solid #d9dde3;
-    padding: 1rem clamp(1rem, 3vw, 2rem);
-}
-
-.header-content {
-    box-sizing: border-box;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 1.5rem;
-    margin: 0 auto;
-    max-width: 82rem;
-}
-
-.title-section {
-    flex: 1;
-}
-
-.eyebrow {
-    color: #5e6c84;
-    font-size: 0.825rem;
-    font-weight: 700;
-    letter-spacing: 0.03rem;
-    text-transform: uppercase;
-    margin-bottom: 0.15rem;
-}
-
-.title-section h1 {
-    margin: 0;
-    font-size: 2.5rem;
-    font-weight: 700;
-    line-height: 1.1;
-    color: #1c2530;
-}
-
-.title-section p {
-    margin: 0.25rem 0 0;
-    font-size: 0.85rem;
-    color: #3f4a5a;
-}
-
-.market-status-card {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-
-    background: #ffffff;
-    border: 1px solid #d9dde3;
-    border-radius: 10px;
-    min-height: 3.4rem;
-    max-width: 100%;
-    padding: 0.75rem 1rem;
-    box-sizing: border-box;
-
-    white-space: nowrap;
-}
-
-.market-status {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-}
-
-.status-dot {
-    width: 0.625rem;
-    height: 0.625rem;
-    flex: 0 0 0.625rem;
-    border-radius: 50%;
-}
-
-.market-open {
-    .status-dot {
-        background: #1e9e4a;
-    }
-
-    .status-text {
-        color: #1e9e4a;
-    }
-}
-
-.market-closed {
-    .status-dot {
-        background: #d92d20;
-    }
-
-    .status-text {
-        color: #d92d20;
-    }
-}
-
-.status-text {
-    font-size: 0.85rem;
-    font-weight: 600;
-}
-
-.divider {
-    width: 1px;
-    height: 24px;
-    background: #d9dde3;
-}
-
-.last-updated {
-    color: #202938;
-    font-size: 14px;
+.manage-cash-page {
+    display: grid;
+    align-content: start;
+    gap: 2rem;
+    min-height: calc(100vh - 72px);
+    padding: 1.5rem clamp(1rem, 2vw, 2rem) 2rem;
+    background:
+        radial-gradient(circle at 86% 0%, rgba(85, 196, 189, 0.11), transparent 30%),
+        linear-gradient(180deg, var(--color-page-start) 0%, var(--color-page) 100%);
 }
 
 .manage-cash-content {
     display: grid;
-    grid-template-columns: minmax(0, 48rem);
-    gap: clamp(1rem, 2.5vw, 1.5rem);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    gap: clamp(1rem, 2vw, 1.5rem);
     align-items: start;
-    box-sizing: border-box;
-    margin: 0 auto;
-    justify-content: center;
-    max-width: 100%;
-    padding: clamp(1.5rem, 4vw, 3rem) clamp(1rem, 3vw, 2rem);
     width: 100%;
+    margin: 0 auto;
 }
 
-app-cash-balance {
+.manage-cash-column {
+    min-width: 0;
+}
+
+app-cash-balance,
+app-forex-container {
     display: block;
     min-width: 0;
 }
 
-
-@media (max-width: 768px) {
-    .header-content {
-        flex-direction: column;
-    }
-
-    .market-status-card {
-        white-space: normal;
-        align-items: flex-start;
-    }
-
-    .last-updated {
-        min-width: 0;
-    }
-
-    .title-section h1 {
-        font-size: 1.6rem;
-    }
-
-    .title-section p {
-        font-size: 0.9rem;
-    }
-
-    .market-status-card {
-        font-size: 0.7rem;
+@media (max-width: 960px) {
+    .manage-cash-content {
+        grid-template-columns: 1fr;
     }
 }

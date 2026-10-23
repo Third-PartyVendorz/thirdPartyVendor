@@ -1,0 +1,56 @@
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    color: var(--color-text);
+    background: var(--color-page);
+    font-family: 'Source Sans 3', sans-serif;
+}
+
+h1,
+h2,
+h3,
+button,
+input,
+select {
+    font-family: 'Manrope', 'Source Sans 3', sans-serif;
+}
+
+body {
+    min-width: 320px;
+    margin: 0;
+    color: var(--color-text);
+    background: var(--color-page);
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+    &:focus-visible {
+        outline: 3px solid var(--color-focus);
+        outline-offset: 2px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

@@ -10,6 +10,7 @@ import { ProfilePage } from './profile-page/profile-page';
 import { AnalyticsDashboard } from './analytics-dashboard/analytics-dashboard';
 import { TradePage } from './trade-page/trade-page.component';
 import { AnalystLayoutComponent } from './layouts/analyst-layout';
+import { AdminLayoutComponent } from './layouts/admin-layout';
 import { ManageCash } from './manage-cash/manage-cash/manage-cash';
 import { AdminDashboardPage } from './admin/admin-dashboard-page/admin-dashboard-page';
 import { AdminUsersPage } from './admin/users-page/admin-users-page';
@@ -36,12 +37,20 @@ export const routes: Routes = [
     ],
   },
   {
+    path: 'admin',
+    component: AdminLayoutComponent,
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ADMIN'] },
+    children: [
+      { path: '', component: AdminDashboardPage },
+      { path: 'users', component: AdminUsersPage },
+      { path: 'audit', component: AuditLogsPage },
+    ],
+  },
+  {
     path: '',
     component: MainLayoutComponent,
     children: [
-      { path: 'admin', component: AdminDashboardPage, canActivate: [authGuard, roleGuard], data: { roles: ['ADMIN'] } },
-      { path: 'admin/users', component: AdminUsersPage, canActivate: [authGuard, roleGuard], data: { roles: ['ADMIN'] } },
-      { path: 'admin/audit', component: AuditLogsPage, canActivate: [authGuard, roleGuard], data: { roles: ['ADMIN'] } },
       { path: 'dashboard', component: DashboardPage, canActivate: [authGuard, roleGuard], data: { roles: ['USER'] } },
       { path: 'portfolio-history', component: HistoryPage, canActivate: [authGuard, roleGuard], data: { roles: ['USER'] } },
       { path: 'trade', component: TradePage, canActivate: [authGuard, roleGuard], data: { roles: ['USER'] } },

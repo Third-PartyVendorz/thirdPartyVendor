@@ -5,6 +5,7 @@ import { finalize } from 'rxjs';
 import { OrderResponse } from '../dto/OrderResponse';
 import { MessageService } from '../services/message.service';
 import { OrderService } from '../services/order.service';
+import { PageHeader } from '../shared/page-header/page-header';
 import { TradeService } from '../trade-page/trade.service';
 import { CashTransactionResponse } from '../dto/CashTransactionResponse';
 
@@ -34,7 +35,7 @@ type HistoryFilter = 'All orders' | 'Filled' | 'Pending' | 'Cancelled';
 @Component({
   selector: 'app-history-page',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, PageHeader],
   templateUrl: './history-page.html',
   styleUrl: './history-page.scss',
 })

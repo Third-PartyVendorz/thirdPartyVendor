@@ -7,16 +7,17 @@ import { ForexHoldings } from '../forex-holdings/forex-holdings';
 import { PortfolioGraphics } from '../portfolio-graphics/portfolio-graphics';
 import { HoldingService } from '../../services/holding.service';
 import { Holding } from '../holdings-table/holding.model';
+import { PageHeader } from '../../shared/page-header/page-header';
 import { MarketApiService } from '../../services/marketApi.service';
 import { switchMap, from, forkJoin, concatMap, catchError, map, reduce, Observable } from 'rxjs';
 import { of } from 'rxjs';
-import { MarketCacheQuotesAPIResponse, Quote } from '../../dto/MarketCacheQuotesAPIResponse';
+import { MarketQuoteBatchAPIResponse } from '../../dto/MarketQuoteAPIResponse';
 import { MarketSymbolAPIResponse } from '../../dto/MarketSymbolAPIResponse';
 import { HoldingResponse } from '../../dto/HoldingResponse';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, Navbar, PortfolioSummary, HoldingsTable, ForexHoldings, PortfolioGraphics],
+  imports: [CommonModule, Navbar, PortfolioSummary, HoldingsTable, ForexHoldings, PortfolioGraphics, PageHeader],
   selector: 'app-dashboard-page',
   styleUrl: './dashboard-page.scss',
   templateUrl: './dashboard-page.html',
@@ -62,14 +63,17 @@ export class DashboardPage implements OnInit {
         }
 
         const quoteResponses$ = from(tickerBatches).pipe(
-          concatMap((tickerBatch: string[]) => this.marketApiService.fetchCacheQuotes(tickerBatch).pipe(
+          concatMap((tickerBatch: string[]) => this.marketApiService.fetchQuotes(tickerBatch).pipe(
             catchError(error => {
               console.error('Error fetching cached quote batch:', error);
-              return of({ data: { quotes: [] } } as MarketCacheQuotesAPIResponse);
+              return of({ data: { quotes: [] } } as MarketQuoteBatchAPIResponse);
             })
           )),
           map(response => response.data.quotes),
-          reduce((allQuotes: Quote[], batchQuotes: Quote[]) => [...allQuotes, ...batchQuotes], [])
+          reduce((
+            allQuotes: MarketQuoteBatchAPIResponse['data']['quotes'],
+            batchQuotes: MarketQuoteBatchAPIResponse['data']['quotes']
+          ) => [...allQuotes, ...batchQuotes], [])
         );
 
         const assetRequests: Record<string, Observable<MarketSymbolAPIResponse | null>> = {};

@@ -1,35 +1,92 @@
 <section class="trade-page">
-	<header class="trade-search-panel">
-		<form class="trade-search-form" (ngSubmit)="submitSearch()">
-			<label for="trade-ticker-input">Search ticker</label>
-			<div class="trade-search-input">
-				<span class="material-icons-outlined" aria-hidden="true">search</span>
-				<input id="trade-ticker-input" name="ticker" [(ngModel)]="searchTicker" type="text" placeholder="Enter a ticker..." autocomplete="off" />
-			</div>
-			<button type="submit">Search</button>
-		</form>
-
-		<div class="market-status" aria-label="Last updated">
-			<span class="material-icons-outlined" aria-hidden="true">schedule</span>
-			<span>Last updated {{ assetDetails()?.quote?.asOf | date:'medium' }}</span>
+	<app-page-header
+		eyebrow="Trading"
+		title="Execute a trade"
+	>
+		<app-market-status />
+	</app-page-header>
+	<div class="assets-discovery-row">
+	<section class="assets-search-panel command-panel">
+		<div class="assets-search-copy">
+			<p class="assets-eyebrow">Find an asset</p>
+			<h2>Search by ticker</h2>
 		</div>
-		<p *ngIf="searchError" class="trade-search-error">{{ searchError }}</p>
-	</header>
+		<app-custom-slider
+			class="market-type-slider"
+			[leftValue]="'equity'"
+			[rightValue]="'crypto'"
+			leftLabel="Equities"
+			rightLabel="Crypto"
+			[value]="marketType"
+			[leftColor]="'#07253e'"
+			[rightColor]="'#0b3558'"
+			(valueChange)="setMarketType($event)"
+		></app-custom-slider>
+		<form class="assets-search-form" (ngSubmit)="submitSearch()">
+			<label class="sr-only" for="trade-ticker-input">Ticker</label>
+			<span class="material-icons-outlined search-icon" aria-hidden="true">search</span>
+			<input class="field-control" id="trade-ticker-input" name="ticker" [(ngModel)]="searchTicker" type="text" autocomplete="off" />
+				<ng-container *ngIf="marketType === 'crypto'">
+					<span class="ticker-quote-separator">:</span>
+					<input class="field-control ticker-currency-input" name="currency" [(ngModel)]="cryptoCurrency" type="text" placeholder="USD" maxlength="3" autocomplete="off" />
+				</ng-container>
+			<button class="ticker-search-button" type="submit"><span class="material-icons-outlined" aria-hidden="true">search</span>Search</button>
+		</form>
+		<p *ngIf="searchError" class="assets-search-error">{{ searchError }}</p>
+	</section>
+
+	<section class="trending-assets command-panel" aria-labelledby="trade-trending-assets-title">
+		<div class="trending-heading">
+			<p class="assets-eyebrow">Market watch · Last 24 hours</p>
+			<h2 id="trade-trending-assets-title">Trending symbols</h2>
+		</div>
+		<div class="trending-body">
+			<p *ngIf="trendingLoading()">Loading trending symbols...</p>
+			<p *ngIf="trendingError()">{{ trendingError() }}</p>
+			<p *ngIf="!trendingLoading() && !trendingError() && !trendingTickers().length">No orders in the last 24 hours.</p>
+			<table class="trending-table" *ngIf="trendingTickers().length">
+				<thead>
+					<tr>
+						<th>Rank</th>
+						<th>Symbol</th>
+						<th>Orders</th>
+						<th>Price</th>
+						<th>Change</th>
+						<th><span class="visually-hidden">Actions</span></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr *ngFor="let asset of trendingTickers(); let i = index">
+						<td class="rank">{{ i + 1 }}</td>
+						<td class="ticker-symbol">{{ asset.symbol }}</td>
+						<td>{{ asset.orderCount }}</td>
+						<td>{{ asset.price !== null ? (asset.price | currency:asset.currency:'symbol':'1.2-2') : '--' }}</td>
+						<td class="ticker-change" [class.negative-change]="asset.changePercent !== null && asset.changePercent < 0">{{ asset.changePercent === null ? '--' : ((asset.changePercent > 0 ? '+' : '') + (asset.changePercent | number:'1.2-2') + '%') }}</td>
+						<td class="ticker-actions">
+							<a class="ticker-action" [routerLink]="['/explore-assets']" [queryParams]="{ ticker: asset.symbol }">Explore</a>
+							<button class="ticker-action" type="button" (click)="selectPopular(asset.symbol)">Trade</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</section>
+	</div>
 
 	<app-asset-result class="hidden" [ticker]="activeTicker" [autoOpenTrade]="autoOpenTrade" (tradeButtonClicked)="onAssetLoaded($event)" (tickerNotFound)="onTickerNotFound($event)"></app-asset-result>
 
-	<ng-container *ngIf="!activeTicker; else loadedTicker">
-			<article class="trade-empty-state">
-				<span class="material-icons-outlined">query_stats</span>
-				<h2>Find an asset to trade</h2>
-				<p>Search for a ticker above to see its latest quote and place an order.</p>
-		</article>
-	</ng-container>
-
-	<ng-template #loadedTicker>
+	<ng-container *ngIf="activeTicker">
 		<ng-container *ngIf="assetDetails() as details">
 			<div class="trade-workspace">
 				<div class="stock-info-compact">
+					<a
+						class="asset-details-link"
+						[routerLink]="['/explore-assets']"
+						[queryParams]="{ ticker: details.symbol }"
+					>
+						<span class="material-icons-outlined" aria-hidden="true">open_in_new</span>
+						View more details
+					</a>
 					<div class="stock-identity">
 						<div class="info-badge">{{ details.symbol }}</div>
 						<div>
@@ -51,6 +108,11 @@
 						<div><span>Ask</span><strong>{{ details.quote.ask | currency:details.quote.currency:'symbol':'1.2-2' }}</strong></div>
 						<div><span>Previous close</span><strong>{{ details.quote.previousClose | currency:details.quote.currency:'symbol':'1.2-2' }}</strong></div>
 					</div>
+					<div class="quote-context">
+						<span><strong>Spread</strong> {{ (details.quote.ask - details.quote.bid) | currency:details.quote.currency:'symbol':'1.2-2' }}</span>
+						<span><strong>State</strong> {{ details.quote.marketState }}</span>
+						<span><strong>As of</strong> {{ details.quote.asOf | date:'shortTime' }}</span>
+					</div>
 
 					<div class="position-card">
 						<div class="position-icon"><span class="material-icons-outlined">description</span></div>
@@ -67,7 +129,7 @@
 				</div>
 			</div>
 		</ng-container>
-	</ng-template>
+	</ng-container>
 </section>
 
 @if (showFrozenAccountModal) {

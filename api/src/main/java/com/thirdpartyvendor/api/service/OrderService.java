@@ -139,26 +139,28 @@ public class OrderService {
 
     public List<OrderResponse> getOrders(Long userId) {
         return orderRepository.findByUserId(userId).stream()
-            .map(order -> {
-                Trade execution = tradeRepository.findByOrderId(order.getId()).stream()
-                    .findFirst()
-                    .orElse(null);
-
-                return new OrderResponse(
-                    order.getId(),
-                    order.getUserId(),
-                    order.getTicker(),
-                    order.getOrderIntent(),
-                    order.getQuantity(),
-                    order.getOrderPrice(),
-                    execution != null ? execution.getExecutionPrice() : null,
-                    execution != null ? execution.getExecutionQuantity() : null,
-                    order.getStatus(),
-                    order.getCreatedAt(),
-                    order.getOrderCurrency()
-                );
-            })
+            .map(this::toOrderResponse)
             .collect(Collectors.toList());
+    }
+
+    private OrderResponse toOrderResponse(Order order) {
+        Trade execution = tradeRepository.findByOrderId(order.getId()).stream()
+            .findFirst()
+            .orElse(null);
+
+        return new OrderResponse(
+            order.getId(),
+            order.getUserId(),
+            order.getTicker(),
+            order.getOrderIntent(),
+            order.getQuantity(),
+            order.getOrderPrice(),
+            execution != null ? execution.getExecutionPrice() : null,
+            execution != null ? execution.getExecutionQuantity() : null,
+            order.getStatus(),
+            order.getCreatedAt(),
+            order.getOrderCurrency()
+        );
     }
 
     public OrderResponse cancelOrder(Long orderId, Long userId) {

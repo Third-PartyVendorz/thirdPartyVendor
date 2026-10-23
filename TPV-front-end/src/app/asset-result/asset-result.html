@@ -3,7 +3,7 @@
 
 	<div *ngIf="notFound() && !loading()" class="asset-not-found">
 		<article class="asset-card asset-status-card error">Asset not found. Please check the ticker symbol and try again.</article>
-		<p class="asset-status-message">Use the search bar above to try another ticker.</p>
+		<p class="asset-status-message">Go back to search to try another ticker.</p>
 	</div>
 
 	<div *ngIf="!loading()">
@@ -15,10 +15,30 @@
 						<div>
 							<p class="asset-kicker">{{ currentAsset.exchange }} • {{ currentAsset.currency }}</p>
 							<h1>{{ currentAsset.name }}</h1>
+							<span class="asset-type-badge">{{ currentAsset.type }}</span>
 						</div>
 						<button (click)="onTradeButtonClick(currentAsset.symbol)" class="trade-button">
 							Trade
 							<span class="material-icons-outlined trade-button__icon">compare_arrows</span>
+						</button>
+						<button
+							*ngIf="!isWatchlisted"
+							(click)="watchlistButtonClicked.emit()"
+							class="watchlist-button"
+							type="button"
+						>
+							<span class="material-icons-outlined" aria-hidden="true">bookmark_add</span>
+							Add to watchlist
+						</button>
+						<button
+							*ngIf="isWatchlisted"
+							(click)="watchlistRemoveClicked.emit()"
+							class="watchlist-button watchlist-button--saved"
+							type="button"
+							title="Remove from watchlist"
+						>
+							<span class="material-icons-outlined" aria-hidden="true">bookmark</span>
+							In watchlist
 						</button>
 					</div>
 
@@ -30,6 +50,14 @@
 						</div>
 						<p class="asset-updated">Updated {{ currentQuote.asOf | date:'medium' }}</p>
 					</div>
+
+					<div class="asset-quote-strip" aria-label="Current quote details">
+						<div><span>Bid</span><strong>{{ currentQuote.bid | currency:currentQuote.currency:'symbol':'1.2-2' }}</strong></div>
+						<div><span>Ask</span><strong>{{ currentQuote.ask | currency:currentQuote.currency:'symbol':'1.2-2' }}</strong></div>
+						<div><span>Spread</span><strong>{{ (currentQuote.ask - currentQuote.bid) | currency:currentQuote.currency:'symbol':'1.2-2' }}</strong></div>
+						<div><span>Previous close</span><strong>{{ currentQuote.previousClose | currency:currentQuote.currency:'symbol':'1.2-2' }}</strong></div>
+						<div><span>Market state</span><strong>{{ currentQuote.marketState === 'unknown' ? 'Unavailable' : currentQuote.marketState }}</strong></div>
+					</div>
 				</header>
 
 				<article *ngIf="errorMessage()" class="asset-card asset-status-card error">{{ errorMessage() }}</article>
@@ -39,6 +67,13 @@
 						<div class="card-heading">
 							<div>
 								<p class="card-eyebrow">History</p>
+								<p *ngIf="hasHistoricalData" class="range-gain-loss" [class.positive]="(rangeGainLoss ?? 0) > 0" [class.negative]="(rangeGainLoss ?? 0) < 0">
+									<ng-container *ngIf="rangeGainLoss !== null; else noRangeGainLoss">
+										{{ rangeGainLoss > 0 ? '+' : '' }}{{ rangeGainLoss | currency:currentQuote.currency:'symbol':'1.2-2' }}
+										({{ (rangeGainLossPercent ?? 0) > 0 ? '+' : '' }}{{ rangeGainLossPercent | number:'1.2-2' }}%) over {{ rangeDayLabel }} period
+									</ng-container>
+									<ng-template #noRangeGainLoss>N/A</ng-template>
+								</p>
 							</div>
 							<div class="chart-range chart-controls">
 								<div class="interval-picker" role="group" aria-label="Historical range">
@@ -133,30 +168,8 @@
 					</div>
 				</article>
 
-				<aside class="asset-card asset-summary-card">
-					<div class="card-heading compact">
-						<div>
-							<p class="card-eyebrow">Asset</p>
-							<h2>About this {{ currentAsset.type }}</h2>
-						</div>
-					</div>
-
-					<dl class="summary-grid">
-						<div>
-							<dt>Name</dt>
-							<dd>{{ currentAsset.name }}</dd>
-						</div>
-						<div>
-							<dt>Exchange</dt>
-							<dd>{{ currentAsset.exchange }}</dd>
-						</div>
-						<div>
-							<dt>Currency</dt>
-							<dd>{{ currentAsset.currency }}</dd>
-						</div>
-					</dl>
-				</aside>
 			</div>
+
 			</ng-container>
 		</ng-container>
 	</div>

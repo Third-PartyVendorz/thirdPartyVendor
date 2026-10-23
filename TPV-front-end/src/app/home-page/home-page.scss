@@ -2,7 +2,7 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: 'Inter', sans-serif;
+    font-family: inherit;
 }
 
 .home-page {
@@ -11,7 +11,9 @@
     align-items: center;
     min-height: 100vh;
     padding: 2rem;
-    background: linear-gradient(135deg, #f6f9fc 0%, #e8eef6 100%);
+    background:
+        radial-gradient(circle at top left, rgba(85, 196, 189, 0.12), transparent 34%),
+        linear-gradient(180deg, var(--color-page-start) 0%, var(--color-page) 100%);
 }
 
 .home-page__card {

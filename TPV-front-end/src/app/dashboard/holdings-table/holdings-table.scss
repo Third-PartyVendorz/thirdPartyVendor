@@ -1,9 +1,9 @@
 .holdings-card{
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
-    margin: 0.5rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    margin: 0;
+    border-radius: var(--radius-surface);
+    box-shadow: var(--shadow-surface);
     overflow: hidden;
 
     @media (max-width: 1024px) {
@@ -32,7 +32,7 @@
     margin: 0;
     font-size: 1.4rem;
     font-weight: 600;
-    color: #111827;
+    color: var(--color-text);
 }
 
 .card-header label {
@@ -112,7 +112,7 @@ th {
     font-weight: 600;
     color: #111827;
     white-space: nowrap;
-    background: linear-gradient(180deg, #f8fbff, #eef5fb)
+    background: #f1f6fa;
 }
 
 th.sortable {
@@ -127,6 +127,51 @@ th.sortable {
     &:active {
         background-color: #e5e7eb;
     }
+}
+
+.sort-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+}
+
+.sort-indicator {
+    display: inline-grid;
+    gap: 0.14rem;
+    width: 0.8rem;
+    height: 1.05rem;
+    align-content: center;
+}
+
+.sort-indicator span {
+    width: 0;
+    height: 0;
+    border-right: 0.32rem solid transparent;
+    border-left: 0.32rem solid transparent;
+}
+
+.sort-indicator span:first-child {
+    border-bottom: 0.3rem solid currentColor;
+}
+
+.sort-indicator span:last-child {
+    border-top: 0.3rem solid currentColor;
+}
+
+.sort-indicator--asc span:last-child,
+.sort-indicator--desc span:first-child {
+    opacity: 0.2;
+}
+
+.sort-indicator--asc span:first-child,
+.sort-indicator--desc span:last-child {
+    color: var(--color-accent-deep);
 }
 
 .numeric {
@@ -145,8 +190,19 @@ tbody tr:hover {
 td {
     padding: 0.75rem 1.5rem;
     font-size: 1rem;
-    color: #111827;
+    color: var(--color-text);
     vertical-align: middle;
+}
+
+.holding-ticker {
+    color: var(--color-brand-strong);
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.holding-ticker:hover {
+    color: var(--color-accent-deep);
+    text-decoration: underline;
 }
 
 .change {
