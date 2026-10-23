@@ -3,8 +3,10 @@
 }
 
 .manage-cash-page {
-	display: block;
-	color: #1c2530;
+	min-height: calc(100vh - 72px);
+	padding: 2.4rem clamp(1rem, 4vw, 4rem) 3rem;
+	color: var(--color-text);
+	background: linear-gradient(180deg, var(--color-page-start) 0%, var(--color-page) 100%);
 }
 
 .forex-container {
@@ -18,8 +20,69 @@
 	box-shadow: 0 0.75rem 2rem rgba(28, 37, 48, 0.06);
 }
 
+.forex-card-header {
+	margin-bottom: 1.25rem;
+	padding-bottom: 1.25rem;
+	border-bottom: 1px solid #e7eaee;
+}
+
+.card-eyebrow {
+	margin: 0 0 0.3rem;
+	color: #6b7788;
+	font-size: 0.7rem;
+	font-weight: 700;
+	letter-spacing: 0.06rem;
+	text-transform: uppercase;
+}
+
+.forex-card-header h2 {
+	margin: 0;
+	color: #1c2530;
+	font-size: 1.6rem;
+	line-height: 1.1;
+}
+
 .forex-content {
 	width: 100%;
+}
+
+.forex-empty-state {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	margin-top: 1.25rem;
+	padding: 1.25rem;
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius-surface);
+	background: var(--color-surface);
+	box-shadow: var(--shadow-surface);
+}
+
+.forex-empty-state > .material-icons-outlined {
+	display: grid;
+	place-items: center;
+	flex: 0 0 3rem;
+	width: 3rem;
+	height: 3rem;
+	border-radius: 12px;
+	background: rgba(85, 196, 189, 0.14);
+	color: var(--color-accent-deep);
+	font-size: 1.7rem;
+}
+
+.forex-empty-state h2,
+.forex-empty-state p {
+	margin: 0;
+}
+
+.forex-empty-state h2 {
+	color: var(--color-text);
+	font-size: 1.15rem;
+}
+
+.forex-empty-state p:last-child {
+	margin-top: 0.25rem;
+	color: var(--color-text-muted);
 }
 
 .forex-hero {
@@ -47,11 +110,11 @@ p {
 }
 
 h1 {
-	margin-bottom: 0.3rem;
-	color: #1c2530;
-	font-size: 1.6rem;
-	font-weight: 700;
-	line-height: 1.1;
+	margin-bottom: 0.55rem;
+	color: var(--color-brand);
+	font-size: clamp(2rem, 4vw, 3.25rem);
+	line-height: 1.05;
+	letter-spacing: -0.03em;
 }
 
 .hero-copy {
@@ -63,14 +126,16 @@ h1 {
 
 .currency-search {
 	position: relative;
-	display: flex;
-	// align-items: end;
-	gap: 0.6rem;
-	margin: 0 0 1.25rem;
-	padding: 0.9rem;
-	border: 1px solid #e1e6eb;
-	border-radius: 0.6rem;
-	background: #f7f9fb;
+	display: grid;
+	grid-template-columns: auto minmax(0, 1fr) auto minmax(0, 1fr) auto;
+	align-items: end;
+	gap: 0.65rem;
+	width: 100%;
+	margin: 0 0 1.5rem;
+	min-height: 0;
+	padding: 0;
+	border: 0;
+	background: transparent;
 	box-shadow: none;
 }
 
@@ -92,12 +157,13 @@ h1 {
 	position: relative;
 	flex: 0 0 1.7rem;
 	height: 1.7rem;
+	align-self: baseline;
 }
 
 .currency-info-button:hover,
 .currency-info-button[aria-expanded='true'] {
 	background: #eaf4fa;
-	color: #07528c;
+	color: var(--color-brand-strong);
 }
 
 .currency-info-button .material-icons-outlined { font-size: 1.15rem; }
@@ -113,7 +179,7 @@ h1 {
 	border: 1px solid #cfe2ed;
 	border-radius: 8px;
 	background: #fff;
-	box-shadow: 0 8px 20px rgba(23, 65, 102, 0.14);
+	box-shadow: 0 8px 20px rgba(7, 37, 62, 0.14);
 	color: #274968;
 	font-size: 0.78rem;
 	font-weight: 600;
@@ -122,7 +188,6 @@ h1 {
 
 .currency-search label {
 	display: flex;
-	flex: 0 0 180px;
 	flex-direction: column;
 	min-width: 0;
 	gap: 0.4rem;
@@ -139,7 +204,7 @@ h1 {
 	border: 1px solid #aeb8c2;
 	border-radius: 0.5rem;
 	outline: 0;
-	color: #1c2530;
+	color: var(--color-text);
 	font: inherit;
 	font-weight: 700;
 	text-transform: uppercase;
@@ -157,18 +222,17 @@ h1 {
     gap: 0.45rem;
     padding: 0.72rem 1.1rem;
     border: 0;
-	border-radius: 0.5rem;
-	background: #004785;
+    border-radius: 8px;
+	background: var(--color-brand-strong);
     color: #fff;
     font: inherit;
     font-weight: 800;
     cursor: pointer;
     height: fit-content;
-    align-self: center;
-	margin-left: 2rem;
+	margin-left: 0;
 }
 
-.search-button:hover { background: #003966; }
+.search-button:hover { background: var(--color-brand-deep); }
 .search-button .material-icons-outlined { font-size: 1.1rem; }
 
 .search-error {
@@ -225,21 +289,92 @@ h1 {
 .forex-workspace {
 	display: grid;
 	grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-	gap: 1.25rem;
+	gap: 1rem;
 }
 
 .rate-card,
 .exchange-card {
-	border: 1px solid #d9dde3;
-	border-radius: 0.65rem;
-	background: #fff;
-	box-shadow: none;
+	border: 1px solid var(--color-border);
+	border-radius: 8px;
+	background: rgba(255, 255, 255, 0.94);
+	box-shadow: var(--shadow-surface);
+}
+
+.exchange-context {
+	display: grid;
+	grid-template-columns: auto minmax(0, 1fr);
+	align-items: start;
+	gap: 1rem;
+	width: min(820px, 100%);
+	margin-top: 1.75rem;
+	padding-left: 1rem;
+	border-left: 3px solid var(--color-accent);
+}
+
+.exchange-context__mark {
+	display: grid;
+	place-items: center;
+	width: 2.8rem;
+	height: 2.8rem;
+	border-radius: 50%;
+	background: var(--color-brand);
+	color: var(--color-accent);
+}
+
+.exchange-context h2 {
+	margin: 0;
+	color: var(--color-brand-deep);
+	font-size: clamp(1.2rem, 2vw, 1.55rem);
+	letter-spacing: -0.025em;
+}
+
+.exchange-context > div:last-child > p:not(.eyebrow) {
+	max-width: 34rem;
+	margin: 0.4rem 0 0;
+	color: var(--color-text-muted);
+	line-height: 1.5;
+}
+
+.exchange-context ol {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 1rem;
+	padding: 0;
+	margin: 1.25rem 0 0;
+	list-style: none;
+	counter-reset: exchange-step;
+}
+
+.exchange-context li {
+	display: grid;
+	gap: 0.2rem;
+	counter-increment: exchange-step;
+}
+
+.exchange-context li::before {
+	content: '0' counter(exchange-step);
+	color: var(--color-accent-deep);
+	font-family: 'Manrope', sans-serif;
+	font-size: 0.72rem;
+	font-weight: 800;
+	letter-spacing: 0.08em;
+}
+
+.exchange-context li strong {
+	color: var(--color-text);
+	font-size: 0.86rem;
+}
+
+.exchange-context li span {
+	color: var(--color-text-subtle);
+	font-size: 0.8rem;
+	line-height: 1.35;
 }
 
 .rate-card {
 	overflow: hidden;
 	padding: 1.5rem;
-	background: #004785;
+	background: linear-gradient(145deg, var(--color-brand-deep), var(--color-brand) 70%, #126f78);
 	color: #fff;
 }
 
@@ -608,7 +743,7 @@ h2 {
 .conversion-summary > .material-icons-outlined { color: #16a36e; font-size: 1.2rem; }
 .cash-availability { margin: 0 0 1rem; color: #6883a0; font-size: 0.78rem; }
 .cash-availability strong { color: #274968; }
-.exchange-button { width: 100%; padding: 0.85rem; background: #07528c; color: #fff; }
+.exchange-button { width: 100%; padding: 0.85rem; background: var(--color-brand-strong); color: #fff; }
 .exchange-button:hover { background: #063f6b; }
 .exchange-button:disabled { opacity: 0.65; cursor: wait; }
 .disclaimer { margin: 0.8rem 0 0; color: #7891a8; font-size: 0.75rem; text-align: center; }
@@ -729,7 +864,7 @@ h2 {
 
 @media (max-width: 780px) {
 	.manage-cash-page { padding-top: 1.5rem; }
-	.forex-container { padding: 1rem; }
+	.forex-container { padding: 1.25rem; }
 	.forex-hero { align-items: flex-start; flex-direction: column; gap: 1rem; }
 	.currency-search {
 		display: flex;
@@ -745,7 +880,7 @@ h2 {
 
 @media (max-width: 480px) {
 	.manage-cash-page { padding-right: 0.75rem; padding-left: 0.75rem; }
-	.forex-container { padding: 0.75rem; }
+	.forex-container { padding: 1rem; }
 	.rate-card, .exchange-card { padding: 1.1rem; }
 	.rate-value { margin-top: 2rem; font-size: 1.65rem; }
 	.forex-chart-frame { grid-template-columns: 52px minmax(0, 1fr); gap: 0.45rem; }

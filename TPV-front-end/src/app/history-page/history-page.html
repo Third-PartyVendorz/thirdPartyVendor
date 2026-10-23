@@ -1,11 +1,8 @@
 <section class="history-page">
-	<header class="history-hero">
-		<div>
-			<p class="history-eyebrow">Activity log</p>
-			<h1>Order History</h1>
-			<p class="history-lead">Review past orders, execution status, and recent trading activity in one place.</p>
-		</div>
-
+	<app-page-header
+		eyebrow="Activity"
+		title="Order history"
+	>
 		<div class="history-actions">
 			<button 
 				type="button"
@@ -19,7 +16,7 @@
 			<button type="button" class="ghost-button" (click)="downloadCsv()">Download CSV</button>
 			<button type="button" class="primary-button" (click)="openNewOrder()">New order</button>
 		</div>
-	</header>
+	</app-page-header>
 
 	<section class="history-summary-grid" aria-label="Order summary metrics">
 		<article class="summary-card" *ngFor="let card of summaryCards">
@@ -131,6 +128,7 @@
 							<th>Total</th>
 							<th>Status</th>
 							<th>Venue</th>
+							<th>Actions</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -152,6 +150,17 @@
 								<span [ngClass]="['status-badge', entry.statusClass]">{{ entry.status }}</span>
 							</td>
 							<td>{{ entry.venue }}</td>
+							<td>
+								<button
+									*ngIf="entry.status === 'Pending'"
+									type="button"
+									class="cancel-order-button"
+									(click)="requestOrderCancellation(entry)"
+									[disabled]="isCancelling(entry.orderId)"
+								>
+									{{ isCancelling(entry.orderId) ? 'Cancelling...' : 'Cancel' }}
+								</button>
+							</td>
 						</tr>
 					</tbody>
 				</table>
@@ -201,4 +210,39 @@
 			</article>
 		</aside>
 	</section>
+
+	<div *ngIf="pendingCancellation() as entry" class="cancel-dialog-backdrop" (click)="dismissCancellation()">
+		<section
+			class="cancel-dialog"
+			role="alertdialog"
+			aria-modal="true"
+			aria-labelledby="cancel-dialog-title"
+			aria-describedby="cancel-dialog-message"
+			(click)="$event.stopPropagation()"
+		>
+			<p class="cancel-dialog__eyebrow">Cancel pending order</p>
+			<h2 id="cancel-dialog-title">Cancel {{ entry.ticker }}?</h2>
+			<p id="cancel-dialog-message">
+			Your {{ entry.side.toLowerCase() }} order will be cancelled and will not execute.
+			</p>
+			<div class="cancel-dialog__actions">
+				<button
+					type="button"
+					class="cancel-dialog__keep"
+					(click)="dismissCancellation()"
+					[disabled]="isCancelling(entry.orderId)"
+				>
+					Keep order
+				</button>
+				<button
+					type="button"
+					class="cancel-dialog__confirm"
+					(click)="confirmCancellation()"
+					[disabled]="isCancelling(entry.orderId)"
+				>
+					{{ isCancelling(entry.orderId) ? 'Cancelling...' : 'Cancel order' }}
+				</button>
+			</div>
+		</section>
+	</div>
 </section>

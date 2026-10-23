@@ -2,13 +2,11 @@ import { HttpClient } from '@angular/common/http';
 import { HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { MarketQuoteAPIResponse } from '../dto/MarketQuoteAPIResponse';
+import { MarketQuoteAPIResponse, MarketQuoteBatchAPIResponse } from '../dto/MarketQuoteAPIResponse';
 import { MarketSymbolAPIResponse } from '../dto/MarketSymbolAPIResponse';
 import { MarketHistoricalAPIResponse } from '../dto/MarketHistoricalAPIResponse';
 
 import { environment } from '../../environments/environment.local';
-
-
 
 @Injectable({
   providedIn: 'root'
@@ -24,6 +22,18 @@ export class MarketApiService {
       headers: {
         'X-Api-Key': this.FAUXNANCE_API_KEY
       }
+    });
+  }
+
+  fetchQuotes(tickers: string[]): Observable<MarketQuoteBatchAPIResponse> {
+    const symbols = [...new Set(tickers.map((ticker) => ticker.trim().toUpperCase()).filter(Boolean))].slice(0, 25);
+    const params = new HttpParams().set('symbols', symbols.join(','));
+
+    return this.http.get<MarketQuoteBatchAPIResponse>(`${this.FAUXNANCE_API_URL}/quotes`, {
+      headers: {
+        'X-Api-Key': this.FAUXNANCE_API_KEY
+      },
+      params,
     });
   }
 

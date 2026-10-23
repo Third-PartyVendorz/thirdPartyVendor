@@ -3,22 +3,21 @@ import { CommonModule } from '@angular/common';
 import { PortfolioSummary } from '../portfolio-summary/portfolio-summary';
 import { Navbar } from '../../navbar/navbar';
 import { HoldingsTable } from '../holdings-table/holdings-table';
+import { ForexHoldings } from '../forex-holdings/forex-holdings';
 import { PortfolioGraphics } from '../portfolio-graphics/portfolio-graphics';
 import { HoldingService } from '../../services/holding.service';
 import { Holding } from '../holdings-table/holding.model';
-import { AuthService } from '../../services/auth.service';
-import { TradeService } from '../../trade-page/trade.service';
-// import { Trade } from '../../trade-page/'
+import { PageHeader } from '../../shared/page-header/page-header';
 import { MarketApiService } from '../../services/marketApi.service';
-import { switchMap, forkJoin, catchError, map } from 'rxjs';
+import { switchMap, from, forkJoin, concatMap, catchError, map, reduce, Observable } from 'rxjs';
 import { of } from 'rxjs';
-import { MarketQuoteAPIResponse } from '../../dto/MarketQuoteAPIResponse';
+import { MarketQuoteBatchAPIResponse } from '../../dto/MarketQuoteAPIResponse';
 import { MarketSymbolAPIResponse } from '../../dto/MarketSymbolAPIResponse';
 import { HoldingResponse } from '../../dto/HoldingResponse';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, Navbar, PortfolioSummary, HoldingsTable, PortfolioGraphics],
+  imports: [CommonModule, Navbar, PortfolioSummary, HoldingsTable, ForexHoldings, PortfolioGraphics, PageHeader],
   selector: 'app-dashboard-page',
   styleUrl: './dashboard-page.scss',
   templateUrl: './dashboard-page.html',
@@ -31,7 +30,6 @@ export class DashboardPage implements OnInit {
 
   constructor(
     private holdingService: HoldingService,
-    private authService: AuthService,
     private cdr: ChangeDetectorRef,
     private marketApiService: MarketApiService
   ) {}
@@ -53,81 +51,78 @@ export class DashboardPage implements OnInit {
         assetType: response.assetType,
         numShares: response.numShares,
         costBasis: response.costBasis ?? 0,
-        realizedGainLoss: response.realizedGainLoss ?? 0
+        realizedGainLoss: response.realizedGainLoss ?? 0,
+        currency: response.currency
       }))),
       switchMap((holdings: Holding[]) => {
-        // Create observables for all market quote AND asset info requests
-        const quoteRequests: { [key: string]: any } = {};
-        const assetRequests: { [key: string]: any } = {};
-        
-        holdings.forEach(holding => {
-          // Fetch quote data (price, change, etc.)
-          quoteRequests[holding.ticker] = this.marketApiService.fetchQuote(holding.ticker).pipe(
+        const tickers = [...new Set(holdings.map(holding => holding.ticker))];
+        const tickerBatches: string[][] = [];
+
+        for (let index = 0; index < tickers.length; index += 25) {
+          tickerBatches.push(tickers.slice(index, index + 25));
+        }
+
+        const quoteResponses$ = from(tickerBatches).pipe(
+          concatMap((tickerBatch: string[]) => this.marketApiService.fetchQuotes(tickerBatch).pipe(
             catchError(error => {
-              console.error(`Error fetching quote for ${holding.ticker}:`, {
-                status: error.status,
-                statusText: error.statusText,
-                message: error.message,
-                url: error.url,
-                error: error.error
-              });
-              return of(null);
+              console.error('Error fetching cached quote batch:', error);
+              return of({ data: { quotes: [] } } as MarketQuoteBatchAPIResponse);
             })
-          );
-          
-          // Fetch asset info (company name, symbol data, etc.)
-          assetRequests[holding.ticker] = this.marketApiService.fetchAssetInfo(holding.ticker).pipe(
+          )),
+          map(response => response.data.quotes),
+          reduce((
+            allQuotes: MarketQuoteBatchAPIResponse['data']['quotes'],
+            batchQuotes: MarketQuoteBatchAPIResponse['data']['quotes']
+          ) => [...allQuotes, ...batchQuotes], [])
+        );
+
+        const assetRequests: Record<string, Observable<MarketSymbolAPIResponse | null>> = {};
+        tickers.forEach(ticker => {
+          assetRequests[ticker] = this.marketApiService.fetchAssetInfo(ticker).pipe(
             catchError(error => {
-              console.error(`Error fetching asset info for ${holding.ticker}:`, {
-                status: error.status,
-                statusText: error.statusText,
-                message: error.message,
-                url: error.url,
-                error: error.error
-              });
-              return of(null);
+              console.error(`Error fetching company info for ${ticker}:`, error);
+              return of(null as MarketSymbolAPIResponse | null);
             })
           );
         });
 
-        // Wait for all requests to complete
         return forkJoin({
-          quotes: forkJoin(quoteRequests),
+          quotes: quoteResponses$,
           assets: forkJoin(assetRequests)
         }).pipe(
-          switchMap((result) => {
-            const quoteResponses = result.quotes as Record<string, MarketQuoteAPIResponse | null>;
-            const assetResponses = result.assets as Record<string, MarketSymbolAPIResponse | null>;
-            
-            // Merge both quote and asset data into holdings
+          map(({ quotes, assets }) => {
+            const quotesByTicker = new Map(quotes.map(quote => [quote.symbol, quote.quote]));
+            const companyNamesByTicker = new Map(
+              Object.entries(assets)
+                .filter((entry): entry is [string, MarketSymbolAPIResponse] => entry[1] !== null)
+                .map(([ticker, response]) => [ticker, response.data.name])
+            );
+            const assetTypesByTicker = new Map(
+              Object.entries(assets)
+                .filter((entry): entry is [string, MarketSymbolAPIResponse] => entry[1] !== null)
+                .map(([ticker, response]) => [ticker, response.data.type])
+            );
+
             holdings.forEach(holding => {
-              const quoteResponse = quoteResponses[holding.ticker];
-              const assetResponse = assetResponses[holding.ticker];
-              
-              // Apply quote data
-              if (quoteResponse && quoteResponse.data) {
-                const marketData = quoteResponse.data;
+              const marketData = quotesByTicker.get(holding.ticker);
+              holding.companyName = companyNamesByTicker.get(holding.ticker) ?? (holding.security || undefined);
+              holding.assetType = assetTypesByTicker.get(holding.ticker) ?? holding.assetType;
+
+              if (marketData) {
+                holding.currency = marketData.currency;
                 holding.price = marketData.price;
                 holding.change = marketData.change;
                 holding.dailyChangePercent = marketData.changePercent;
-                
-                // Calculate derived fields if averageCost is available
-                if (holding.price) {
-                  holding.marketValue = holding.numShares * marketData.price;
-                  holding.unrealizedGainLoss = holding.marketValue - (holding.costBasis ?? 0);
-                  holding.gainLoss = (holding.realizedGainLoss ?? 0) + holding.unrealizedGainLoss;
-                  holding.gainLossPercent = (holding.costBasis ?? 0) > 0
-                    ? (holding.gainLoss / (holding.costBasis ?? 0)) * 100
-                    : undefined;
-                }
-              }
-              
-              // Apply asset data (company name, etc.)
-              if (assetResponse && assetResponse.data) {
-                holding.companyName = assetResponse.data.name;
+                holding.marketValue = holding.numShares * marketData.price;
+                holding.unrealizedGainLoss = holding.marketValue - (holding.costBasis ?? 0);
+                holding.gainLoss = (holding.realizedGainLoss ?? 0) + holding.unrealizedGainLoss;
+                holding.gainLossPercent = (holding.costBasis ?? 0) > 0
+                  ? (holding.gainLoss / (holding.costBasis ?? 0)) * 100
+                  : undefined;
               }
             });
-            return of(holdings);
+
+            return holdings;
           })
         );
       }),

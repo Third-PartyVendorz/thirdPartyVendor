@@ -1,0 +1,10 @@
+<header class="page-header">
+    <div class="page-header__copy">
+        <p class="page-header__eyebrow" *ngIf="eyebrow">{{ eyebrow }}</p>
+        <h1>{{ title }}</h1>
+        <p class="page-header__description" *ngIf="description">{{ description }}</p>
+    </div>
+    <div class="page-header__actions">
+        <ng-content></ng-content>
+    </div>
+</header>

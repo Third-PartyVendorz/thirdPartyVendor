@@ -2,6 +2,12 @@ export interface MarketQuoteAPIResponse {
   data: MarketQuoteData;
 }
 
+export interface MarketQuoteBatchAPIResponse {
+  data: {
+    quotes: { symbol: string; stale?: boolean; quote: MarketQuoteData | null }[];
+  };
+}
+
 export interface MarketQuoteData {
   symbol: string;
   price: number;

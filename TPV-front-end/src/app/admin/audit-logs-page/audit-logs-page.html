@@ -77,7 +77,7 @@
 		</div>
 		<div class="detail-section"><h3>Recorded event</h3><p>{{ event.summary }}</p></div>
 		<div class="detail-section"><h3>Recorded values</h3><p *ngFor="let detail of event.details">{{ detail }}</p></div>
-		<div class="detail-section" *ngIf="event.type !== 'Order'"><h3>{{ event.type === 'Trade' ? 'Execution price' : 'Exchange rate' }}</h3><p>{{ event.pricing }}</p></div>
+		<div class="detail-section" *ngIf="event.type !== 'Forex exchange'"><h3>{{ event.type === 'Trade' ? 'Order and execution pricing' : 'Order pricing' }}</h3><p>{{ event.pricing }}</p></div>
 		<div class="detail-section" *ngIf="event.type === 'Forex exchange'"><h3>Cash movement</h3><p>{{ event.impact }}</p></div>
 	</aside>
 </main>

@@ -3,17 +3,17 @@
 	gap: 1.25rem;
 	padding: 1.25rem;
 	background:
-		radial-gradient(circle at top left, rgba(248, 183, 118, 0.22), transparent 30%),
-		linear-gradient(180deg, #f7fbff 0%, #eef4f9 100%);
+		radial-gradient(circle at top left, rgba(85, 196, 189, 0.12), transparent 30%),
+		linear-gradient(180deg, var(--color-page-start) 0%, var(--color-page) 100%);
 	min-height: calc(100vh - 72px);
 }
 
 .card-shell {
-	border: 1px solid rgba(148, 163, 184, 0.2);
-	border-radius: 24px;
-	background: rgba(255, 255, 255, 0.95);
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius-surface);
+	background: var(--color-surface);
 	padding: 1.5rem;
-	box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+	box-shadow: var(--shadow-surface);
 }
 
 .profile-hero {
@@ -36,7 +36,7 @@
 	height: 88px;
 	border-radius: 50%;
 	padding: 4px;
-	background: linear-gradient(135deg, #033d6c, #0b5ca5 68%, #f8b776);
+	background: linear-gradient(135deg, var(--color-brand), var(--color-brand-strong) 68%, var(--color-accent));
 	flex: 0 0 auto;
 	box-shadow: 0 12px 24px rgba(3, 61, 108, 0.18);
 }
@@ -62,7 +62,7 @@
 	letter-spacing: 0.14em;
 	font-size: 0.75rem;
 	font-weight: 700;
-	color: #64748b;
+	color: var(--color-text-subtle);
 }
 
 .identity-copy h1,
@@ -86,7 +86,7 @@
 .supporting-copy,
 .profile-note p {
 	margin: 0;
-	color: #475569;
+	color: var(--color-text-muted);
 	line-height: 1.65;
 }
 
@@ -115,9 +115,9 @@
 }
 
 .primary-action {
-	background: linear-gradient(135deg, #033d6c, #0b5ca5);
+	background: linear-gradient(135deg, var(--color-brand), var(--color-brand-strong));
 	color: #fff;
-	box-shadow: 0 14px 24px rgba(3, 61, 108, 0.18);
+	box-shadow: var(--shadow-action);
 }
 
 .secondary-action {

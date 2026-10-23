@@ -1,0 +1,96 @@
+.forex-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    margin: 0;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.card-header {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.card-header h2 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #111827;
+}
+
+.state-message {
+    margin: 0;
+    padding: 1.25rem 1.5rem;
+    color: #475569;
+}
+
+.state-message.error {
+    color: #b91c1c;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table-wrapper {
+    max-height: 12rem;
+    overflow-y: auto;
+}
+
+thead {
+    background: #fafbfd;
+}
+
+th {
+    text-align: left;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #111827;
+    background: linear-gradient(180deg, #f8fbff, #eef5fb);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+tbody tr {
+    border-top: 1px solid #edf1f7;
+}
+
+tbody tr:hover {
+    background: #f8fafc;
+}
+
+td {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    color: #111827;
+}
+
+.numeric {
+    text-align: right;
+}
+
+.currency {
+    font-weight: 600;
+    color: #111827;
+}
+
+@media (max-width: 1024px) {
+    .forex-card {
+        box-shadow: none;
+    }
+
+    .card-header {
+        border: 1px solid #e5e7eb;
+        border-radius: 12px 12px 0 0;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+    }
+
+    th,
+    td {
+        padding: 0.75rem 1rem;
+    }
+}

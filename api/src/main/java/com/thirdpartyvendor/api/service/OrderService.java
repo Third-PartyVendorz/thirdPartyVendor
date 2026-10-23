@@ -18,6 +18,7 @@ import com.thirdpartyvendor.api.entity.Order.OrderStatus;
 import com.thirdpartyvendor.api.entity.Trade;
 import com.thirdpartyvendor.api.error.AuthExceptions.ForbiddenException;
 import com.thirdpartyvendor.api.error.CashExceptions.InsufficientCashException;
+import com.thirdpartyvendor.api.error.OrderExceptions.BadOrderException;
 import com.thirdpartyvendor.api.error.OrderExceptions.OrderNotFoundException;
 import com.thirdpartyvendor.api.repository.HoldingRepository;
 import com.thirdpartyvendor.api.repository.OrderRepository;
@@ -55,14 +56,18 @@ public class OrderService {
 
     public OrderResponse createOrder(CreateOrderRequest createOrderRequest, Long userId) {
         orderValidator.validateCreateOrder(createOrderRequest, userId);
-        validateOrderFunds(createOrderRequest, userId);
+        String ticker = normalizeTicker(createOrderRequest.ticker());
+        MarketQuoteAPIResponse quoteResponse = marketDataAPIClient.fetchQuote(ticker);
+        BigDecimal instrumentPriceAtOrder = quoteResponse.data().price().setScale(4, RoundingMode.HALF_UP);
+        validateOrderFunds(createOrderRequest, userId, instrumentPriceAtOrder);
 
         Order newOrder = new Order();
         newOrder.setUserId(userId);
-        newOrder.setTicker(normalizeTicker(createOrderRequest.ticker()));
+        newOrder.setTicker(ticker);
         newOrder.setOrderIntent(createOrderRequest.orderIntent());
         newOrder.setQuantity(createOrderRequest.quantity());
         newOrder.setOrderPrice(createOrderRequest.orderPrice());
+        newOrder.setInstrumentPriceAtOrder(instrumentPriceAtOrder);
         newOrder.setStatus(OrderStatus.PENDING);
         newOrder.setOrderCurrency(normalizeCurrency(createOrderRequest.orderCurrency()));
 
@@ -93,10 +98,7 @@ public class OrderService {
         );
     }
 
-    private void validateOrderFunds(CreateOrderRequest request, Long userId) {
-        MarketQuoteAPIResponse quoteResponse = marketDataAPIClient.fetchQuote(normalizeTicker(request.ticker()));
-        BigDecimal quotePrice = quoteResponse.data().price().setScale(4, RoundingMode.HALF_UP);
-
+    private void validateOrderFunds(CreateOrderRequest request, Long userId, BigDecimal quotePrice) {
         if (request.orderIntent() == Order.OrderIntent.BUY) {
             BigDecimal tradeAmount = resolveTradeAmount(request.quantity(), request.orderPrice(), quotePrice);
             cashHoldingsService.ensureSufficientCash(normalizeCurrency(request.orderCurrency()), tradeAmount, userId);
@@ -138,26 +140,28 @@ public class OrderService {
 
     public List<OrderResponse> getOrders(Long userId) {
         return orderRepository.findByUserId(userId).stream()
-            .map(order -> {
-                Trade execution = tradeRepository.findByOrderId(order.getId()).stream()
-                    .findFirst()
-                    .orElse(null);
-
-                return new OrderResponse(
-                    order.getId(),
-                    order.getUserId(),
-                    order.getTicker(),
-                    order.getOrderIntent(),
-                    order.getQuantity(),
-                    order.getOrderPrice(),
-                    execution != null ? execution.getExecutionPrice() : null,
-                    execution != null ? execution.getExecutionQuantity() : null,
-                    order.getStatus(),
-                    order.getCreatedAt(),
-                    order.getOrderCurrency()
-                );
-            })
+            .map(this::toOrderResponse)
             .collect(Collectors.toList());
+    }
+
+    private OrderResponse toOrderResponse(Order order) {
+        Trade execution = tradeRepository.findByOrderId(order.getId()).stream()
+            .findFirst()
+            .orElse(null);
+
+        return new OrderResponse(
+            order.getId(),
+            order.getUserId(),
+            order.getTicker(),
+            order.getOrderIntent(),
+            order.getQuantity(),
+            order.getOrderPrice(),
+            execution != null ? execution.getExecutionPrice() : null,
+            execution != null ? execution.getExecutionQuantity() : null,
+            order.getStatus(),
+            order.getCreatedAt(),
+            order.getOrderCurrency()
+        );
     }
 
     public OrderResponse cancelOrder(Long orderId, Long userId) {
@@ -166,6 +170,10 @@ public class OrderService {
 
         if (!order.getUserId().equals(userId)) {
             throw new ForbiddenException("Only the associated user can modify this order.");
+        }
+
+        if (order.getStatus() != OrderStatus.PENDING) {
+            throw new BadOrderException("Only pending orders can be cancelled.");
         }
 
         order.setStatus(OrderStatus.CANCELLED);

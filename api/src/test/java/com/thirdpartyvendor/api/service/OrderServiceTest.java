@@ -241,4 +241,35 @@ class OrderServiceTest {
 
         verify(orderRepository, never()).save(any(Order.class));
     }
+
+    @Test
+    @DisplayName("Test a user can cancel their pending order")
+    void testCancelPendingOrder() {
+        Order order = new Order();
+        order.setId(1L);
+        order.setUserId(10L);
+        order.setStatus(Order.OrderStatus.PENDING);
+        when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
+
+        OrderResponse result = orderService.cancelOrder(1L, 10L);
+
+        assertEquals(Order.OrderStatus.CANCELLED, result.status());
+        verify(orderRepository).save(order);
+    }
+
+    @Test
+    @DisplayName("Test a user cannot cancel an order that is not pending")
+    void testCancelOrderRejectsNonPendingOrder() {
+        for (Order.OrderStatus status : List.of(Order.OrderStatus.FILLED, Order.OrderStatus.CANCELLED)) {
+            Order order = new Order();
+            order.setId(1L);
+            order.setUserId(10L);
+            order.setStatus(status);
+            when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
+
+            assertThrows(BadOrderException.class, () -> orderService.cancelOrder(1L, 10L));
+        }
+
+        verify(orderRepository, never()).save(any(Order.class));
+    }
 }       

@@ -5,16 +5,16 @@
 }
 
 .navbar-content {
-    background-color: #033D6C;
-    border-bottom: 4px solid #F8B776;
-    height: 72px;
+    background: linear-gradient(110deg, var(--color-brand-deep), var(--color-brand));
+    height: 68px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    padding: 0 24px;
+    padding: 0 clamp(1rem, 3vw, 2.5rem);
     position: relative;
-    gap: 16px;
+    gap: 24px;
+    box-shadow: 0 8px 24px rgba(7, 37, 62, 0.16);
 }
 
 .brand-name {
@@ -26,18 +26,18 @@
     color: #ffffff;
     margin: 0;
     font-size: 2rem;
-    font-weight: 300;
-    letter-spacing: 1px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-size: clamp(1.3rem, 3vw, 2.5rem);
+    overflow: visible;
+    text-overflow: clip;
+    font-size: clamp(1.05rem, 1.6vw, 1.35rem);
 }
 
 .desktop-nav ul {
     list-style: none;
     display: flex;
-    gap: clamp(12px, 2vw, 30px);
+    gap: clamp(4px, 1vw, 12px);
     flex-wrap: nowrap;
     white-space: nowrap;
 }
@@ -45,7 +45,7 @@
 .desktop-nav {
     flex: 1 1 auto;
     min-width: 0;
-    overflow: hidden;
+    overflow: visible;
     justify-self: center;
 }
 
@@ -54,16 +54,28 @@
 }
 
 .desktop-nav ul li a {
-    color: #ffffff;
+    color: rgba(255, 255, 255, 0.78);
     text-decoration: none;
     font-weight: 400;
     display: inline-block;
-    padding: 4px 0;
+    padding: 1.45rem 0.75rem 1.1rem;
     border-bottom: 2px solid transparent;
+    transition: color 150ms ease, border-color 150ms ease;
 }
 
 .desktop-nav ul li a:hover {
-    color: #F8B776;
+    color: #ffffff;
+    border-bottom-color: rgba(85, 196, 189, 0.65);
+}
+
+.desktop-nav ul li.active-link a,
+.mobile-nav a.active-link {
+    color: #ffffff;
+    border-bottom-color: var(--color-accent);
+}
+
+.mobile-nav a.active-link {
+    background: transparent;
 }
 
 .profile-button {
@@ -140,7 +152,7 @@
 }
 
 .frozen-warning:focus-visible {
-    box-shadow: 0 0 0 3px rgba(248, 183, 118, 0.55);
+    box-shadow: 0 0 0 3px rgba(85, 196, 189, 0.4);
 }
 
 .frozen-warning--mobile {
@@ -169,8 +181,8 @@
     min-width: 150px;
     padding: 8px 0;
     background-color: #ffffff;
-    border: 1px solid #F8B776;
-    border-radius: 4px;
+    border: 1px solid rgba(85, 196, 189, 0.35);
+    border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
     z-index: 1001;
 }
@@ -191,7 +203,7 @@
 
 .profile-dropdown a:hover,
 .profile-dropdown button:hover {
-    background-color: rgba(248, 183, 118, 0.2);
+    background-color: rgba(85, 196, 189, 0.14);
 }
 
 .profile-button img {
@@ -204,11 +216,11 @@
     display: none;
     flex-direction: column;
     gap: 0.5rem;
-    background-color: #033D6C;
+    background: var(--color-brand-deep);
     padding: 1rem;
-    border: 1px solid #F8B776;
+    border: 1px solid rgba(85, 196, 189, 0.35);
     position: fixed;
-    top: 72px;
+    top: 68px;
     right: 0;
     width: 200px;
     z-index: 1000;
@@ -221,12 +233,11 @@
     font-weight: 400;
     padding: 0.5rem 0;
     display: block;
-    border-left: 3px solid transparent;
-    padding-left: 0.5rem;
+    border-bottom: 2px solid transparent;
 }
 
 .mobile-nav a:hover {
-    color: #F8B776;
+    color: var(--color-accent);
 }
 
 .mobile-menu-button {
@@ -242,28 +253,19 @@
 }
 
 .mobile-menu-button:hover {
-    color: #F8B776;
+    color: var(--color-accent);
 }
 
 .nav-link.active-link {
-    color: #F8B776;
+    color: #ffffff;
+    border-bottom-color: var(--color-accent);
 }
 
 .desktop-nav .nav-link.active-link {
-    border-bottom-color: #F8B776;
+    border-bottom-color: var(--color-accent);
 }
 
-.desktop-nav li.active-link .nav-link {
-    color: #F8B776;
-    border-bottom-color: #F8B776;
-}
-
-.mobile-nav .nav-link.active-link {
-    border-left-color: #F8B776;
-    background-color: rgba(248, 183, 118, 0.12);
-}
-
-@media (max-width: 980px) {
+@media (max-width: 1120px) {
     .desktop-nav {
         display: none;
     }
@@ -281,22 +283,21 @@
     }
 }
 
-@media (min-width: 981px) {
+@media (min-width: 1121px) {
     .navbar-content {
         display: grid;
-        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+        grid-template-columns: max-content auto max-content;
         align-items: center;
         column-gap: clamp(24px, 3vw, 48px);
     }
 
     .brand-name {
         justify-self: start;
-        max-width: 100%;
         padding-right: 12px;
     }
 
     .brand-name h1 {
-        font-size: clamp(1.2rem, 2vw, 2rem);
+        font-size: clamp(1.05rem, 1.6vw, 1.35rem);
     }
 
     .desktop-nav {
