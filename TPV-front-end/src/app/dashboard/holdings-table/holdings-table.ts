@@ -40,6 +40,10 @@ export class HoldingsTable {
           aValue = a.companyName || '';
           bValue = b.companyName || '';
           break;
+        case 'assetType':
+          aValue = a.assetType || '';
+          bValue = b.assetType || '';
+          break;
         case 'shares':
           aValue = a.numShares;
           bValue = b.numShares;
@@ -104,6 +108,14 @@ export class HoldingsTable {
   getSortIndicator(column: SortColumn): string {
     if (this.sortColumn !== column) return '↕';
     return this.sortDirection === 'asc' ? '▲' : '▼';
+  }
+
+  getSortState(column: SortColumn): SortDirection | 'none' {
+    if (this.sortColumn !== column || !this.sortDirection) {
+      return 'none';
+    }
+
+    return this.sortDirection;
   }
 
   toggleExpand(ticker: string): void {

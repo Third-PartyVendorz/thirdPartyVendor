@@ -415,11 +415,11 @@ export class TradeFormComponent implements OnInit, OnChanges {
   }
 
   navigateToForex = (): void => {
-    this.router.navigate(['/forex'], { queryParams: { from: this.currency, to: this.currency } });
+    this.router.navigate(['/manage-cash']);
   }
 
   navigateToFunding = (): void => {
-    this.router.navigate(['/funding']);
+    this.router.navigate(['/manage-cash']);
   }
 }
 

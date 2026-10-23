@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Locale;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.thirdpartyvendor.api.entity.Watchlist;
 import com.thirdpartyvendor.api.error.WatchlistExceptions.WatchlistLimitException;
@@ -36,6 +37,7 @@ public class WatchlistService {
 		return getWatchlist(userId);
 	}
 
+	@Transactional
 	public List<String> removeFromWatchlist(Long userId, List<String> tickers) {
 		List<String> normalizedTickers = tickers.stream()
 			.map(this::normalizeTicker)

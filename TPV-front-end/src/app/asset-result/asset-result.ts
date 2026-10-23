@@ -73,8 +73,12 @@ export class AssetResultComponent implements OnInit {
 	}
 
 	@Input() autoOpenTrade = false;
+	@Input() isWatchlisted = false;
 
 	@Output() tradeButtonClicked = new EventEmitter<AssetTradeDetails>();
+	@Output() watchlistButtonClicked = new EventEmitter<void>();
+	@Output() watchlistRemoveClicked = new EventEmitter<void>();
+	@Output() assetFound = new EventEmitter<string>();
 	@Output() tickerNotFound = new EventEmitter<string>();
 
 	constructor(
@@ -108,6 +112,10 @@ export class AssetResultComponent implements OnInit {
 
 				if (asset) {
 					this.asset.set(asset.data);
+				}
+
+				if (quote && asset) {
+					this.assetFound.emit(ticker);
 				}
 
 				if (candles) {

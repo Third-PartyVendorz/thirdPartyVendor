@@ -1,4 +1,5 @@
 :host {
+  width: fit-content;
   display: inline-block;
   font-family: inherit;
 }
@@ -48,7 +49,6 @@
 .thumb-label {
   color: #ffffff;
   font-weight: 700;
-  font-size: 0.875rem;
 }
 
 .slider-track.active-right .slider-thumb {

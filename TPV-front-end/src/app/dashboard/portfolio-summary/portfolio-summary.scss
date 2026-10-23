@@ -1,6 +1,7 @@
 .portfolio-card {
-    background: #ffffff;
-    padding: 0.5rem;
+    display: grid;
+    gap: 1rem;
+    padding: 0;
 }
 
 .portfolio-header {
@@ -19,17 +20,17 @@
 
 .summary-title h1 {
     margin: 0;
-	color: #0f172a;
+    color: var(--color-text);
 }
 
 .summary-title p {
     margin: 0;
-	color: #475569;
+    color: var(--color-text-muted);
 	line-height: 1.6;
 }
 
 .trade-button {
-    background: linear-gradient(135deg, #033d6c, #0b5ca5);
+    background: linear-gradient(135deg, var(--color-brand), var(--color-brand-strong));
     color: #ffffff;
     border: none;
     border-radius: 14px;
@@ -47,10 +48,10 @@
     display: grid;
     grid-template-columns: 2fr 1fr 1fr 1.25fr;
     gap: 0;
-    border: 1px solid rgba(148, 163, 184, 0.2);
-	border-radius: 24px;
-	background: rgba(255, 255, 255, 0.94);
-	box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-surface);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-surface);
 }
 
 .metric {

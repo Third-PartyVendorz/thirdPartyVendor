@@ -7,6 +7,8 @@ import { ForexHoldings } from '../forex-holdings/forex-holdings';
 import { PortfolioGraphics } from '../portfolio-graphics/portfolio-graphics';
 import { HoldingService } from '../../services/holding.service';
 import { Holding } from '../holdings-table/holding.model';
+import { PageHeader } from '../../shared/page-header/page-header';
+import { RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { TradeService } from '../../trade-page/trade.service';
 // import { Trade } from '../../trade-page/'
@@ -19,7 +21,7 @@ import { HoldingResponse } from '../../dto/HoldingResponse';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, Navbar, PortfolioSummary, HoldingsTable, ForexHoldings, PortfolioGraphics],
+  imports: [CommonModule, Navbar, PortfolioSummary, HoldingsTable, ForexHoldings, PortfolioGraphics, PageHeader],
   selector: 'app-dashboard-page',
   styleUrl: './dashboard-page.scss',
   templateUrl: './dashboard-page.html',
@@ -60,7 +62,7 @@ export class DashboardPage implements OnInit {
         // Create observables for all market quote AND asset info requests
         const quoteRequests: { [key: string]: any } = {};
         const assetRequests: { [key: string]: any } = {};
-        
+
         holdings.forEach(holding => {
           // Fetch quote data (price, change, etc.)
           quoteRequests[holding.ticker] = this.marketApiService.fetchQuote(holding.ticker).pipe(
@@ -75,7 +77,7 @@ export class DashboardPage implements OnInit {
               return of(null);
             })
           );
-          
+
           // Fetch asset info (company name, symbol data, etc.)
           assetRequests[holding.ticker] = this.marketApiService.fetchAssetInfo(holding.ticker).pipe(
             catchError(error => {
@@ -104,14 +106,14 @@ export class DashboardPage implements OnInit {
             holdings.forEach(holding => {
               const quoteResponse = quoteResponses[holding.ticker];
               const assetResponse = assetResponses[holding.ticker];
-              
+
               // Apply quote data
               if (quoteResponse && quoteResponse.data) {
                 const marketData = quoteResponse.data;
                 holding.price = marketData.price;
                 holding.change = marketData.change;
                 holding.dailyChangePercent = marketData.changePercent;
-                
+
                 // Calculate derived fields if averageCost is available
                 if (holding.price) {
                   holding.marketValue = holding.numShares * marketData.price;
@@ -122,7 +124,7 @@ export class DashboardPage implements OnInit {
                     : undefined;
                 }
               }
-              
+
               // Apply asset data (company name, etc.)
               if (assetResponse && assetResponse.data) {
                 holding.companyName = assetResponse.data.name;

@@ -1,33 +1,19 @@
-<div class="manage-cash-header">
-    <div class="header-content">
-        <div class="title-section">
-            <div class="eyebrow">MANAGE CASH</div>
-            <h1>Manage Cash</h1>
-            <p>
-                Deposit funds, withdraw cash, and view your linked accounts 
-                and foreign exchange cash balance.
-            </p>
-        </div>
-    
+<main class="manage-cash-page">
+    <app-page-header
+        eyebrow="Manage cash"
+        title="Manage Cash"
+        description="Move capital between currencies with live rates and clear execution details."
+    >
+        <app-market-status />
+    </app-page-header>
 
-        <div class="market-status-card">
-            <div class="market-status" [ngClass]="{
-                'market-open': marketOpen,
-                'market-closed': !marketOpen
-            }">
-                <span class="status-dot"></span>
-                <span class="status-text">{{ marketOpen ? 'Market Open' : 'Market Closed' }}</span>
-            </div>
-            <div class="divider"></div>
-            
-            <div class="last-updated">
-                Last updated: 
-                {{ lastUpdated | date : 'MMM d, y h:mm a' }}
-            </div>
-        </div>
+    <div class="manage-cash-content">
+        <section class="manage-cash-column" aria-label="Cash movement">
+            <app-cash-balance />
+        </section>
+
+        <section class="manage-cash-column" aria-label="Foreign exchange">
+            <app-forex-container />
+        </section>
     </div>
-</div>
-<div class="manage-cash-content">
-    <app-cash-balance/>
-    <app-forex-container />
-</div>
+</main>

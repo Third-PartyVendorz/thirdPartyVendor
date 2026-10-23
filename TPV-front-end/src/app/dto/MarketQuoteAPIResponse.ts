@@ -2,6 +2,10 @@ export interface MarketQuoteAPIResponse {
   data: MarketQuoteData;
 }
 
+export interface MarketQuoteBatchAPIResponse {
+  data: Record<string, MarketQuoteData | null>;
+}
+
 export interface MarketQuoteData {
   symbol: string;
   price: number;

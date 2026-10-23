@@ -1,0 +1,13 @@
+<div class="market-status-card">
+  <div class="market-status" [ngClass]="{
+    'market-open': marketOpen,
+    'market-closed': !marketOpen
+  }">
+    <span class="status-dot"></span>
+    <span class="status-text">{{ marketOpen ? 'Market Open' : 'Market Closed' }}</span>
+  </div>
+  <div class="divider"></div>
+  <div class="last-updated">
+    Last updated: {{ lastUpdated | date : 'MMM d, y h:mm a' }}
+  </div>
+</div>
