@@ -96,19 +96,14 @@
                     class="expand-button"
                 >
                     <span class="expand-icon">{{ isExpanded(holding.ticker) ? '▼' : '▶' }}</span>
-                    {{ holding.companyName ? holding.companyName + ' ' : '' }}(<a class="holding-ticker" [routerLink]="['/explore-assets']" [queryParams]="{ ticker: holding.ticker }">{{ holding.ticker }}</a>)
+                    {{ holding.companyName ? holding.companyName + ' ' : '' }}<a class="holding-ticker" [routerLink]="['/explore-assets']" [queryParams]="{ ticker: holding.ticker }">({{ holding.ticker }})</a>
                 </button>
             </div>
             <div class="mobile-summary-card" *ngIf="isExpanded(holding.ticker)">
-                <button
-                    type="button"
-                    class="mobile-holdings-row mobile-ticker-button"
-                    [routerLink]="['/explore-assets']"
-                    [queryParams]="{ ticker: holding.ticker }"
-                >
+                <div class="mobile-holdings-row">
                     <span class="mobile-holdings-label">Ticker</span>
                     <span class="mobile-holdings-value company-name">{{ holding.ticker }}</span>
-                </button>
+                </div>
                 <div class="mobile-holdings-row" *ngIf="holding.companyName">
                     <span class="mobile-holdings-label">Company</span>
                     <span class="mobile-holdings-value">{{ holding.companyName }}</span>
@@ -116,14 +111,6 @@
                 <div class="mobile-holdings-row" *ngIf="holding.assetType">
                     <span class="mobile-holdings-label">Asset Type</span>
                     <span class="mobile-holdings-value">{{ holding.assetType | titlecase }}</span>
-                </div>
-                <div class="mobile-holdings-row">
-                    <span class="mobile-holdings-label">Security</span>
-                    <span class="mobile-holdings-value company-name">{{ holding.security }}</span>
-                </div>
-                <div class="mobile-holdings-row">
-                    <span class="mobile-holdings-label">Type</span>
-                    <span class="mobile-holdings-value">{{ holding.assetType }}</span>
                 </div>
                 <div class="mobile-holdings-row">
                     <span class="mobile-holdings-label">Shares</span>

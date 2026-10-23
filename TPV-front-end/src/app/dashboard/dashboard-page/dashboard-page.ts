@@ -109,6 +109,7 @@ export class DashboardPage implements OnInit {
               holding.assetType = assetTypesByTicker.get(holding.ticker) ?? holding.assetType;
 
               if (marketData) {
+                holding.currency = marketData.currency;
                 holding.price = marketData.price;
                 holding.change = marketData.change;
                 holding.dailyChangePercent = marketData.changePercent;
