@@ -5,6 +5,13 @@
       "cpu" : ${fargate_cpu},
       "memory" : ${fargate_memory},
       "networkMode": "awsvpc",
+      "environment": [
+        { "name": "DB_HOST", "value": ${db_host_json} },
+        { "name": "DB_PORT", "value": ${db_port_json} },
+        { "name": "DB_NAME", "value": ${db_name_json} },
+        { "name": "DB_USER", "value": ${db_user_json} },
+        { "name": "DB_PASSWORD", "value": ${db_password_json} }
+      ],
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {

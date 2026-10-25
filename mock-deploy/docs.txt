@@ -57,3 +57,11 @@ For now only initialize a single db instance
 try connecting from jenkins
 
 echo some type of validation or running a SQL query
+
+
+
+Next:
+
+Create endpoint in API
+
+Test querying db after creating with Lambda function

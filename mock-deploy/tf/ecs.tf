@@ -12,6 +12,11 @@ data "template_file" "task_def_template" {
         aws_region = var.region
         log_group_name = aws_cloudwatch_log_group.tpv_spring_logs.name
         app_port = var.spring_port
+        db_host_json = jsonencode(aws_db_instance.rds_primary.address)
+        db_port_json = jsonencode(tostring(aws_db_instance.rds_primary.port))
+        db_name_json = jsonencode(aws_db_instance.rds_primary.db_name)
+        db_user_json = jsonencode(var.database_username)
+        db_password_json = jsonencode(var.database_password)
     }
 }
 
@@ -45,3 +50,7 @@ resource "aws_ecs_service" "spring_ecs_service" {
 
     depends_on = [aws_alb_listener.alb_listener]
 }
+
+
+
+# Going to need the analytics service defined here as well

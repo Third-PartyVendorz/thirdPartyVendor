@@ -67,7 +67,7 @@ resource "aws_security_group" "rds_security" {
         to_port     = var.primary_db_port
         #security_groups = [aws_security_group.alb_security.id]
         #Will also pass alb here when I ensure I can init db
-        security_groups = [aws_security_group.lambda_security.id]
+        security_groups = [aws_security_group.lambda_security.id, aws_security_group.ecs_security.id]
     }
 
     egress {
