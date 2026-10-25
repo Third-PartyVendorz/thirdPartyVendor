@@ -40,6 +40,22 @@ resource "aws_security_group" "ecs_security" {
 
 
 
+resource "aws_security_group" "lambda_security" {
+    name = "lambda-security"
+    vpc_id = aws_vpc.vpc.id    
+
+    egress {
+        protocol    = "-1"
+        from_port   = 0
+        to_port     = 0
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+}
+
+
+
+
+
 resource "aws_security_group" "rds_security" {
     name        = "rds-security"
     description = "Controls access to the rds instance, ensure we only get traffic from alb"
@@ -50,7 +66,8 @@ resource "aws_security_group" "rds_security" {
         from_port   = var.primary_db_port
         to_port     = var.primary_db_port
         #security_groups = [aws_security_group.alb_security.id]
-        cidr_blocks = ["0.0.0.0/0"]
+        #Will also pass alb here when I ensure I can init db
+        security_groups = [aws_security_group.lambda_security.id]
     }
 
     egress {

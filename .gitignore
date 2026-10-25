@@ -46,3 +46,6 @@ yarn-error.log*
 __pycache__/
 *.pyc
 .pytest_cache/
+
+# Generated Lambda deployment package
+mock-deploy/testing/lambda.zip
