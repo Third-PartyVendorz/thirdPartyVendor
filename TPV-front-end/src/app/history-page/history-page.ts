@@ -282,8 +282,8 @@ export class HistoryPage implements OnInit {
       ticker: order.ticker,
       side: order.orderIntent === 'BUY' ? 'Buy' : 'Sell',
       quantity: this.formatQuantity(order.quantity),
-      price: this.formatOptionalCurrency(order.orderPrice),
-      total: this.formatOptionalCurrency(order.orderPrice),
+      price: this.formatOptionalCurrency(order.orderPrice, order.orderCurrency),
+      total: this.formatOptionalCurrency(order.orderPrice, order.orderCurrency),
       status,
       statusClass: this.getStatusClass(status),
       venue: order.orderCurrency,
@@ -315,20 +315,18 @@ export class HistoryPage implements OnInit {
     return quantity === null ? '—' : quantity.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 4 });
   }
 
-  private formatOptionalCurrency(value: number | null): string {
+  private formatOptionalCurrency(value: number | null, currency: string): string {
     if (value === null) {
       return '—';
     }
 
-    return this.formatCurrency(value);
+    return this.formatCurrency(value, currency);
   }
 
-  private formatCurrency(value: number): string {
+  private formatCurrency(value: number, currency = 'USD'): string {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
+      currency,
     }).format(value);
   }
 
@@ -378,7 +376,7 @@ export class HistoryPage implements OnInit {
 
   formatCashTransactionAmount(transaction: CashTransactionResponse): string {
     const sign = transaction.type === 'DEPOSIT' ? '+' : '-';
-    return `${sign}${this.formatCurrency(transaction.amount)}`;
+    return `${sign}${this.formatCurrency(transaction.amount, transaction.currencyCode)}`;
   }
 
   private isSameDay(left: Date, right: Date): boolean {
