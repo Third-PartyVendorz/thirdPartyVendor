@@ -24,6 +24,7 @@ export class PortfolioSummary implements OnInit {
   isLoading = signal(true);
   errorMessage = signal<string | null>(null);
   securitiesValue = signal(0);
+  private readonly dailySecurityGain = signal<number | null>(0);
   isSecuritiesLoading = signal(true);
   securitiesError = signal<string | null>(null);
   private readonly holdingsSubject = new BehaviorSubject<Holding[]>([]);
@@ -36,7 +37,22 @@ export class PortfolioSummary implements OnInit {
   @Input() holdingsError: string | null = null;
 
   get portfolioValue(): number {
-    return this.cashBalance() + this.securitiesValue();
+    return this.securitiesValue();
+  }
+
+  get dailyGainLoss(): number | null {
+    if (this.holdingsLoading || this.isSecuritiesLoading() ||
+        this.holdingsError || this.securitiesError()) {
+      return null;
+    }
+    return this.dailySecurityGain();
+  }
+
+  get dailyGainLossPercentage(): number | null {
+    const gain = this.dailyGainLoss;
+    if (gain === null) return null;
+    const previousValue = this.portfolioValue - gain;
+    return previousValue > 0 ? (gain / previousValue) * 100 : gain === 0 ? 0 : null;
   }
 
   private usdRate(currencyCode: string): Observable<number> {
@@ -69,21 +85,31 @@ export class PortfolioSummary implements OnInit {
             throw new Error(`Missing market valuation for ${holding.ticker}`);
           }
           return this.usdRate(holding.currency).pipe(
-            map(rate => holding.marketValue! * rate)
+            map(rate => ({
+              value: holding.marketValue! * rate,
+              dailyGain: Number.isFinite(holding.change)
+                ? holding.change! * rate
+                : null
+            }))
           );
         });
-        return (values.length ? forkJoin(values) : of([] as number[])).pipe(
-          map(amounts => amounts.reduce((total, amount) => total + amount, 0))
+        return (values.length ? forkJoin(values) : of([])).pipe(
+          map(amounts => amounts.reduce<{ value: number; dailyGain: number | null }>((total, amount) => ({
+            value: total.value + amount.value,
+            dailyGain: total.dailyGain === null || amount.dailyGain === null
+              ? null : total.dailyGain + amount.dailyGain
+          }), { value: 0, dailyGain: 0 }))
         );
       }).pipe(
         catchError(() => {
           this.securitiesError.set('Unable to value all security holdings in USD.');
-          return of(0);
+          return of({ value: 0, dailyGain: null });
         })
       )),
       takeUntilDestroyed(this.destroyRef)
-    ).subscribe(value => {
-      this.securitiesValue.set(value);
+    ).subscribe(totals => {
+      this.securitiesValue.set(totals.value);
+      this.dailySecurityGain.set(totals.dailyGain);
       this.isSecuritiesLoading.set(false);
     });
 
@@ -120,8 +146,6 @@ export class PortfolioSummary implements OnInit {
       }
     });
   }
-  @Input() dailyGainLoss: number = 1238.45;
-  @Input() dailyGainLossPercentage: number = 4.55;
   @Input() totalGainLoss: number = 6892.37;
   @Input() totalGainLossPercent: number = 31.91;
 }

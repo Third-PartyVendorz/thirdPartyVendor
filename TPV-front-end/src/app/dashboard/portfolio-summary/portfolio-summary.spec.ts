@@ -125,15 +125,15 @@ describe('PortfolioSummary', () => {
     expect(values[1].textContent.trim()).toBe('Unavailable');
   });
 
-  it('adds USD security market value to cash, not buying power or cost basis', () => {
+  it('uses security market value only, excluding cash, buying power and cost basis', () => {
     tradeService.getCashHoldings.mockReturnValue(of([
       { currencyCode: 'USD', balance: 1000, buyingPower: 700 },
     ]));
     fixture.componentRef.setInput('holdings', [holding({ costBasis: 300 })]);
     fixture.detectChanges();
 
-    expect(component.portfolioValue).toBe(1400);
-    expect(fixture.nativeElement.querySelector('.value').textContent.trim()).toBe('$1,400.00');
+    expect(component.portfolioValue).toBe(400);
+    expect(fixture.nativeElement.querySelector('.value').textContent.trim()).toBe('$400.00');
     expect(marketApiService.fetchForexQuote).not.toHaveBeenCalled();
   });
 
@@ -147,7 +147,7 @@ describe('PortfolioSummary', () => {
     ]);
     fixture.detectChanges();
 
-    expect(component.portfolioValue).toBeCloseTo(730);
+    expect(component.portfolioValue).toBeCloseTo(620);
     expect(marketApiService.fetchForexQuote).toHaveBeenCalledTimes(1);
   });
 
@@ -156,15 +156,36 @@ describe('PortfolioSummary', () => {
       { currencyCode: 'USD', balance: 1000, buyingPower: 700 },
     ]));
     fixture.detectChanges();
-    expect(component.portfolioValue).toBe(1000);
+    expect(component.portfolioValue).toBe(0);
 
     fixture.componentRef.setInput('holdings', [holding()]);
     fixture.detectChanges();
-    expect(component.portfolioValue).toBe(1400);
+    expect(component.portfolioValue).toBe(400);
 
     fixture.componentRef.setInput('holdings', []);
     fixture.detectChanges();
-    expect(component.portfolioValue).toBe(1000);
+    expect(component.portfolioValue).toBe(0);
+  });
+
+  it('displays holdings value even when cash cannot be fetched', () => {
+    tradeService.getCashHoldings.mockReturnValue(throwError(() => new Error('Cash API failed')));
+    fixture.componentRef.setInput('holdings', [holding({ change: 5 })]);
+    fixture.detectChanges();
+
+    expect(component.errorMessage()).toBeTruthy();
+    expect(component.portfolioValue).toBe(400);
+    expect(fixture.nativeElement.querySelector('.value').textContent.trim()).toBe('$400.00');
+    expect(component.dailyGainLoss).toBe(5);
+  });
+
+  it('displays holdings value without waiting for cash', () => {
+    tradeService.getCashHoldings.mockReturnValue(new Subject<CashHoldingResponse[]>());
+    fixture.componentRef.setInput('holdings', [holding({ change: 5 })]);
+    fixture.detectChanges();
+
+    expect(component.isLoading()).toBe(true);
+    expect(fixture.nativeElement.querySelector('.value').textContent.trim()).toBe('$400.00');
+    expect(component.dailyGainLoss).toBe(5);
   });
 
   it('waits for the dashboard holdings request before displaying total value', () => {
@@ -197,6 +218,79 @@ describe('PortfolioSummary', () => {
     expect(fixture.nativeElement.querySelector('.value').textContent.trim()).toBe('Unavailable');
     expect(component.errorMessage()).toBeNull();
     expect(component.cashBalance()).toBe(0);
+  });
+
+  it('sums holding daily changes without multiplying by shares and excludes cash', () => {
+    tradeService.getCashHoldings.mockReturnValue(of([
+      { currencyCode: 'USD', balance: 1000, buyingPower: 700 },
+    ]));
+    fixture.componentRef.setInput('holdings', [holding({ change: 5 })]);
+    fixture.detectChanges();
+
+    expect(component.dailyGainLoss).toBe(5);
+    expect(component.dailyGainLossPercentage).toBeCloseTo(5 / 395 * 100);
+    const daily = fixture.nativeElement.querySelector('.portfolio-daily-change');
+    expect(daily.textContent).toContain('$5.00');
+    expect(daily.textContent).toContain('+1.27%');
+    expect(daily.classList.contains('positive')).toBe(true);
+  });
+
+  it('converts and sums daily changes across currencies and updates after holdings change', () => {
+    marketApiService.fetchForexQuote.mockReturnValue(of({ data: { price: 1.1 } }));
+    fixture.componentRef.setInput('holdings', [
+      holding({ change: 5 }),
+      holding({ ticker: 'SAP', currency: 'EUR', marketValue: 200, change: -10, numShares: 3 }),
+    ]);
+    fixture.detectChanges();
+
+    expect(component.dailyGainLoss).toBeCloseTo(-6);
+    expect(component.dailyGainLossPercentage).toBeCloseTo(-6 / 626 * 100);
+    expect(fixture.nativeElement.querySelector('.portfolio-daily-change').classList.contains('negative')).toBe(true);
+
+    fixture.componentRef.setInput('holdings', [holding({ change: 0 })]);
+    fixture.detectChanges();
+    expect(component.dailyGainLoss).toBe(0);
+    expect(component.dailyGainLossPercentage).toBe(0);
+  });
+
+  it('shows zero daily gains for an empty portfolio', () => {
+    fixture.detectChanges();
+    expect(component.dailyGainLoss).toBe(0);
+    expect(component.dailyGainLossPercentage).toBe(0);
+    const daily = fixture.nativeElement.querySelector('.portfolio-daily-change');
+    expect(daily.textContent).toContain('$0.00');
+    expect(daily.textContent).not.toContain('▼');
+  });
+
+  it('does not invent a daily gain when a quote change is missing', () => {
+    fixture.componentRef.setInput('holdings', [holding()]);
+    fixture.detectChanges();
+    expect(component.dailyGainLoss).toBeNull();
+    expect(component.dailyGainLossPercentage).toBeNull();
+    expect(component.portfolioValue).toBe(400);
+    expect(fixture.nativeElement.querySelector('.portfolio-daily-change').textContent).toContain('Unavailable');
+  });
+
+  it('does not divide by a zero prior portfolio value', () => {
+    fixture.componentRef.setInput('holdings', [holding({ marketValue: 10, numShares: 1, change: 10 })]);
+    fixture.detectChanges();
+    expect(component.dailyGainLoss).toBe(10);
+    expect(component.dailyGainLossPercentage).toBeNull();
+    expect(fixture.nativeElement.querySelector('.portfolio-daily-change').textContent).toContain('(N/A)');
+  });
+
+  it('hides daily gains while holdings load or fail', () => {
+    fixture.componentRef.setInput('holdings', [holding({ change: 5 })]);
+    fixture.componentRef.setInput('holdingsLoading', true);
+    fixture.detectChanges();
+    expect(component.dailyGainLoss).toBeNull();
+    expect(fixture.nativeElement.querySelector('.portfolio-daily-change').textContent).toContain('Loading…');
+
+    fixture.componentRef.setInput('holdingsLoading', false);
+    fixture.componentRef.setInput('holdingsError', 'Failed');
+    fixture.detectChanges();
+    expect(component.dailyGainLoss).toBeNull();
+    expect(fixture.nativeElement.querySelector('.portfolio-daily-change').textContent).toContain('Unavailable');
   });
 
   it.each([0, -1, NaN, Infinity])('rejects invalid exchange rate %s', (price) => {

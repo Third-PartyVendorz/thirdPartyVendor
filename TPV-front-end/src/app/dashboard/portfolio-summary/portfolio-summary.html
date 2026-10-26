@@ -3,20 +3,34 @@
         <div class="metric-primary">
             <div class="label">Total Value</div>
 
-            <div class="value" [attr.title]="errorMessage() || holdingsError || securitiesError()">
-                @if (errorMessage() || holdingsError || securitiesError()) {
+            <div class="value" [attr.title]="holdingsError || securitiesError()">
+                @if (holdingsError || securitiesError()) {
                     Unavailable
-                } @else if (isLoading() || holdingsLoading || isSecuritiesLoading()) {
+                } @else if (holdingsLoading || isSecuritiesLoading()) {
                     Loading…
                 } @else {
                     {{ portfolioValue | currency:'USD':'symbol': '1.2-2' }}
                 }
             </div>
 
-            <div class="portfolio-daily-change" [class.positive]="dailyGainLoss > 0" [class.negative]="dailyGainLoss < 0">     
-                {{ dailyGainLoss > 0 ? '▲' : '▼' }}
-                {{ dailyGainLoss | currency: 'USD' :'symbol': '1.2-2' }}
-                ({{ dailyGainLossPercentage > 0 ? '+' : '' }}{{ dailyGainLossPercentage | number:'1.2-2' }}%)
+            <div class="portfolio-daily-change"
+                [class.positive]="(dailyGainLoss ?? 0) > 0" [class.negative]="(dailyGainLoss ?? 0) < 0"
+                title="Security price changes converted at current USD exchange rates; excludes FX gains and intraday cash flows.">
+                @if (holdingsError || securitiesError()) {
+                    Unavailable
+                } @else if (holdingsLoading || isSecuritiesLoading()) {
+                    Loading…
+                } @else if (dailyGainLoss === null) {
+                    Unavailable
+                } @else {
+                    {{ dailyGainLoss > 0 ? '▲' : dailyGainLoss < 0 ? '▼' : '' }}
+                    {{ dailyGainLoss | currency: 'USD' :'symbol': '1.2-2' }}
+                    @if (dailyGainLossPercentage !== null) {
+                        ({{ dailyGainLossPercentage > 0 ? '+' : '' }}{{ dailyGainLossPercentage | number:'1.2-2' }}%)
+                    } @else {
+                        (N/A)
+                    }
+                }
                 <span class="period">Today</span>
             </div>
         </div>
