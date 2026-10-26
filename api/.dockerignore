@@ -1,6 +1,9 @@
 # Build artifacts and outputs
 target/
 
+# Flyway migrations (schema is initialized by the Lambda function)
+src/main/resources/db/migration/
+
 # CI/CD and build configuration
 Jenkinsfile
 jenkins-setup.txt

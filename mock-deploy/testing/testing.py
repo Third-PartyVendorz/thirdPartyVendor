@@ -21,18 +21,14 @@ def lambda_handler(event, context):
     )
     try:
         with conn.cursor() as cur:
-            q1 = "CREATE TABLE IF NOT EXISTS test(id SERIAL PRIMARY KEY, name TEXT);"
-            cur.execute(q1)
-
-            q2 = "INSERT INTO test(name) VALUES('test name');"
-            cur.execute(q2)
-            conn.commit()
+            schema_path = Path(__file__).with_name("schema.sql")
+            cur.execute(schema_path.read_text(encoding="utf-8"))
 
             cur.execute("SELECT version();")
             version = cur.fetchone()[0]
         return {
             "statusCode": 200,
-            "message": "Table created successfully",
+            "message": "Schema initialized successfully",
             "version": version,
         }
     finally:

@@ -30,6 +30,15 @@ variable "spring_image" {
 }
 
 
+
+
+
+
+
+
+
+
+
 # ----------
 
 

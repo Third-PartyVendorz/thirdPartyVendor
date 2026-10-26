@@ -101,6 +101,18 @@ resource "aws_vpc_endpoint" "logs" {
   private_dns_enabled = true
 }
 
+
+resource "aws_vpc_endpoint" "secretsmanager" {
+  vpc_id              = aws_vpc.vpc.id
+  vpc_endpoint_type   = "Interface"
+  service_name        = "com.amazonaws.${var.region}.secretsmanager"
+  subnet_ids          = aws_subnet.private[*].id
+  security_group_ids  = [aws_security_group.endpoint.id]
+  private_dns_enabled = true
+}
+
+
+
 resource "aws_vpc_endpoint" "gateway_endpoints" {
   vpc_id              = aws_vpc.vpc.id
   vpc_endpoint_type   = "Gateway"

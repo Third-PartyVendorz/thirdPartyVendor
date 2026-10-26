@@ -10,3 +10,8 @@ output "rds_connector_function_name" {
     description = "Lambda function used to verify private RDS connectivity"
     value       = aws_lambda_function.rds_connector.function_name
 }
+
+#output "jwt_secret_arn" {
+#    description = "JWT secret ARN; populate its plain-text value before starting ECS tasks"
+#    value       = aws_secretsmanager_secret.jwt.arn
+#}

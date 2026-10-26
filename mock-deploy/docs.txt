@@ -97,4 +97,21 @@ Dockerfile for Flask
 
 Create task definition and service for flask api in ecs.tf file + Security group for flask api
 
+Update lambda function to initialize the actual schema
+
+Will also need a lambda function to update a users role
+
+Create task definition and service for flask api in ecs.tf file + Security group for flask api
+
 Update Jenkinsfile
+
+
+Will eventually implement Secrets Manager:
+
+
+
+Need: 
+
+    - Private link interface endpoint
+    - ECS policy so that ECS can actually fetch secrets
+    - Update ECS and Task template

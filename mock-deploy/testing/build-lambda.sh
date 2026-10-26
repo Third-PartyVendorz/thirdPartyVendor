@@ -17,6 +17,7 @@ python3 -m pip install \
     --requirement "$script_dir/requirements.txt"
 
 cp "$script_dir/testing.py" "$package_dir/testing.py"
+cp "$script_dir/schema.sql" "$package_dir/schema.sql"
 curl --fail --silent --show-error --location \
     https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem \
     --output "$package_dir/global-bundle.pem"

@@ -7,9 +7,12 @@ PostgreSQL driver, and the AWS RDS CA bundle at the archive root.
 Rebuild after changing the handler or dependencies; Terraform detects the ZIP hash.
 
 The Lambda handler is `testing.lambda_handler`. Invoke it with an empty JSON
-event (`{}`) to run `SELECT version();`. Successful invocations return a
-`statusCode` of 200 and the PostgreSQL version. Connection/query failures fail
-the invocation rather than reporting success.
+event (`{}`) to initialize the database from `schema.sql`, then run
+`SELECT version();`. The schema script is packaged with the Lambda and is
+intended for an empty database; subsequent invocations fail because its objects
+already exist. Successful invocations return a `statusCode` of 200 and the
+PostgreSQL version. Connection/query failures fail the invocation rather than
+reporting success.
 
 Terraform provides `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, and `DB_PASSWORD`
 and attaches the existing Lambda security group in the private subnets.

@@ -3,7 +3,8 @@ pipeline {
 
 	environment {
 		AWS_REGION = 'us-east-2'
-		ECR_REPOSITORY = 'spring-ecr-repository'
+		ECR_REPOSITORY_SPRING = 'spring-ecr-repository'
+		ECR_REPOSITORY_FLASK = 'flask-ecr-repository'
 		IMAGE_TAG = "${env.BUILD_NUMBER}"
 	}
 
@@ -20,7 +21,7 @@ pipeline {
 					dir('mock-deploy/tf') {
 						sh '''
 							terraform init
-							terraform apply -auto-approve -target=aws_ecr_repository.spring_repository
+							terraform apply -auto-approve -target=aws_ecr_repository.spring_repository, -target=aws_ecr_repository.flask_repositoryv
 						'''
 					}
 				}
@@ -29,7 +30,9 @@ pipeline {
 
 		stage('Build image') {
 			steps {
-				sh 'docker build -t ${ECR_REPOSITORY}:${IMAGE_TAG} mock-deploy/mock-api'
+				// sh 'docker build -t ${ECR_REPOSITORY}:${IMAGE_TAG} mock-deploy/mock-api'
+				sh 'docker build -t ${ECR_REPOSITORY_SPRING}:${IMAGE_TAG} api/'
+				sh 'docker build -t ${ECR_REPOSITORY_FLASK}:${IMAGE_TAG} analytics/'
 			}
 		}
 
@@ -40,8 +43,10 @@ pipeline {
 						ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
 						REGISTRY="${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
 						aws ecr get-login-password --region "${AWS_REGION}" | docker login --username AWS --password-stdin "${REGISTRY}"
-						docker tag "${ECR_REPOSITORY}:${IMAGE_TAG}" "${REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}"
-						docker push "${REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}"
+						docker tag "${ECR_REPOSITORY_SPRING}:${IMAGE_TAG}" "${REGISTRY}/${ECR_REPOSITORY_SPRING}:${IMAGE_TAG}"
+						docker push "${REGISTRY}/${ECR_REPOSITORY_SPRING}:${IMAGE_TAG}"
+						docker tag "${ECR_REPOSITORY_FLASK}:${IMAGE_TAG}" "${REGISTRY}/${ECR_REPOSITORY_FLASK}:${IMAGE_TAG}"
+						docker push "${REGISTRY}/${ECR_REPOSITORY_FLASK}:${IMAGE_TAG}"
 					'''
 				}
 			}
@@ -111,7 +116,7 @@ PY
 				dir('mock-deploy/tf') {
 					sh '''
 						ALB_HOST=$(terraform output -raw alb_hostname)
-						API_URL="http://${ALB_HOST}:8080/"
+						API_URL="http://${ALB_HOST}:8081/"
 						echo "API URL: ${API_URL}"
 						curl --fail --show-error --silent --retry 10 --retry-connrefused --retry-delay 10 --connect-timeout 10 --max-time 30 "${API_URL}"
 						echo

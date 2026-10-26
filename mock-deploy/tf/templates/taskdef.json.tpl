@@ -10,7 +10,9 @@
         { "name": "DB_PORT", "value": ${db_port_json} },
         { "name": "DB_NAME", "value": ${db_name_json} },
         { "name": "DB_USER", "value": ${db_user_json} },
-        { "name": "DB_PASSWORD", "value": ${db_password_json} }
+        { "name": "DB_PASSWORD", "value": ${db_password_json} },
+        { "name": "APP_JWT_EXPIRATION_MS", "value": "86400000" },
+        { "name": "APP_REFRESH_EXPIRATION_MS", "value": "86400000" }
       ],
       "logConfiguration": {
         "logDriver": "awslogs",
@@ -24,6 +26,12 @@
         {
           "hostPort": ${app_port},
           "containerPort": ${app_port}
+        }
+      ],
+      "secrets": [
+        {
+          "name": "APP_JWT_SECRET",
+          "valueFrom": ${jwt_secret_arn_json}
         }
       ]
     }

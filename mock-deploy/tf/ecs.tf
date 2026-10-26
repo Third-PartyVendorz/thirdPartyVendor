@@ -17,6 +17,11 @@ data "template_file" "task_def_template" {
         db_name_json = jsonencode(aws_db_instance.rds_primary.db_name)
         db_user_json = jsonencode(var.database_username)
         db_password_json = jsonencode(var.database_password)
+
+
+        #jwt_secret_arn_json = jsonencode(aws_secretsmanager_secret.jwt.arn)
+
+        jwt_secret_arn_json = jsonencode(data.aws_secretsmanager_secret.jwt.arn)
     }
 }
 
@@ -48,7 +53,12 @@ resource "aws_ecs_service" "spring_ecs_service" {
         container_port = var.spring_port
     }
 
-    depends_on = [aws_alb_listener.alb_listener]
+    depends_on = [
+        aws_alb_listener.alb_listener,
+        aws_iam_role_policy_attachment.ecs_task_execution_policy,
+        aws_iam_role_policy.ecs_jwt_secret,
+        aws_vpc_endpoint.secretsmanager,
+    ]
 }
 
 
