@@ -21,7 +21,7 @@ pipeline {
 					dir('mock-deploy/tf') {
 						sh '''
 							terraform init
-							terraform apply -auto-approve -target=aws_ecr_repository.spring_repository, -target=aws_ecr_repository.flask_repositoryv
+							terraform apply -auto-approve -target=aws_ecr_repository.spring_repository -target=aws_ecr_repository.flask_repository
 						'''
 					}
 				}
