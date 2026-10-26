@@ -28,12 +28,12 @@ def lambda_handler(event, context):
             cur.execute(q2)
             conn.commit()
 
-            cur.execute("SELECT version();")
-            version = cur.fetchone()[0]
+            # cur.execute("SELECT version();")
+            # version = cur.fetchone()[0]
         return {
             "statusCode": 200,
             "message": "Table created successfully",
-            "version": version,
+            # "version": version,
         }
     finally:
         # A psycopg2 connection context manager alone does not close the socket.
