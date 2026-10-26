@@ -155,22 +155,24 @@ public class AuthController {
 	private ResponseCookie buildAuthCookie(HttpServletRequest request, String value, long jwtExpirationMs) {
 		return ResponseCookie.from("authToken", value)
 			.httpOnly(true)
-			.secure(request.isSecure())
+			// .secure(request.isSecure())
+			.secure(true)
 			.path("/")
 			.maxAge(Duration.ofMillis(jwtExpirationMs))
 			// .sameSite("Strict")
-			.sameSite("Lax")
+			.sameSite("None")
 			.build();
 	}
 
 	private ResponseCookie buildRefreshCookie(HttpServletRequest request, String value, long refreshExpirationMs) {
 		return ResponseCookie.from("refreshToken", value)
 			.httpOnly(true)
-			.secure(request.isSecure())
+			// .secure(request.isSecure())
+			.secure(true)
 			.path("/")
 			.maxAge(Duration.ofMillis(refreshExpirationMs))
 			// .sameSite("Strict")
-			.sameSite("Lax")
+			.sameSite("None")
 			.build();
 	}
 }
