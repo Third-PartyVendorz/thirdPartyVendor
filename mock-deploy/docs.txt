@@ -88,3 +88,13 @@ New task definition for flask API --> 2 containers running in our ecs
 
 
 Secrets manager
+
+
+
+Dockerfile for Spring
+
+Dockerfile for Flask
+
+Create task definition and service for flask api in ecs.tf file + Security group for flask api
+
+Update Jenkinsfile
