@@ -13,3 +13,7 @@
 data "aws_secretsmanager_secret" "jwt" {
   name = "tpv/jwt-secret" # Name of your existing secret
 }
+
+data "aws_secretsmanager_secret" "fauxnance_key" {
+  name = "tpv/fauxnance-api-key" # Name of your existing secret
+}

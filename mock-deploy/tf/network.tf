@@ -59,11 +59,14 @@ resource "aws_security_group" "endpoint" {
   vpc_id      = aws_vpc.vpc.id
 
   ingress {
-    description = "HTTPS from private subnets"
+    description = "HTTPS from private and public workloads"
     protocol    = "tcp"
     from_port   = 443
     to_port     = 443
-    cidr_blocks = [for subnet in aws_subnet.private : subnet.cidr_block]
+    cidr_blocks = concat(
+      [for subnet in aws_subnet.private : subnet.cidr_block],
+      [for subnet in aws_subnet.public : subnet.cidr_block],
+    )
   }
 
   egress {

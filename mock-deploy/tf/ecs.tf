@@ -12,11 +12,11 @@ data "template_file" "task_def_template" {
         aws_region = var.region
         log_group_name = aws_cloudwatch_log_group.tpv_spring_logs.name
         app_port = var.spring_port
-        db_host_json = jsonencode(aws_db_instance.rds_primary.address)
-        db_port_json = jsonencode(tostring(aws_db_instance.rds_primary.port))
-        db_name_json = jsonencode(aws_db_instance.rds_primary.db_name)
+        datasource_url_json = jsonencode("jdbc:postgresql://${aws_db_instance.rds_primary.address}:${aws_db_instance.rds_primary.port}/${aws_db_instance.rds_primary.db_name}?sslmode=verify-full&sslrootcert=/app/global-bundle.pem")
         db_user_json = jsonencode(var.database_username)
         db_password_json = jsonencode(var.database_password)
+        fauxnance_api_url_json = jsonencode(var.fauxnance_api_url)
+        fauxnance_api_key_secret_arn_json = jsonencode(data.aws_secretsmanager_secret.fauxnance_key.arn)
 
 
         #jwt_secret_arn_json = jsonencode(aws_secretsmanager_secret.jwt.arn)
@@ -44,7 +44,8 @@ resource "aws_ecs_service" "spring_ecs_service" {
 
     network_configuration {
         security_groups = [aws_security_group.ecs_security.id]
-        subnets = aws_subnet.private.*.id
+        subnets = aws_subnet.public.*.id
+        assign_public_ip = true
     }
 
     load_balancer {
@@ -58,6 +59,7 @@ resource "aws_ecs_service" "spring_ecs_service" {
         aws_iam_role_policy_attachment.ecs_task_execution_policy,
         aws_iam_role_policy.ecs_jwt_secret,
         aws_vpc_endpoint.secretsmanager,
+        aws_route.public_rt,
     ]
 }
 

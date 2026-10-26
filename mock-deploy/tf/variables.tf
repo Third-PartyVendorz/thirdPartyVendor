@@ -21,13 +21,19 @@ variable "health_check_path" {
 
 
 # ----- Application Variables -----
-variable "spring_port" {default = 8080}
+variable "spring_port" {default = 8081}
 
 variable "spring_image" {
     description = "The tag of the Spring image already pushed to ECR"
     type        = string
     default     = "latest"
 }
+
+variable "fauxnance_api_url" {
+    description = "Base URL of the external Fauxnance API"
+    type        = string
+}
+
 
 
 

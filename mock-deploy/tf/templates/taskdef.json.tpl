@@ -6,11 +6,12 @@
       "memory" : ${fargate_memory},
       "networkMode": "awsvpc",
       "environment": [
-        { "name": "DB_HOST", "value": ${db_host_json} },
-        { "name": "DB_PORT", "value": ${db_port_json} },
-        { "name": "DB_NAME", "value": ${db_name_json} },
-        { "name": "DB_USER", "value": ${db_user_json} },
-        { "name": "DB_PASSWORD", "value": ${db_password_json} },
+        { "name": "SPRING_DATASOURCE_URL", "value": ${datasource_url_json} },
+        { "name": "SPRING_DATASOURCE_USERNAME", "value": ${db_user_json} },
+        { "name": "SPRING_DATASOURCE_PASSWORD", "value": ${db_password_json} },
+        { "name": "SPRING_FLYWAY_ENABLED", "value": "false" },
+        { "name": "SERVER_PORT", "value": "${app_port}" },
+        { "name": "FAUXNANCE_API_URL", "value": ${fauxnance_api_url_json} },
         { "name": "APP_JWT_EXPIRATION_MS", "value": "86400000" },
         { "name": "APP_REFRESH_EXPIRATION_MS", "value": "86400000" }
       ],
@@ -32,6 +33,10 @@
         {
           "name": "APP_JWT_SECRET",
           "valueFrom": ${jwt_secret_arn_json}
+        },
+        {
+          "name": "FAUXNANCE_API_KEY",
+          "valueFrom": ${fauxnance_api_key_secret_arn_json}
         }
       ]
     }

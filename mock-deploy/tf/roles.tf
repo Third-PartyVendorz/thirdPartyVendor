@@ -64,7 +64,10 @@ resource "aws_iam_role_policy" "ecs_jwt_secret" {
       Effect   = "Allow"
       Action   = ["secretsmanager:GetSecretValue"]
       #Resource = aws_secretsmanager_secret.jwt.arn
-      Resource = data.aws_secretsmanager_secret.jwt.arn
+      Resource = [
+        data.aws_secretsmanager_secret.jwt.arn,
+        data.aws_secretsmanager_secret.fauxnance_key.arn,
+      ]
     }]
   })
 }

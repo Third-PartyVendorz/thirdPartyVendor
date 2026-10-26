@@ -18,6 +18,7 @@ resource "aws_security_group" "alb_security" {
     }
 }
 
+#Will also need another security group for the flask api
 resource "aws_security_group" "ecs_security" {
     name        = "ecs-security"
     description = "Controls access to the ecs, ensure we only get traffic from alb"
