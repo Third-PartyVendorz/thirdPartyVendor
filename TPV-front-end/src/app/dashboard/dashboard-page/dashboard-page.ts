@@ -56,6 +56,8 @@ export class DashboardPage implements OnInit {
         currency: response.currency
       }))),
       switchMap((holdings: Holding[]) => {
+        if (holdings.length === 0) return of([] as Holding[]);
+
         const tickers = [...new Set(holdings.map(holding => holding.ticker))];
         const tickerBatches: string[][] = [];
 

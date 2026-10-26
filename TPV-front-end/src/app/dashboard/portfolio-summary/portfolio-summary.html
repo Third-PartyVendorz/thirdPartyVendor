@@ -3,8 +3,14 @@
         <div class="metric-primary">
             <div class="label">Total Value</div>
 
-            <div class="value">
-                {{ portfolioValue | currency:'USD':'symbol': '1.2-2' }}
+            <div class="value" [attr.title]="errorMessage() || holdingsError || securitiesError()">
+                @if (errorMessage() || holdingsError || securitiesError()) {
+                    Unavailable
+                } @else if (isLoading() || holdingsLoading || isSecuritiesLoading()) {
+                    Loading…
+                } @else {
+                    {{ portfolioValue | currency:'USD':'symbol': '1.2-2' }}
+                }
             </div>
 
             <div class="portfolio-daily-change" [class.positive]="dailyGainLoss > 0" [class.negative]="dailyGainLoss < 0">     

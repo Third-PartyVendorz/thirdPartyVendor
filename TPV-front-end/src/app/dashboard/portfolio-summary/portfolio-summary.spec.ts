@@ -3,6 +3,7 @@ import { of, Subject, throwError } from 'rxjs';
 import { CashHoldingResponse } from '../../dto/CashHoldingResponse';
 import { MarketApiService } from '../../services/marketApi.service';
 import { TradeService } from '../../trade-page/trade.service';
+import { Holding } from '../holdings-table/holding.model';
 import { PortfolioSummary } from './portfolio-summary';
 
 describe('PortfolioSummary', () => {
@@ -10,6 +11,13 @@ describe('PortfolioSummary', () => {
   let fixture: ComponentFixture<PortfolioSummary>;
   let tradeService: { getCashHoldings: ReturnType<typeof vi.fn> };
   let marketApiService: { fetchForexQuote: ReturnType<typeof vi.fn> };
+
+  function holding(overrides: Partial<Holding> = {}): Holding {
+    return {
+      ticker: 'AAPL', userId: 1, security: 'Apple', assetType: 'STOCK',
+      numShares: 2, currency: 'USD', marketValue: 400, ...overrides,
+    };
+  }
 
   beforeEach(async () => {
     tradeService = { getCashHoldings: vi.fn(() => of([] as CashHoldingResponse[])) };
@@ -115,6 +123,80 @@ describe('PortfolioSummary', () => {
     const values = fixture.nativeElement.querySelectorAll('.metric .small-value');
     expect(values[0].textContent.trim()).toBe('Unavailable');
     expect(values[1].textContent.trim()).toBe('Unavailable');
+  });
+
+  it('adds USD security market value to cash, not buying power or cost basis', () => {
+    tradeService.getCashHoldings.mockReturnValue(of([
+      { currencyCode: 'USD', balance: 1000, buyingPower: 700 },
+    ]));
+    fixture.componentRef.setInput('holdings', [holding({ costBasis: 300 })]);
+    fixture.detectChanges();
+
+    expect(component.portfolioValue).toBe(1400);
+    expect(fixture.nativeElement.querySelector('.value').textContent.trim()).toBe('$1,400.00');
+    expect(marketApiService.fetchForexQuote).not.toHaveBeenCalled();
+  });
+
+  it('converts securities and cash using the same cached USD rate', () => {
+    tradeService.getCashHoldings.mockReturnValue(of([
+      { currencyCode: 'EUR', balance: 100, buyingPower: 80 },
+    ]));
+    marketApiService.fetchForexQuote.mockReturnValue(of({ data: { price: 1.1 } }));
+    fixture.componentRef.setInput('holdings', [
+      holding(), holding({ ticker: 'SAP', currency: 'EUR', marketValue: 200 }),
+    ]);
+    fixture.detectChanges();
+
+    expect(component.portfolioValue).toBeCloseTo(730);
+    expect(marketApiService.fetchForexQuote).toHaveBeenCalledTimes(1);
+  });
+
+  it('supports cash-only portfolios and updates when holdings arrive or are removed', () => {
+    tradeService.getCashHoldings.mockReturnValue(of([
+      { currencyCode: 'USD', balance: 1000, buyingPower: 700 },
+    ]));
+    fixture.detectChanges();
+    expect(component.portfolioValue).toBe(1000);
+
+    fixture.componentRef.setInput('holdings', [holding()]);
+    fixture.detectChanges();
+    expect(component.portfolioValue).toBe(1400);
+
+    fixture.componentRef.setInput('holdings', []);
+    fixture.detectChanges();
+    expect(component.portfolioValue).toBe(1000);
+  });
+
+  it('waits for the dashboard holdings request before displaying total value', () => {
+    fixture.componentRef.setInput('holdingsLoading', true);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.value').textContent.trim()).toBe('Loading…');
+
+    fixture.componentRef.setInput('holdingsLoading', false);
+    fixture.componentRef.setInput('holdingsError', 'Holdings failed');
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.value').textContent.trim()).toBe('Unavailable');
+  });
+
+  it('rejects missing prices and recovers on the next holdings update', () => {
+    fixture.componentRef.setInput('holdings', [holding({ marketValue: undefined })]);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.value').textContent.trim()).toBe('Unavailable');
+
+    fixture.componentRef.setInput('holdings', [holding()]);
+    fixture.detectChanges();
+    expect(component.securitiesError()).toBeNull();
+    expect(component.portfolioValue).toBe(400);
+  });
+
+  it('does not display a partial portfolio value when security FX fails', () => {
+    marketApiService.fetchForexQuote.mockReturnValue(throwError(() => new Error('FX failed')));
+    fixture.componentRef.setInput('holdings', [holding({ currency: 'EUR' })]);
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('.value').textContent.trim()).toBe('Unavailable');
+    expect(component.errorMessage()).toBeNull();
+    expect(component.cashBalance()).toBe(0);
   });
 
   it.each([0, -1, NaN, Infinity])('rejects invalid exchange rate %s', (price) => {
