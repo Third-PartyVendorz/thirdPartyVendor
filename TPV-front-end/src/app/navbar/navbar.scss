@@ -22,16 +22,17 @@
     min-width: 0;
 }
 
-.brand-name h1 {
+.brand-name button {
+    background: transparent;
     color: #ffffff;
-    margin: 0;
-    font-size: 2rem;
+    border: none;
+    cursor: pointer;
     font-weight: 600;
     letter-spacing: -0.02em;
     white-space: nowrap;
     overflow: visible;
     text-overflow: clip;
-    font-size: clamp(1.05rem, 1.6vw, 1.35rem);
+    font-size: clamp(1.15rem, 1.6vw, 1.35rem);
 }
 
 .desktop-nav ul {
