@@ -40,8 +40,8 @@ def db_check():
             connection.close()
 
         return jsonify(ok=True, result=result)
-    except (psycopg2.Error, KeyError, ValueError):
-        app.logger.warning("Database connectivity check failed")
+    except (psycopg2.Error, KeyError, ValueError) as exc:
+        app.logger.warning("Database connectivity check failed (%s): %s", type(exc).__name__, exc)
         return jsonify(ok=False, error="Database unavailable"), 503
 
 
