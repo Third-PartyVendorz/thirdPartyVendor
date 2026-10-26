@@ -4,5 +4,6 @@ import java.math.BigDecimal;
 
 public record CashHoldingResponse(
     String currencyCode,
-    BigDecimal balance
+    BigDecimal balance,
+    BigDecimal buyingPower
 ) {}

@@ -7,6 +7,7 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.thirdpartyvendor.api.client.MarketDataAPIClient;
 import com.thirdpartyvendor.api.dto.CreateOrderRequest;
@@ -54,6 +55,7 @@ public class OrderService {
         this.tradeRepository = tradeRepository;
     }
 
+    @Transactional
     public OrderResponse createOrder(CreateOrderRequest createOrderRequest, Long userId) {
         orderValidator.validateCreateOrder(createOrderRequest, userId);
         String ticker = normalizeTicker(createOrderRequest.ticker());
@@ -101,7 +103,11 @@ public class OrderService {
     private void validateOrderFunds(CreateOrderRequest request, Long userId, BigDecimal quotePrice) {
         if (request.orderIntent() == Order.OrderIntent.BUY) {
             BigDecimal tradeAmount = resolveTradeAmount(request.quantity(), request.orderPrice(), quotePrice);
-            cashHoldingsService.ensureSufficientCash(normalizeCurrency(request.orderCurrency()), tradeAmount, userId);
+            cashHoldingsService.reserveBuyingPower(
+                normalizeCurrency(request.orderCurrency()),
+                tradeAmount,
+                userId
+            );
             return;
         }
 
@@ -164,6 +170,7 @@ public class OrderService {
         );
     }
 
+    @Transactional
     public OrderResponse cancelOrder(Long orderId, Long userId) {
         Order order = orderRepository.findById(orderId)
             .orElseThrow(() -> new OrderNotFoundException("Order not found"));
@@ -174,6 +181,14 @@ public class OrderService {
 
         if (order.getStatus() != OrderStatus.PENDING) {
             throw new BadOrderException("Only pending orders can be cancelled.");
+        }
+
+        if (order.getOrderIntent() == Order.OrderIntent.BUY) {
+            cashHoldingsService.releaseBuyingPower(
+                order.getOrderCurrency(),
+                order.getBuyingPowerReservation(),
+                userId
+            );
         }
 
         order.setStatus(OrderStatus.CANCELLED);
