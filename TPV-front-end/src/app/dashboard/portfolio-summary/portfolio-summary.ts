@@ -5,6 +5,9 @@ import { BehaviorSubject, catchError, defer, forkJoin, map, Observable, of, shar
 import { TradeService } from '../../trade-page/trade.service';
 import { MarketApiService } from '../../services/marketApi.service';
 import { Holding } from '../holdings-table/holding.model';
+import { OrderService } from '../../services/order.service';
+import { OrderStatus } from '../../shared/order-status';
+import { TradeSide } from '../../shared/trade-side';
 
 @Component({
   standalone: true,
@@ -17,7 +20,8 @@ export class PortfolioSummary implements OnInit {
   constructor(
     private tradeService: TradeService,
     private marketApiService: MarketApiService,
-    private destroyRef: DestroyRef
+    private destroyRef: DestroyRef,
+    private orderService: OrderService
   ) {}
   buyingPower = signal(0);
   cashBalance = signal(0);
@@ -27,6 +31,9 @@ export class PortfolioSummary implements OnInit {
   private readonly dailySecurityGain = signal<number | null>(0);
   isSecuritiesLoading = signal(true);
   securitiesError = signal<string | null>(null);
+  netPrincipal = signal(0);
+  isOrdersLoading = signal(true);
+  ordersError = signal<string | null>(null);
   private readonly holdingsSubject = new BehaviorSubject<Holding[]>([]);
   private readonly exchangeRates = new Map<string, Observable<number>>();
 
@@ -55,6 +62,21 @@ export class PortfolioSummary implements OnInit {
     return previousValue > 0 ? (gain / previousValue) * 100 : gain === 0 ? 0 : null;
   }
 
+  get totalGainLoss(): number | null {
+    if (this.isOrdersLoading() || this.ordersError() || this.holdingsLoading ||
+        this.holdingsError || this.isSecuritiesLoading() || this.securitiesError()) {
+      return null;
+    }
+    return this.portfolioValue - this.netPrincipal();
+  }
+
+  get totalGainLossPercent(): number | null {
+    const gain = this.totalGainLoss;
+    if (gain === null) return null;
+    const principal = this.netPrincipal();
+    return principal > 0 ? (gain / principal) * 100 : gain === 0 && principal === 0 ? 0 : null;
+  }
+
   private usdRate(currencyCode: string): Observable<number> {
     const currency = currencyCode.trim().toUpperCase();
     if (currency === 'USD') return of(1);
@@ -76,6 +98,38 @@ export class PortfolioSummary implements OnInit {
   }
 
   ngOnInit(): void {
+    this.orderService.fetchOrders().pipe(
+      switchMap(orders => {
+        const amounts = orders.filter(order => order.status === OrderStatus.FILLED).map(order => {
+          const price = order.executionPrice;
+          const quantity = order.executionQuantity;
+          if (price === null || !Number.isFinite(price) || price <= 0 ||
+              quantity === null || !Number.isFinite(quantity) || quantity <= 0 ||
+              !order.orderCurrency?.trim() ||
+              (order.orderIntent !== TradeSide.BUY && order.orderIntent !== TradeSide.SELL)) {
+            throw new Error(`Invalid execution data for order ${order.orderId}`);
+          }
+          const direction = order.orderIntent === TradeSide.BUY ? 1 : -1;
+          return this.usdRate(order.orderCurrency).pipe(
+            map(rate => direction * price * quantity * rate)
+          );
+        });
+        return (amounts.length ? forkJoin(amounts) : of([] as number[])).pipe(
+          map(values => values.reduce((principal, amount) => principal + amount, 0))
+        );
+      }),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: principal => {
+        this.netPrincipal.set(principal);
+        this.isOrdersLoading.set(false);
+      },
+      error: () => {
+        this.ordersError.set('Unable to calculate principal from executed orders.');
+        this.isOrdersLoading.set(false);
+      }
+    });
+
     this.holdingsSubject.pipe(
       switchMap(holdings => defer(() => {
         this.isSecuritiesLoading.set(true);
@@ -146,6 +200,4 @@ export class PortfolioSummary implements OnInit {
       }
     });
   }
-  @Input() totalGainLoss: number = 6892.37;
-  @Input() totalGainLossPercent: number = 31.91;
 }

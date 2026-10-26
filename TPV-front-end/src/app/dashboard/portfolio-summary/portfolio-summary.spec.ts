@@ -5,12 +5,26 @@ import { MarketApiService } from '../../services/marketApi.service';
 import { TradeService } from '../../trade-page/trade.service';
 import { Holding } from '../holdings-table/holding.model';
 import { PortfolioSummary } from './portfolio-summary';
+import { OrderService } from '../../services/order.service';
+import { OrderResponse } from '../../dto/OrderResponse';
+import { OrderStatus } from '../../shared/order-status';
+import { TradeSide } from '../../shared/trade-side';
 
 describe('PortfolioSummary', () => {
   let component: PortfolioSummary;
   let fixture: ComponentFixture<PortfolioSummary>;
   let tradeService: { getCashHoldings: ReturnType<typeof vi.fn> };
   let marketApiService: { fetchForexQuote: ReturnType<typeof vi.fn> };
+  let orderService: { fetchOrders: ReturnType<typeof vi.fn> };
+
+  function order(overrides: Partial<OrderResponse> = {}): OrderResponse {
+    return {
+      orderId: 1, ticker: 'AAPL', orderIntent: TradeSide.BUY,
+      quantity: 99, orderPrice: 9999, executionPrice: 100, executionQuantity: 3,
+      status: OrderStatus.FILLED, createdAt: '2026-10-26T12:00:00Z',
+      orderCurrency: 'USD', ...overrides,
+    };
+  }
 
   function holding(overrides: Partial<Holding> = {}): Holding {
     return {
@@ -22,16 +36,117 @@ describe('PortfolioSummary', () => {
   beforeEach(async () => {
     tradeService = { getCashHoldings: vi.fn(() => of([] as CashHoldingResponse[])) };
     marketApiService = { fetchForexQuote: vi.fn() };
+    orderService = { fetchOrders: vi.fn(() => of([] as OrderResponse[])) };
     await TestBed.configureTestingModule({
       imports: [PortfolioSummary],
       providers: [
         { provide: TradeService, useValue: tradeService },
         { provide: MarketApiService, useValue: marketApiService },
+        { provide: OrderService, useValue: orderService },
       ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(PortfolioSummary);
     component = fixture.componentInstance;
+  });
+
+  it('calculates total gains from executed buys less sells, ignoring unfilled orders', () => {
+    orderService.fetchOrders.mockReturnValue(of([
+      order(),
+      order({ orderId: 2, ticker: 'SOLD', orderIntent: TradeSide.SELL, executionPrice: 50, executionQuantity: 2 }),
+      order({ orderId: 3, status: OrderStatus.PENDING, executionPrice: null, executionQuantity: null }),
+      order({ orderId: 4, status: OrderStatus.CANCELLED, executionPrice: null, executionQuantity: null }),
+    ]));
+    fixture.componentRef.setInput('holdings', [holding()]);
+    fixture.detectChanges();
+
+    expect(orderService.fetchOrders).toHaveBeenCalledTimes(1);
+    expect(component.netPrincipal()).toBe(200);
+    expect(component.totalGainLoss).toBe(200);
+    expect(component.totalGainLossPercent).toBe(100);
+    const total = fixture.nativeElement.querySelectorAll('.metric .small-value')[2];
+    expect(total.textContent).toContain('$200.00');
+    expect(total.textContent).toContain('+100.00%');
+  });
+
+  it('converts executed order principal to USD and reuses the rate for holdings', () => {
+    orderService.fetchOrders.mockReturnValue(of([
+      order({ orderCurrency: 'EUR' }),
+      order({ orderId: 2, orderCurrency: 'EUR', orderIntent: TradeSide.SELL, executionQuantity: 1 }),
+    ]));
+    marketApiService.fetchForexQuote.mockReturnValue(of({ data: { price: 1.1 } }));
+    fixture.componentRef.setInput('holdings', [holding({ currency: 'EUR' })]);
+    fixture.detectChanges();
+
+    expect(component.netPrincipal()).toBeCloseTo(220);
+    expect(component.totalGainLoss).toBeCloseTo(220);
+    expect(component.totalGainLossPercent).toBeCloseTo(100);
+    expect(marketApiService.fetchForexQuote).toHaveBeenCalledTimes(1);
+  });
+
+  it('calculates negative total gains', () => {
+    orderService.fetchOrders.mockReturnValue(of([order({ executionQuantity: 5 })]));
+    fixture.componentRef.setInput('holdings', [holding()]);
+    fixture.detectChanges();
+    expect(component.totalGainLoss).toBe(-100);
+    expect(component.totalGainLossPercent).toBe(-20);
+  });
+
+  it('returns zero gains for an empty portfolio with no executed orders', () => {
+    fixture.detectChanges();
+    expect(component.netPrincipal()).toBe(0);
+    expect(component.totalGainLoss).toBe(0);
+    expect(component.totalGainLossPercent).toBe(0);
+  });
+
+  it.each([0, -100])('shows N/A percentage for nonpositive net principal %s with gains', principal => {
+    orderService.fetchOrders.mockReturnValue(of([
+      order(),
+      order({ orderId: 2, orderIntent: TradeSide.SELL, executionQuantity: principal === 0 ? 3 : 4 }),
+    ]));
+    fixture.componentRef.setInput('holdings', [holding()]);
+    fixture.detectChanges();
+    expect(component.netPrincipal()).toBe(principal);
+    expect(component.totalGainLoss).toBe(400 - principal);
+    expect(component.totalGainLossPercent).toBeNull();
+  });
+
+  it('shows loading and then calculated total gains after orders arrive', () => {
+    const orders = new Subject<OrderResponse[]>();
+    orderService.fetchOrders.mockReturnValue(orders);
+    fixture.componentRef.setInput('holdings', [holding()]);
+    fixture.detectChanges();
+    expect(component.totalGainLoss).toBeNull();
+    expect(fixture.nativeElement.querySelectorAll('.metric .small-value')[2].textContent).toContain('Loading…');
+    orders.next([order()]);
+    fixture.detectChanges();
+    expect(component.totalGainLoss).toBe(100);
+    expect(component.totalGainLossPercent).toBeCloseTo(100 / 3);
+  });
+
+  it('does not show fabricated gains when order history fails', () => {
+    orderService.fetchOrders.mockReturnValue(throwError(() => new Error('Orders failed')));
+    fixture.componentRef.setInput('holdings', [holding()]);
+    fixture.detectChanges();
+    expect(component.totalGainLoss).toBeNull();
+    expect(component.ordersError()).toBeTruthy();
+    expect(component.portfolioValue).toBe(400);
+    expect(fixture.nativeElement.querySelectorAll('.metric .small-value')[2].textContent).toContain('Unavailable');
+  });
+
+  it('rejects filled orders with missing execution data instead of using requested values', () => {
+    orderService.fetchOrders.mockReturnValue(of([order({ executionPrice: null })]));
+    fixture.detectChanges();
+    expect(component.ordersError()).toBeTruthy();
+    expect(component.totalGainLoss).toBeNull();
+  });
+
+  it('shows unavailable gains when an order currency cannot be converted', () => {
+    orderService.fetchOrders.mockReturnValue(of([order({ orderCurrency: 'EUR' })]));
+    marketApiService.fetchForexQuote.mockReturnValue(throwError(() => new Error('FX failed')));
+    fixture.detectChanges();
+    expect(component.ordersError()).toBeTruthy();
+    expect(component.totalGainLoss).toBeNull();
   });
 
   it('returns zero for no cash holdings without fetching exchange rates', () => {
