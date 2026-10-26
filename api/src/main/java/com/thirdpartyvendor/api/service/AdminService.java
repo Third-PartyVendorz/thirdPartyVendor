@@ -108,7 +108,8 @@ public class AdminService {
             .map(
                 cashHoldings -> new CashHoldingResponse(
                     cashHoldings.getCurrencyCode(),
-                    cashHoldings.getBalance()
+                    cashHoldings.getBalance(),
+                    cashHoldings.getBuyingPower()
             )).collect(Collectors.toList());
     }
 

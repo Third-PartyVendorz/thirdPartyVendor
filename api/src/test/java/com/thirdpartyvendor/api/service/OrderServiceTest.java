@@ -156,6 +156,7 @@ class OrderServiceTest {
         assertEquals(newOrder.getId(), result.orderId());
         verify(orderRepository).save(any(Order.class));
         verify(marketDataAPIClient).fetchQuote("AAPL");
+        verify(cashHoldingsService).reserveBuyingPower("USD", new BigDecimal("1000.000000"), userId);
     }
 
     @Test
@@ -205,6 +206,7 @@ class OrderServiceTest {
 
         assertEquals(newOrder.getId(), result.orderId());
         verify(orderRepository).save(any(Order.class));
+        verify(cashHoldingsService).reserveBuyingPower("USD", new BigDecimal("500.000000"), userId);
     }
 
     @Test
@@ -249,11 +251,16 @@ class OrderServiceTest {
         order.setId(1L);
         order.setUserId(10L);
         order.setStatus(Order.OrderStatus.PENDING);
+        order.setOrderIntent(Order.OrderIntent.BUY);
+        order.setQuantity(new BigDecimal("2.0000"));
+        order.setInstrumentPriceAtOrder(new BigDecimal("10.0000"));
+        order.setOrderCurrency("USD");
         when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
 
         OrderResponse result = orderService.cancelOrder(1L, 10L);
 
         assertEquals(Order.OrderStatus.CANCELLED, result.status());
+        verify(cashHoldingsService).releaseBuyingPower("USD", new BigDecimal("20.000000"), 10L);
         verify(orderRepository).save(order);
     }
 
