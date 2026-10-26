@@ -158,7 +158,8 @@ public class AuthController {
 			.secure(request.isSecure())
 			.path("/")
 			.maxAge(Duration.ofMillis(jwtExpirationMs))
-			.sameSite("Strict")
+			// .sameSite("Strict")
+			.sameSite("Lax")
 			.build();
 	}
 
@@ -168,7 +169,8 @@ public class AuthController {
 			.secure(request.isSecure())
 			.path("/")
 			.maxAge(Duration.ofMillis(refreshExpirationMs))
-			.sameSite("Strict")
+			// .sameSite("Strict")
+			.sameSite("Lax")
 			.build();
 	}
 }
