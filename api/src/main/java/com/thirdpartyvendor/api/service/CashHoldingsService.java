@@ -48,21 +48,69 @@ public class CashHoldingsService {
         }
     }
     
+    @Transactional
     public void updateCashHolding(String currencyCode, BigDecimal delta, Long userId) {
-        CashHolding cashHolding = cashHoldingsRepository.findByUserIdAndCurrencyCode(userId, currencyCode)
+        CashHolding cashHolding = cashHoldingsRepository.findByUserIdAndCurrencyCodeForUpdate(userId, currencyCode)
             .orElseThrow(() -> new InsufficientCashException("User holds no cash in " + currencyCode));
 
         BigDecimal newBalance = cashHolding.getBalance().add(delta);
+        BigDecimal newBuyingPower = cashHolding.getBuyingPower().add(delta);
 
         if (newBalance.compareTo(BigDecimal.ZERO) < 0) {
             throw new InsufficientCashException("Insufficient cash in " + currencyCode);
         }
 
-        if (newBalance.compareTo(BigDecimal.ZERO) > 0) {
+        if (newBalance.compareTo(BigDecimal.ZERO) != 0 || newBuyingPower.compareTo(BigDecimal.ZERO) != 0) {
             cashHolding.setBalance(newBalance);
+            cashHolding.setBuyingPower(newBuyingPower);
             cashHoldingsRepository.save(cashHolding);
         } else {
             cashHoldingsRepository.delete(cashHolding);
+        }
+    }
+
+    @Transactional
+    public void reserveBuyingPower(String currencyCode, BigDecimal amount, Long userId) {
+        CashHolding cashHolding = cashHoldingsRepository.findByUserIdAndCurrencyCodeForUpdate(userId, currencyCode)
+            .orElseThrow(() -> new InsufficientCashException("User holds no cash in " + currencyCode));
+
+        if (cashHolding.getBuyingPower().compareTo(amount) < 0) {
+            throw new InsufficientCashException("Insufficient buying power in " + currencyCode);
+        }
+
+        cashHolding.setBuyingPower(cashHolding.getBuyingPower().subtract(amount));
+        cashHoldingsRepository.save(cashHolding);
+    }
+
+    @Transactional
+    public void releaseBuyingPower(String currencyCode, BigDecimal amount, Long userId) {
+        CashHolding cashHolding = cashHoldingsRepository.findByUserIdAndCurrencyCodeForUpdate(userId, currencyCode)
+            .orElseThrow(() -> new InsufficientCashException("User holds no cash in " + currencyCode));
+
+        BigDecimal newBuyingPower = cashHolding.getBuyingPower().add(amount);
+        cashHolding.setBuyingPower(newBuyingPower);
+
+        if (cashHolding.getBalance().compareTo(BigDecimal.ZERO) == 0
+            && newBuyingPower.compareTo(BigDecimal.ZERO) == 0) {
+            cashHoldingsRepository.delete(cashHolding);
+        } else {
+            cashHoldingsRepository.save(cashHolding);
+        }
+    }
+
+    @Transactional
+    public void ensureSufficientCashForReservedOrder(
+        String currencyCode,
+        BigDecimal amount,
+        BigDecimal reservation,
+        Long userId
+    ) {
+        CashHolding cashHolding = cashHoldingsRepository.findByUserIdAndCurrencyCodeForUpdate(userId, currencyCode)
+            .orElseThrow(() -> new InsufficientCashException("User holds no cash in " + currencyCode));
+
+        if (cashHolding.getBalance().compareTo(amount) < 0
+            || cashHolding.getBuyingPower().add(reservation).compareTo(amount) < 0) {
+            throw new InsufficientCashException("Insufficient cash in " + currencyCode);
         }
     }
 
@@ -82,21 +130,27 @@ public class CashHoldingsService {
                 newHolding.setUserId(userId);
                 newHolding.setCurrencyCode(currencyCode);
                 newHolding.setBalance(BigDecimal.ZERO);
+                newHolding.setBuyingPower(BigDecimal.ZERO);
                 return cashHoldingsRepository.save(newHolding);
             });
     }
 
     public CashHoldingResponse getCashHoldingByUserAndCurrencyCode(Long userId, String currencyCode) {
         return cashHoldingsRepository.findByUserIdAndCurrencyCode(userId, currencyCode)
-                .map(holding -> new CashHoldingResponse(holding.getCurrencyCode(), holding.getBalance()))
-                .orElseGet(() -> new CashHoldingResponse(currencyCode, BigDecimal.ZERO));
+                .map(holding -> new CashHoldingResponse(
+                    holding.getCurrencyCode(),
+                    holding.getBalance(),
+                    holding.getBuyingPower()
+                ))
+                .orElseGet(() -> new CashHoldingResponse(currencyCode, BigDecimal.ZERO, BigDecimal.ZERO));
     }
 
     public List<CashHoldingResponse> getCashHoldingsByUser(Long userId) {
         return cashHoldingsRepository.findByUserId(userId).stream()
             .map(holding -> new CashHoldingResponse(
                 holding.getCurrencyCode(),
-                holding.getBalance()
+                holding.getBalance(),
+                holding.getBuyingPower()
             ))
             .toList();
     }
@@ -113,6 +167,7 @@ public class CashHoldingsService {
             .toList();
     }
 
+    @Transactional
     public CashHoldingResponse deposit(String currencyCode, BigDecimal amount, Long userId) {
         validateCurrencyCode(currencyCode);
 
@@ -120,22 +175,25 @@ public class CashHoldingsService {
             throw new InvalidCurrencyException("Deposit amount must be greater than 0");
         }
 
-        CashHolding cashHolding = cashHoldingsRepository.findByUserIdAndCurrencyCode(userId, currencyCode)
+        CashHolding cashHolding = cashHoldingsRepository.findByUserIdAndCurrencyCodeForUpdate(userId, currencyCode)
             .orElseGet(() -> {
                 CashHolding newHolding = new CashHolding();
                 newHolding.setUserId(userId);
                 newHolding.setCurrencyCode(currencyCode);
                 newHolding.setBalance(BigDecimal.ZERO);
+                newHolding.setBuyingPower(BigDecimal.ZERO);
                 return newHolding;
             });
 
         BigDecimal newBalance = cashHolding.getBalance().add(amount);
         cashHolding.setBalance(newBalance);
+        cashHolding.setBuyingPower(cashHolding.getBuyingPower().add(amount));
         cashHoldingsRepository.save(cashHolding);
 
         return new CashHoldingResponse(
             cashHolding.getCurrencyCode(),
-            cashHolding.getBalance()
+            cashHolding.getBalance(),
+            cashHolding.getBuyingPower()
         );
     }
 

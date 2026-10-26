@@ -17,13 +17,13 @@ INSERT INTO holdings (security, ticker, asset_type, num_shares, user_id) VALUES
 ON CONFLICT (ticker, user_id) DO NOTHING;
 
 -- Currencies not already present in the migration seed, plus balances used by orders.
-INSERT INTO cash_holdings (user_id, currency_code, balance, last_updated) VALUES
-    (1, 'JPY', 2500000.000000, '2026-09-30 16:00:00'),
-    (1, 'AUD', 18000.000000, '2026-09-30 16:00:00'),
-    (2, 'EUR', 42000.000000, '2026-09-30 16:00:00'),
-    (2, 'GBP', 19000.000000, '2026-09-30 16:00:00'),
-    (3, 'CAD', 38000.000000, '2026-09-30 16:00:00'),
-    (3, 'AUD', 26000.000000, '2026-09-30 16:00:00')
+INSERT INTO cash_holdings (user_id, currency_code, balance, buying_power, last_updated) VALUES
+    (1, 'JPY', 2500000.000000, 2500000.000000, '2026-09-30 16:00:00'),
+    (1, 'AUD', 18000.000000, 18000.000000, '2026-09-30 16:00:00'),
+    (2, 'EUR', 42000.000000, 42000.000000, '2026-09-30 16:00:00'),
+    (2, 'GBP', 19000.000000, 19000.000000, '2026-09-30 16:00:00'),
+    (3, 'CAD', 38000.000000, 38000.000000, '2026-09-30 16:00:00'),
+    (3, 'AUD', 26000.000000, 26000.000000, '2026-09-30 16:00:00')
 ON CONFLICT (user_id, currency_code) DO NOTHING;
 
 -- Every order is executed, so each row below has one corresponding trade.

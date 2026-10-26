@@ -63,8 +63,15 @@ public class OrderExecutionService {
         BigDecimal executionQuantity = resolveExecutionQuantity(order, executionPrice);
         BigDecimal tradeAmount = resolveTradeAmount(order, executionQuantity, executionPrice);
 
+        BigDecimal buyingPowerReservation = BigDecimal.ZERO;
         if (order.getOrderIntent() == Order.OrderIntent.BUY) {
-            cashHoldingsService.ensureSufficientCash(order.getOrderCurrency(), tradeAmount, userId);
+            buyingPowerReservation = order.getBuyingPowerReservation();
+            cashHoldingsService.ensureSufficientCashForReservedOrder(
+                order.getOrderCurrency(),
+                tradeAmount,
+                buyingPowerReservation,
+                userId
+            );
         }
 
         Holding holding = loadExecutionHolding(order, userId);
@@ -73,6 +80,13 @@ public class OrderExecutionService {
 
         cashHoldingsService.ensureCashHoldingExists(order.getOrderCurrency(), userId);
         applyCashChange(order, userId, tradeAmount);
+        if (order.getOrderIntent() == Order.OrderIntent.BUY) {
+            cashHoldingsService.releaseBuyingPower(
+                order.getOrderCurrency(),
+                buyingPowerReservation,
+                userId
+            );
+        }
 
         Trade trade = new Trade();
         trade.setOrderId(order.getId());

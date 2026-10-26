@@ -27,14 +27,17 @@ describe('ForexHoldings', () => {
 
     const request = httpTesting.expectOne(`${environment.apiBaseUrl}/cashHoldings`);
     request.flush([
-      { currencyCode: 'EUR', balance: 125.5 },
-      { currencyCode: 'JPY', balance: 10000 },
+      { currencyCode: 'EUR', balance: 125.5, buyingPower: 100.25 },
+      { currencyCode: 'JPY', balance: 10000, buyingPower: 9000 },
     ]);
     fixture.detectChanges();
 
     expect(fixture.nativeElement.textContent).toContain('EUR');
     expect(fixture.nativeElement.textContent).toContain('125.50');
+    expect(fixture.nativeElement.textContent).toContain('100.25 EUR');
     expect(fixture.nativeElement.textContent).toContain('JPY');
+    expect(fixture.nativeElement.textContent).toContain('9,000.00 JPY');
+    expect(fixture.nativeElement.textContent).toContain('Buying Power');
   });
 
   it.each([
@@ -47,7 +50,7 @@ describe('ForexHoldings', () => {
     fixture.detectChanges();
 
     const request = httpTesting.expectOne(`${environment.apiBaseUrl}/cashHoldings`);
-    request.flush([{ currencyCode: 'EUR', balance }]);
+    request.flush([{ currencyCode: 'EUR', balance, buyingPower: balance }]);
     fixture.detectChanges();
 
     const balanceCell: HTMLTableCellElement = fixture.nativeElement.querySelector('tbody td.numeric');

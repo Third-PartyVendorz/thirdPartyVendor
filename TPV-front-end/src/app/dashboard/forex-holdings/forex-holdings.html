@@ -16,6 +16,7 @@
                     <tr>
                         <th>Currency</th>
                         <th class="numeric">Balance</th>
+                        <th class="numeric">Buying Power</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -23,6 +24,7 @@
                         <tr>
                             <td class="currency">{{ holding.currencyCode }}</td>
                             <td class="numeric">{{ holding.balance | number:'1.2-2' }} {{ holding.currencyCode }}</td>
+                            <td class="numeric">{{ holding.buyingPower | number:'1.2-2' }} {{ holding.currencyCode }}</td>
                         </tr>
                     }
                 </tbody>

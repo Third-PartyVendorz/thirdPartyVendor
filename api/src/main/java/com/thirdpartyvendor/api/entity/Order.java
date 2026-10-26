@@ -1,6 +1,7 @@
 package com.thirdpartyvendor.api.entity;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
@@ -67,6 +68,13 @@ public class Order {
 
     @Column(name = "order_currency", nullable = false)
     private String orderCurrency;
+
+    public BigDecimal getBuyingPowerReservation() {
+        BigDecimal amount = quantity != null
+            ? quantity.multiply(instrumentPriceAtOrder)
+            : orderPrice;
+        return amount.setScale(6, RoundingMode.HALF_UP);
+    }
 
     @PrePersist()
     void onCreate() {
