@@ -2,7 +2,7 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-RUN pip install --no-cache-dir Flask
+RUN pip install --no-cache-dir Flask psycopg2-binary==2.9.10
 
 COPY flask_test.py .
 
