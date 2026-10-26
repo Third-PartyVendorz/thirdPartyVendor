@@ -35,6 +35,12 @@ variable "fauxnance_api_url" {
     default     = "https://y4t9nq2bqf.execute-api.eu-west-2.amazonaws.com/v1"
 }
 
+variable "frontend_origin" {
+    description = "Exact browser origin allowed to call the Spring API, e.g. https://app.example.com"
+    type        = string
+    default     = "http://localhost:4200"
+}
+
 
 
 

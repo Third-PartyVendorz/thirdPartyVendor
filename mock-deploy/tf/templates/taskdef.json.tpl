@@ -11,6 +11,7 @@
         { "name": "SPRING_DATASOURCE_PASSWORD", "value": ${db_password_json} },
         { "name": "SPRING_FLYWAY_ENABLED", "value": "false" },
         { "name": "SERVER_PORT", "value": "${app_port}" },
+        { "name": "APP_CORS_ALLOWED_ORIGIN", "value": ${frontend_origin_json} },
         { "name": "FAUXNANCE_API_URL", "value": ${fauxnance_api_url_json} },
         { "name": "APP_JWT_EXPIRATION_MS", "value": "86400000" },
         { "name": "APP_REFRESH_EXPIRATION_MS", "value": "86400000" }
