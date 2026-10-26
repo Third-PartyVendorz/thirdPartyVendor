@@ -112,7 +112,7 @@ PY
 
 		stage('Verify API') {
 			steps {
-				sleep time: 5, unit: 'MINUTES'
+				sleep time: 15, unit: 'MINUTES'
 				dir('mock-deploy/tf') {
 					sh '''
 						ALB_HOST=$(terraform output -raw alb_hostname)
