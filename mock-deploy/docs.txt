@@ -65,3 +65,26 @@ Next:
 Create endpoint in API
 
 Test querying db after creating with Lambda function
+
+
+
+
+ADD TAGS TO EVERYTHING
+
+
+
+
+
+
+Next steps:
+
+
+Ready to go --> DB init, connection, and fetch works
+
+Correct docker images for spring and flask
+
+New task definition for flask API --> 2 containers running in our ecs
+
+
+
+Secrets manager
