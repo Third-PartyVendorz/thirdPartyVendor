@@ -34,7 +34,7 @@ def db_check():
         try:
             connection.set_session(readonly=True)
             with connection.cursor() as cursor:
-                cursor.execute("SELECT 1")
+                cursor.execute("SELECT * FROM test;")
                 result = cursor.fetchone()[0]
         finally:
             connection.close()
