@@ -14,10 +14,11 @@ import { of } from 'rxjs';
 import { MarketQuoteBatchAPIResponse } from '../../dto/MarketQuoteAPIResponse';
 import { MarketSymbolAPIResponse } from '../../dto/MarketSymbolAPIResponse';
 import { HoldingResponse } from '../../dto/HoldingResponse';
+import { RouterLink } from '@angular/router';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, Navbar, PortfolioSummary, HoldingsTable, ForexHoldings, PortfolioGraphics, PageHeader],
+  imports: [CommonModule, Navbar, PortfolioSummary, HoldingsTable, ForexHoldings, PortfolioGraphics, PageHeader, RouterLink],
   selector: 'app-dashboard-page',
   styleUrl: './dashboard-page.scss',
   templateUrl: './dashboard-page.html',
@@ -55,6 +56,8 @@ export class DashboardPage implements OnInit {
         currency: response.currency
       }))),
       switchMap((holdings: Holding[]) => {
+        if (holdings.length === 0) return of([] as Holding[]);
+
         const tickers = [...new Set(holdings.map(holding => holding.ticker))];
         const tickerBatches: string[][] = [];
 

@@ -1,12 +1,12 @@
 <div class="dashboard">
-    <app-page-header
-        eyebrow="Portfolio"
-        title="Your portfolio"
-    >
-        <a class="button-primary" routerLink="/trade">Execute trade <span aria-hidden="true">↗</span></a>
+    <app-page-header eyebrow="Portfolio" title="Your portfolio">
+        <button class="button-primary" routerLink="/trade">Execute trade <span aria-hidden="true">↗</span></button>
     </app-page-header>
     <div class="top-row">
-        <app-portfolio-summary/>
+        <app-portfolio-summary
+            [holdings]="holdings"
+            [holdingsLoading]="isLoading"
+            [holdingsError]="errorMessage"/>
     </div>
     <app-forex-holdings/>
     <div class="bottom-row">

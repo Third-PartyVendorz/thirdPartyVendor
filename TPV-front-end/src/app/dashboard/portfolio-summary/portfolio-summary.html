@@ -3,39 +3,82 @@
         <div class="metric-primary">
             <div class="label">Total Value</div>
 
-            <div class="value">
-                {{ portfolioValue | currency:'USD':'symbol': '1.2-2' }}
+            <div class="value" [attr.title]="holdingsError || securitiesError()">
+                @if (holdingsError || securitiesError()) {
+                    Unavailable
+                } @else if (holdingsLoading || isSecuritiesLoading()) {
+                    Loading…
+                } @else {
+                    {{ portfolioValue | currency:'USD':'symbol': '1.2-2' }}
+                }
             </div>
 
-            <div class="portfolio-daily-change" [class.positive]="dailyGainLoss > 0" [class.negative]="dailyGainLoss < 0">     
-                {{ dailyGainLoss > 0 ? '▲' : '▼' }}
-                {{ dailyGainLoss | currency: 'USD' :'symbol': '1.2-2' }}
-                ({{ dailyGainLossPercentage > 0 ? '+' : '' }}{{ dailyGainLossPercentage | number:'1.2-2' }}%)
+            <div class="portfolio-daily-change"
+                [class.positive]="(dailyGainLoss ?? 0) > 0" [class.negative]="(dailyGainLoss ?? 0) < 0"
+                title="Security price changes converted at current USD exchange rates; excludes FX gains and intraday cash flows.">
+                @if (holdingsError || securitiesError()) {
+                    Unavailable
+                } @else if (holdingsLoading || isSecuritiesLoading()) {
+                    Loading…
+                } @else if (dailyGainLoss === null) {
+                    Unavailable
+                } @else {
+                    {{ dailyGainLoss > 0 ? '▲' : dailyGainLoss < 0 ? '▼' : '' }}
+                    {{ dailyGainLoss | currency: 'USD' :'symbol': '1.2-2' }}
+                    @if (dailyGainLossPercentage !== null) {
+                        ({{ dailyGainLossPercentage > 0 ? '+' : '' }}{{ dailyGainLossPercentage | number:'1.2-2' }}%)
+                    } @else {
+                        (N/A)
+                    }
+                }
                 <span class="period">Today</span>
             </div>
         </div>
 
         <div class="metric">
             <div class="label">Buying Power</div>
-            <div class="small-value">
-                {{ buyingPower | currency:'USD':'symbol': '1.2-2' }}
+            <div class="small-value" [attr.title]="errorMessage()">
+                @if (isLoading()) {
+                    Loading…
+                } @else if (errorMessage()) {
+                    Unavailable
+                } @else {
+                    {{ buyingPower() | currency:'USD':'symbol': '1.2-2' }}
+                }
             </div>
         </div>
 
         <div class="metric">
             <div class="label">Cash Balance</div>
-            <div class="small-value">
-                {{ cashBalance | currency:'USD':'symbol': '1.2-2' }}
+            <div class="small-value" [attr.title]="errorMessage()">
+                @if (isLoading()) {
+                    Loading…
+                } @else if (errorMessage()) {
+                    Unavailable
+                } @else {
+                    {{ cashBalance() | currency:'USD':'symbol': '1.2-2' }}
+                }
             </div>
         </div>
 
         <div class="metric">
             <div class="label">Total Gain/Loss</div>
             <div class="small-value"
-                [class.positive]="totalGainLoss > 0" [class.negative]="totalGainLoss < 0">
-                {{ totalGainLoss > 0 ? '▲' : '▼' }}
-                {{ totalGainLoss | currency:'USD':'symbol': '1.2-2' }}
-                ({{ totalGainLossPercent > 0 ? '+' : '' }}{{ totalGainLossPercent | number:'1.2-2' }}%)
+                [class.positive]="(totalGainLoss ?? 0) > 0" [class.negative]="(totalGainLoss ?? 0) < 0"
+                [attr.title]="ordersError() || holdingsError || securitiesError() || 'Portfolio value minus executed buys net of sells, converted at current USD exchange rates.'">
+                @if (ordersError() || holdingsError || securitiesError()) {
+                    Unavailable
+                } @else if (isOrdersLoading() || holdingsLoading || isSecuritiesLoading()) {
+                    Loading…
+                } @else if (totalGainLoss !== null) {
+                    {{ totalGainLoss > 0 ? '▲' : totalGainLoss < 0 ? '▼' : '' }}
+                    {{ totalGainLoss | currency:'USD':'symbol': '1.2-2' }}
+                    @if (totalGainLossPercent !== null) {
+                        ({{ totalGainLossPercent > 0 ? '+' : '' }}{{ totalGainLossPercent | number:'1.2-2' }}%)
+                    } @else {
+                        (N/A)
+                    }
+                }
             </div>
 
             <div class="period">
