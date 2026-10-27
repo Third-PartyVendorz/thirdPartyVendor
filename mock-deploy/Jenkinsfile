@@ -58,7 +58,7 @@ pipeline {
 					dir('mock-deploy/tf') {
 						sh '''
 							terraform init
-							terraform apply -auto-approve -var="spring_image=${IMAGE_TAG}"
+							terraform apply -auto-approve -var="spring_image=${IMAGE_TAG}" -var="flask_image=${IMAGE_TAG}"
 						'''
 					}
 				}
@@ -132,7 +132,7 @@ PY
 				dir('mock-deploy/tf') {
 					sh '''
 						terraform init
-						terraform destroy -auto-approve -var="spring_image=${IMAGE_TAG}"
+						terraform destroy -auto-approve -var="spring_image=${IMAGE_TAG}" -var="flask_image=${IMAGE_TAG}"
 					'''
 				}
 			}

@@ -33,7 +33,7 @@ variable "spring_image" {
 variable "flask_port" {default = 8089}
 
 variable "flask_image" {
-    description = "The tag of the Spring image already pushed to ECR"
+    description = "The tag of the Flask image already pushed to ECR"
     type        = string
     default     = "latest"
 }
