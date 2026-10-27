@@ -29,6 +29,19 @@ variable "spring_image" {
     default     = "latest"
 }
 
+
+variable "flask_port" {default = 8089}
+
+variable "flask_image" {
+    description = "The tag of the Spring image already pushed to ECR"
+    type        = string
+    default     = "latest"
+}
+
+
+
+
+
 variable "fauxnance_api_url" {
     description = "Base URL of the external Fauxnance API"
     type        = string
