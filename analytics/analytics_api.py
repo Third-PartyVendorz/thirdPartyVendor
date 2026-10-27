@@ -62,4 +62,4 @@ def analytics():
     return jsonify(analytics_payload)
 
 if __name__ == '__main__':
-    app.run(port=8089,debug=True)
+    app.run(host="0.0.0.0", port=8089)
