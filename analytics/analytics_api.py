@@ -15,8 +15,8 @@ app = Flask(__name__)
 CORS(app, supports_credentials=True)
 
 
-app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
-app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(milliseconds=int(os.getenv("JWT_ACCESS_TOKEN_EXPIRES", 86400000)))
+app.config["APP_JWT_SECRET"] = os.getenv("APP_JWT_SECRET")
+app.config["APP_JWT_EXPIRATION_MS"] = timedelta(milliseconds=int(os.getenv("APP_JWT_EXPIRATION_MS", 86400000)))
 app.config["JWT_ALGORITHM"] = os.getenv("JWT_ALGORITHM", "HS512")
 app.config["JWT_DECODE_ALGORITHMS"] = [os.getenv("JWT_DECODE_ALGORITHMS", "HS512")]
 app.config["JWT_TOKEN_LOCATION"] = ["headers", "cookies"]
@@ -39,6 +39,11 @@ def expired_token_callback(jwt_header, jwt_payload):
 @jwt.unauthorized_loader
 def missing_token_callback(error):
     return jsonify(msg=error), 401
+
+
+@app.route('/', methods=['GET'])
+def health():
+    return jsonify(status="ok"), 200
 
 
 @app.route('/analytics', methods=['GET'])
