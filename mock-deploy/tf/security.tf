@@ -22,7 +22,7 @@
 
 #Will also need another security group for the flask api
 resource "aws_security_group" "ecs_security_spring" {
-    name        = "ecs-security-flask"
+    name        = "ecs-security-spring"
     description = "Controls access to the ecs, ensure we only get traffic from alb"
     vpc_id      = aws_vpc.vpc.id
 
