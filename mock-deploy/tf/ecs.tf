@@ -28,7 +28,7 @@ data "template_file" "task_def_template_spring" {
 }
 
 data "template_file" "task_def_template_flask" {
-    template = file("./templates/taskdef.json.tpl")
+    template = file("${path.module}/templates/flask-taskdef.json.tpl")
 
   vars = {
         container_name = "tpv-flask"
@@ -38,16 +38,11 @@ data "template_file" "task_def_template_flask" {
         aws_region = var.region
         log_group_name = aws_cloudwatch_log_group.tpv_flask_logs.name
         app_port = var.flask_port
-        datasource_url_json = jsonencode("jdbc:postgresql://${aws_db_instance.rds_primary.address}:${aws_db_instance.rds_primary.port}/${aws_db_instance.rds_primary.db_name}?sslmode=verify-full&sslrootcert=/app/global-bundle.pem")
+        db_host_json = jsonencode(aws_db_instance.rds_primary.address)
+        db_port_json = jsonencode(tostring(aws_db_instance.rds_primary.port))
+        db_name_json = jsonencode(aws_db_instance.rds_primary.db_name)
         db_user_json = jsonencode(var.database_username)
         db_password_json = jsonencode(var.database_password)
-        fauxnance_api_url_json = jsonencode(var.fauxnance_api_url)
-        frontend_origin_json = jsonencode(var.frontend_origin)
-        fauxnance_api_key_secret_arn_json = jsonencode(data.aws_secretsmanager_secret.fauxnance_key.arn)
-
-
-        #jwt_secret_arn_json = jsonencode(aws_secretsmanager_secret.jwt.arn)
-
         jwt_secret_arn_json = jsonencode(data.aws_secretsmanager_secret.jwt.arn)
     }
 }
