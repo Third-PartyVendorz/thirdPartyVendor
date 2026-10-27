@@ -10,6 +10,8 @@ resource "aws_security_group" "alb_security" {
         cidr_blocks = ["0.0.0.0/0"]
     }
 
+    #Will also need HTTPS ingress here to address cokie issue
+
     egress {
         protocol    = "-1"
         from_port   = 0
