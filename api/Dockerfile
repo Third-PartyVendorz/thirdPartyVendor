@@ -17,6 +17,9 @@ RUN mvn -B clean package -DskipTests
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
+RUN apk add --no-cache python3
+RUN python3 -c "from urllib.request import urlretrieve; urlretrieve('https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem', '/app/global-bundle.pem')"
+
 COPY --from=build /build/target/api-0.0.1-SNAPSHOT.jar app.jar
 
 EXPOSE 8081

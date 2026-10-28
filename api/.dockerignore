@@ -27,3 +27,7 @@ Thumbs.db
 
 # Maven wrapper (optional - use if your Dockerfile expects to download Maven)
 .mvn/
+
+
+
+src/main/resources/db/migration/
