@@ -4,21 +4,17 @@ Run Jenkinsfile to provision infrastructure
 
 2. 
 
-Build static frontend files
-
-3. 
-
 Go to AWS console and copy the Cloudfront url to the environment variables in the environments.ts file with /api appended
 
 EX:
 
 https://d23ee2y7xqyofm.cloudfront.net/api
 
-4.
+3.
 
 Build static frontend files with: npx ng build
 
-5. 
+4. 
 
 Go to AWS console and add static files in browser folder to S3 bucket
 
