@@ -1,3 +1,10 @@
-ECR and image tags must exist first
+Targeted ECR terraform command:
 
-S3 bucket should exist before building and pushing static files
+terraform init
+
+terraform plan `
+  '-target=aws_ecr_repository.spring_repository' `
+  '-target=aws_ecr_repository.flask_repository' `
+  '-out=ecr.tfplan'
+
+terraform apply 'ecr.tfplan'
