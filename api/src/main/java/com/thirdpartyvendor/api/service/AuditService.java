@@ -1,6 +1,12 @@
 package com.thirdpartyvendor.api.service;
 
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Locale;
+import java.time.LocalDate;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
@@ -9,6 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.thirdpartyvendor.api.dto.AuditEventResponse;
+import com.thirdpartyvendor.api.dto.AuditClientResponse;
+import com.thirdpartyvendor.api.dto.AuditPageResponse;
 import com.thirdpartyvendor.api.entity.AppUser;
 import com.thirdpartyvendor.api.entity.ForexLog;
 import com.thirdpartyvendor.api.entity.Order;
@@ -48,6 +56,64 @@ public class AuditService {
             case "forex" -> mapForex(findForex(numericEventId));
             default -> throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unsupported audit event type");
         };
+    }
+
+    public AuditPageResponse<AuditClientResponse> searchClients(String search, int page, AppUser currentUser) {
+        AuthorizationUtil.requireAdmin(currentUser);
+        validatePage(page);
+        if (search == null || search.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Enter a client name or email");
+        }
+        var clients = userRepository.searchAuditClients(search.trim(),
+            PageRequest.of(page, 20, Sort.by("lastName", "firstName", "id")));
+        return new AuditPageResponse<>(clients.getContent().stream()
+            .map(client -> new AuditClientResponse(client.getId(), clientName(client), client.getEmail())).toList(),
+            clients.getTotalElements(), page, 20);
+    }
+
+    public AuditPageResponse<AuditEventResponse> searchEvents(Long clientId, String eventType,
+        LocalDate from, LocalDate to, String instrument, int page, AppUser currentUser) {
+        AuthorizationUtil.requireAdmin(currentUser);
+        validatePage(page);
+        if (from != null && to != null && from.isAfter(to)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Start date must not be after end date");
+        }
+        String type = eventType == null ? "" : eventType.trim().toLowerCase(Locale.ROOT);
+        if (!List.of("", "order", "trade", "forex").contains(type)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unsupported audit event type");
+        }
+        findClient(clientId);
+        List<AuditEventResponse> events = new ArrayList<>();
+        if (type.isEmpty() || type.equals("order") || type.equals("trade")) {
+            List<Order> orders = orderRepository.findByUserId(clientId);
+            if (type.isEmpty() || type.equals("order")) {
+                orders.stream().map(this::mapOrder).forEach(events::add);
+            }
+            if ((type.isEmpty() || type.equals("trade")) && !orders.isEmpty()) {
+                tradeRepository.findByOrderIdIn(orders.stream().map(Order::getId).toList())
+                    .stream().map(this::mapTrade).forEach(events::add);
+            }
+        }
+        if (type.isEmpty() || type.equals("forex")) {
+            forexLogRepository.findByUserId(clientId).stream().map(this::mapForex).forEach(events::add);
+        }
+        String asset = instrument == null ? "" : instrument.replaceAll("\\s+", "").toUpperCase(Locale.ROOT);
+        List<AuditEventResponse> matches = events.stream()
+            .filter(event -> from == null || !event.timestamp().toLocalDate().isBefore(from))
+            .filter(event -> to == null || !event.timestamp().toLocalDate().isAfter(to))
+            .filter(event -> asset.isEmpty() || event.instrument().replaceAll("\\s+", "")
+                .toUpperCase(Locale.ROOT).contains(asset))
+            .sorted(Comparator.comparing(AuditEventResponse::timestamp).reversed()
+                .thenComparing(AuditEventResponse::type).thenComparing(AuditEventResponse::id))
+            .toList();
+        List<AuditEventResponse> items = matches.stream().skip((long) page * 20).limit(20).toList();
+        return new AuditPageResponse<>(items, matches.size(), page, 20);
+    }
+
+    private void validatePage(int page) {
+        if (page < 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Page must not be negative");
+        }
     }
 
     private Long parseEventId(String eventId) {

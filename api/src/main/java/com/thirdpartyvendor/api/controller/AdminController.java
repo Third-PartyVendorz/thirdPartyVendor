@@ -8,6 +8,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import java.time.LocalDate;
+import com.thirdpartyvendor.api.dto.AuditClientResponse;
+import com.thirdpartyvendor.api.dto.AuditPageResponse;
 
 import com.thirdpartyvendor.api.entity.AppUser;
 import com.thirdpartyvendor.api.service.UserService;
@@ -95,6 +99,28 @@ public class AdminController {
         @AuthenticationPrincipal AppUser currentUser
     ) {
         return adminService.getUserCashHoldings(userId, currentUser);
+    }
+
+    @GetMapping("/audit/clients")
+    public AuditPageResponse<AuditClientResponse> searchAuditClients(
+        @RequestParam String search,
+        @RequestParam(defaultValue = "0") int page,
+        @AuthenticationPrincipal AppUser currentUser
+    ) {
+        return auditService.searchClients(search, page, currentUser);
+    }
+
+    @GetMapping("/audit/clients/{clientId}/events")
+    public AuditPageResponse<AuditEventResponse> searchAuditEvents(
+        @PathVariable Long clientId,
+        @RequestParam(defaultValue = "") String type,
+        @RequestParam(required = false) LocalDate from,
+        @RequestParam(required = false) LocalDate to,
+        @RequestParam(defaultValue = "") String instrument,
+        @RequestParam(defaultValue = "0") int page,
+        @AuthenticationPrincipal AppUser currentUser
+    ) {
+        return auditService.searchEvents(clientId, type, from, to, instrument, page, currentUser);
     }
 
     @GetMapping("/audit/{eventType}/{eventId}")
