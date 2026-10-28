@@ -8,7 +8,11 @@ Build static frontend files
 
 3. 
 
-Go to AWS console and copy the Cloudfront url to the environment variables in the environments.ts file
+Go to AWS console and copy the Cloudfront url to the environment variables in the environments.ts file with /api appended
+
+EX:
+
+https://d23ee2y7xqyofm.cloudfront.net/api
 
 4.
 

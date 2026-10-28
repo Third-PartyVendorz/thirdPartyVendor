@@ -87,22 +87,22 @@ pipeline {
 
 							# Lambda handler failures can still produce an AWS CLI exit code of zero.
 							python3 - "$RESULT_DIR/metadata.json" "$RESULT_DIR/response.json" <<'PY'
-									import json
-									import sys
+import json
+import sys
 
-									with open(sys.argv[1]) as stream:
-										metadata = json.load(stream)
-									with open(sys.argv[2]) as stream:
-										response = json.load(stream)
+with open(sys.argv[1]) as stream:
+    metadata = json.load(stream)
+with open(sys.argv[2]) as stream:
+    response = json.load(stream)
 
-									if metadata.get("StatusCode") != 200 or metadata.get("FunctionError"):
-										sys.exit("RDS connectivity Lambda failed: " + json.dumps(response))
-									if not isinstance(response, dict) or response.get("statusCode") != 200 or not response.get("version"):
-										sys.exit("RDS connectivity check returned an unexpected response: " + json.dumps(response))
+if metadata.get("StatusCode") != 200 or metadata.get("FunctionError"):
+    sys.exit("RDS connectivity Lambda failed: " + json.dumps(response))
+if not isinstance(response, dict) or response.get("statusCode") != 200 or not response.get("version"):
+    sys.exit("RDS connectivity check returned an unexpected response: " + json.dumps(response))
 
-									print("SUCCESS: Lambda connected to RDS and executed SELECT version();")
-									print("PostgreSQL version:", response["version"])
-									PY
+print("SUCCESS: Lambda connected to RDS and executed SELECT version();")
+print("PostgreSQL version:", response["version"])
+PY
 						'''
 					}
 				}
