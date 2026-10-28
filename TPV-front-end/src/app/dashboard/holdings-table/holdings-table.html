@@ -71,6 +71,9 @@
                 </tr>
             </thead>
             <tbody>
+                <tr *ngIf="displayedHoldings.length === 0">
+                    <td class="empty-holdings" colspan="8">No holdings</td>
+                </tr>
                 <tr *ngFor="let holding of displayedHoldings">
                     <td data-label="Ticker">
                         <a class="holding-ticker" [routerLink]="['/explore-assets']" [queryParams]="{ ticker: holding.ticker }">{{ holding.ticker }}</a>
@@ -101,6 +104,7 @@
 
     <!-- Mobile Card View -->
     <div class="mobile-holdings">
+        <p class="empty-holdings" *ngIf="displayedHoldings.length === 0">No holdings</p>
         <div class="mobile-holdings-item" *ngFor="let holding of displayedHoldings" [class.expanded]="isExpanded(holding.ticker)">
             <div class="mobile-holdings-header">
                 <button
