@@ -50,5 +50,63 @@ pipeline {
 				}
 			}
 		}
+
+		stage('Deploy infrastructure') {
+			steps {
+				withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) {
+					dir('deploy/terraform') {
+						sh '''
+							terraform init
+							terraform apply -auto-approve -var="spring_image=${IMAGE_TAG}" -var="flask_image=${IMAGE_TAG}"
+						'''
+					}
+				}
+			}
+		}
+
+		stage('Verify RDS connection') {
+			steps {
+				withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) {
+					dir('deploy/terraform') {
+						sh '''
+							set -eu
+							FUNCTION_NAME=$(terraform output -raw rds_connector_function_name)
+							RESULT_DIR=$(mktemp -d)
+							trap 'rm -rf -- "$RESULT_DIR"' EXIT
+
+							aws lambda wait function-active-v2 --function-name "$FUNCTION_NAME" --region "$AWS_REGION"
+							aws lambda wait function-updated-v2 --function-name "$FUNCTION_NAME" --region "$AWS_REGION"
+							aws lambda invoke \
+								--function-name "$FUNCTION_NAME" \
+								--region "$AWS_REGION" \
+								--invocation-type RequestResponse \
+								--cli-binary-format raw-in-base64-out \
+								--payload '{}' \
+								--output json \
+								"$RESULT_DIR/response.json" > "$RESULT_DIR/metadata.json"
+
+							# Lambda handler failures can still produce an AWS CLI exit code of zero.
+							python3 - "$RESULT_DIR/metadata.json" "$RESULT_DIR/response.json" <<'PY'
+									import json
+									import sys
+
+									with open(sys.argv[1]) as stream:
+										metadata = json.load(stream)
+									with open(sys.argv[2]) as stream:
+										response = json.load(stream)
+
+									if metadata.get("StatusCode") != 200 or metadata.get("FunctionError"):
+										sys.exit("RDS connectivity Lambda failed: " + json.dumps(response))
+									if not isinstance(response, dict) or response.get("statusCode") != 200 or not response.get("version"):
+										sys.exit("RDS connectivity check returned an unexpected response: " + json.dumps(response))
+
+									print("SUCCESS: Lambda connected to RDS and executed SELECT version();")
+									print("PostgreSQL version:", response["version"])
+									PY
+						'''
+					}
+				}
+			}
+		}
     }
 }

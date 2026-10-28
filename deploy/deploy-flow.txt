@@ -1,10 +1,16 @@
-Targeted ECR terraform command:
+1. 
 
-terraform init
+Run Jenkinsfile to provision infrastructure
 
-terraform plan `
-  '-target=aws_ecr_repository.spring_repository' `
-  '-target=aws_ecr_repository.flask_repository' `
-  '-out=ecr.tfplan'
+2. 
 
-terraform apply 'ecr.tfplan'
+Build static frontend files
+
+3. 
+
+Go to AWS console and add static files in browser folder to S3 bucket
+
+
+
+
+
