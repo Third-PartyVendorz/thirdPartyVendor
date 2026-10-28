@@ -55,6 +55,11 @@ export class AdminUsersPage implements OnInit {
   }
 
   toggleFreeze(user: AdminUser): void {
+    if (!user.active) {
+      this.messageService.setErrorMessage('Deleted accounts cannot be frozen or unfrozen.');
+      return;
+    }
+
     if (user.userId === this.userContextService.getUserContext()?.userId) {
       this.messageService.setErrorMessage('You cannot freeze your own administrator account.');
       return;
