@@ -136,9 +136,15 @@
 
 		</div>
 
-	<section class="watchlist-panel command-panel" aria-label="Watchlist">
-		<ng-container *ngTemplateOutlet="watchlistContent"></ng-container>
-	</section>
+	<div class="assets-sidebar-column">
+			<app-trending-symbols-panel
+				(exploreTicker)="selectPopular($event)"
+				(tradeTicker)="tradeTrendingTicker($event)"
+			></app-trending-symbols-panel>
+		<section class="watchlist-panel command-panel" aria-label="Watchlist">
+			<ng-container *ngTemplateOutlet="watchlistContent"></ng-container>
+		</section>
+	</div>
 	</div>
 
 	<div *ngIf="activeTicker" class="asset-view-bar">
@@ -164,6 +170,10 @@
 	</ng-container>
 
 	<aside class="asset-side-column">
+	<app-trending-symbols-panel
+		(exploreTicker)="selectPopular($event)"
+		(tradeTicker)="tradeTrendingTicker($event)"
+	></app-trending-symbols-panel>
 	<section class="watchlist-panel watchlist-panel--compact command-panel" aria-label="Watchlist">
 		<ng-container *ngTemplateOutlet="watchlistContent"></ng-container>
 	</section>
