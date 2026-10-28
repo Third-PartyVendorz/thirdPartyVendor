@@ -71,3 +71,36 @@ resource "aws_iam_role_policy" "ecs_jwt_secret" {
     }]
   })
 }
+
+
+
+
+
+
+
+
+data "aws_iam_policy_document" "allow_cloudfront_oac" {
+  statement {
+    sid       = "AllowCloudfrontServicePrincipalReadOnly"
+    effect    = "Allow"
+    actions   = ["s3:GetObject"]
+    resources = ["${aws_s3_bucket.frontend_bucket.arn}/*"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["cloudfront.amazonaws.com"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "AWS:SourceArn"
+      values   = [aws_cloudfront_distribution.api.arn]
+    }
+  }
+} 
+
+
+resource "aws_s3_bucket_policy" "attach_oac_policy" {
+  bucket = aws_s3_bucket.frontend_bucket.id
+  policy = data.aws_iam_policy_document.allow_cloudfront_oac.json
+}

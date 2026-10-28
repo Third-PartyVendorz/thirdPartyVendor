@@ -17,7 +17,7 @@ data "template_file" "task_def_template_spring" {
         db_user_json = jsonencode(var.database_username)
         db_password_json = jsonencode(var.database_password)
         fauxnance_api_url_json = jsonencode(var.fauxnance_api_url)
-        frontend_origin_json = jsonencode(var.frontend_origin)
+        frontend_origin_json = jsonencode("https://${aws_cloudfront_distribution.api.domain_name}")
         fauxnance_api_key_secret_arn_json = jsonencode(data.aws_secretsmanager_secret.fauxnance_key.arn)
 
 
