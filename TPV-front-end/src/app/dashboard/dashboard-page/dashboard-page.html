@@ -9,8 +9,9 @@
             [holdingsError]="errorMessage"/>
     </div>
     <app-forex-holdings/>
-    <div class="bottom-row">
-        <app-holdings-table [holdings]="holdings"/>
-        <!-- <app-portfolio-graphics/> -->
-    </div>
+    <app-holdings-table [holdings]="holdings"/>
+    <app-portfolio-graphics
+    [holdings]="holdings"
+    [holdingsLoading]="isLoading"
+    [holdingsError]="errorMessage"/>
 </div>
