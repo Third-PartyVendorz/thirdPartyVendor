@@ -307,10 +307,19 @@ export class ForexContainer implements OnInit {
   }
 
   backToExchange(): void {
+    const wasConfirmed = this.exchangeConfirmed();
+
     this.showConfirmation.set(false);
     this.exchangeConfirmed.set(false);
     this.executionError = '';
     this.cashBalanceAtReview = null;
+
+    if (wasConfirmed) {
+      this.sellAmount = '0.00';
+      this.exchangeError = '';
+      this.updateAmounts();
+      this.loadCashBalance();
+    }
   }
 
   selectPair(baseCurrency: string, quoteCurrency: string): void {
