@@ -8,6 +8,14 @@ Build static frontend files
 
 3. 
 
+Go to AWS console and copy the Cloudfront url to the environment variables in the environments.ts file
+
+4.
+
+Build static frontend files with: npx ng build
+
+5. 
+
 Go to AWS console and add static files in browser folder to S3 bucket
 
 
