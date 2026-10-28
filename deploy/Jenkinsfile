@@ -1,0 +1,54 @@
+pipeline {
+	agent any
+
+	environment {
+		AWS_REGION = 'us-east-1'
+		ECR_REPOSITORY_SPRING = 'spring-ecr-repository'
+		ECR_REPOSITORY_FLASK = 'flask-ecr-repository'
+		IMAGE_TAG = "${env.BUILD_NUMBER}"
+	}
+
+	stages {
+		stage('Package Lambda') {
+			steps {
+				sh 'bash mock-deploy/testing/build-lambda.sh'
+			}
+		}
+
+		stage('Provision ECR') {
+			steps {
+				withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) {
+					dir('mock-deploy/tf') {
+						sh '''
+							terraform init
+							terraform apply -auto-approve -target=aws_ecr_repository.spring_repository -target=aws_ecr_repository.flask_repository
+						'''
+					}
+				}
+			}
+		}
+
+		stage('Build image') {
+			steps {
+				sh 'docker build -t ${ECR_REPOSITORY_SPRING}:${IMAGE_TAG} api/'
+				sh 'docker build -t ${ECR_REPOSITORY_FLASK}:${IMAGE_TAG} analytics/'
+			}
+		}
+
+		stage('Push image') {
+			steps {
+				withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) {
+					sh '''
+						ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+						REGISTRY="${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+						aws ecr get-login-password --region "${AWS_REGION}" | docker login --username AWS --password-stdin "${REGISTRY}"
+						docker tag "${ECR_REPOSITORY_SPRING}:${IMAGE_TAG}" "${REGISTRY}/${ECR_REPOSITORY_SPRING}:${IMAGE_TAG}"
+						docker push "${REGISTRY}/${ECR_REPOSITORY_SPRING}:${IMAGE_TAG}"
+						docker tag "${ECR_REPOSITORY_FLASK}:${IMAGE_TAG}" "${REGISTRY}/${ECR_REPOSITORY_FLASK}:${IMAGE_TAG}"
+						docker push "${REGISTRY}/${ECR_REPOSITORY_FLASK}:${IMAGE_TAG}"
+					'''
+				}
+			}
+		}
+    }
+}
