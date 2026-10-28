@@ -20,4 +20,6 @@ export interface Holding {
     gainLoss?: number;
     gainLossPercent?: number;
     dailyChangePercent?: number;
+    totalChange?: number;
+    dailyChange?: number;
 }

@@ -10,7 +10,8 @@
             <option value="shares">Shares</option>
             <option value="price">Current Price</option>
             <option value="marketValue">Market Value</option>
-            <option value="dailyChangePercent">Day Change</option>
+            <option value="totalChange">Total Gain/Loss</option>
+            <option value="dailyChange">Day Change</option>
         </select>
     </div>
 
@@ -43,21 +44,36 @@
                             <span class="sort-indicator" [class.sort-indicator--asc]="getSortState('shares') === 'asc'" [class.sort-indicator--desc]="getSortState('shares') === 'desc'" aria-hidden="true"><span></span><span></span></span>
                         </button>
                     </th>
-                    <th class="numeric sortable" (click)="toggleSort('price')">
-                       Current Price {{ getSortIndicator('price') }}
+                    <th class="numeric sortable">
+                        <button class="sort-trigger" type="button" (click)="toggleSort('price')" [attr.aria-label]="'Sort holdings by price'">
+                            Current Price
+                            <span class="sort-indicator" [class.sort-indicator--asc]="getSortState('price') === 'asc'" [class.sort-indicator--desc]="getSortState('price') === 'desc'" aria-hidden="true"><span></span><span></span></span>
+                        </button>
                     </th>
-                    <th class="numeric sortable" (click)="toggleSort('marketValue')">
-                        Market Value {{ getSortIndicator('marketValue') }}
+                    <th class="numeric sortable">
+                        <button class="sort-trigger" type="button" (click)="toggleSort('marketValue')" [attr.aria-label]="'Sort holdings by market value'">
+                            Market value
+                            <span class="sort-indicator" [class.sort-indicator--asc]="getSortState('marketValue') === 'asc'" [class.sort-indicator--desc]="getSortState('marketValue') === 'desc'" aria-hidden="true"><span></span><span></span></span>
+                        </button>
                     </th>
-                    <th class="numeric">
-                        Total Gain/Loss
+                    <th class="numeric sortable">
+                        <button class="sort-trigger" type="button" (click)="toggleSort('totalChange')" [attr.aria-label]="'Sort holdings by total gains or loss'">
+                            Total Gain/Loss
+                            <span class="sort-indicator" [class.sort-indicator--asc]="getSortState('totalChange') === 'asc'" [class.sort-indicator--desc]="getSortState('totalChange') === 'desc'" aria-hidden="true"><span></span><span></span></span>
+                        </button>
                     </th>
-                    <th class="numeric sortable" (click)="toggleSort('dailyChangePercent')">
-                        Day Change {{ getSortIndicator('dailyChangePercent') }}
+                    <th class="numeric sortable">
+                        <button class="sort-trigger" type="button" (click)="toggleSort('dailyChange')" [attr.aria-label]="'Sort holdings by daily gains or loss'">
+                            Day Change
+                            <span class="sort-indicator" [class.sort-indicator--asc]="getSortState('dailyChange') === 'asc'" [class.sort-indicator--desc]="getSortState('dailyChange') === 'desc'" aria-hidden="true"><span></span><span></span></span>
+                        </button>
                     </th>
                 </tr>
             </thead>
             <tbody>
+                <tr *ngIf="displayedHoldings.length === 0">
+                    <td class="empty-holdings" colspan="8">No holdings</td>
+                </tr>
                 <tr *ngFor="let holding of displayedHoldings">
                     <td data-label="Ticker">
                         <a class="holding-ticker" [routerLink]="['/explore-assets']" [queryParams]="{ ticker: holding.ticker }">{{ holding.ticker }}</a>
@@ -88,6 +104,7 @@
 
     <!-- Mobile Card View -->
     <div class="mobile-holdings">
+        <p class="empty-holdings" *ngIf="displayedHoldings.length === 0">No holdings</p>
         <div class="mobile-holdings-item" *ngFor="let holding of displayedHoldings" [class.expanded]="isExpanded(holding.ticker)">
             <div class="mobile-holdings-header">
                 <button

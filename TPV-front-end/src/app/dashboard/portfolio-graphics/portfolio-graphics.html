@@ -1,1 +1,126 @@
-<p>portfolio-graphics works!</p>
+<section class="portfolio-charts" aria-label="Portfolio charts">
+	<article class="chart-card" [attr.aria-busy]="holdingsLoading || allocationLoading()">
+		<header class="chart-header">
+			<div>
+				<p class="panel-kicker">Allocation</p>
+				<h2>Holdings by security type</h2>
+				<p class="chart-copy">Where your portfolio is invested today.</p>
+			</div>
+			<span class="chart-badge">USD · Securities</span>
+		</header>
+
+		@if (holdingsLoading || allocationLoading()) {
+			<p class="chart-state" role="status">Loading allocation…</p>
+		} @else if (holdingsError || allocationError()) {
+			<p class="chart-state error" role="status">{{ holdingsError || allocationError() }}</p>
+		} @else if (!allocations().length) {
+			<div class="chart-state">
+				<strong>No holdings to display yet</strong>
+				<span>Your security allocation will appear after your first investment.</span>
+			</div>
+		} @else {
+			<div class="allocation-layout">
+				<svg class="pie-chart" viewBox="0 0 280 280" role="img" aria-label="Holdings by security type, weighted by USD market value. Values are listed alongside the chart.">
+					@for (slice of allocations(); track slice.label) {
+						<path [attr.d]="slice.path" [attr.fill]="slice.color">
+							<title>{{ slice.label }}: {{ slice.percentage | number:'1.1-1' }}% · {{ slice.value | currency:'USD' }}</title>
+						</path>
+					}
+				</svg>
+				<div class="allocation-details">
+					<div class="total-value">
+						<span class="metric-label">Securities value</span>
+						<strong>{{ totalValue() | currency:'USD' }}</strong>
+					</div>
+					<ul class="allocation-legend" aria-label="Allocation values">
+						@for (slice of allocations(); track slice.label) {
+							<li>
+								<span class="legend-dot" [style.background]="slice.color" aria-hidden="true"></span>
+								<div class="legend-label"><strong>{{ slice.label }}</strong><span>{{ slice.value | currency:'USD' }}</span></div>
+								<span class="legend-percent">{{ slice.percentage | number:'1.1-1' }}%</span>
+							</li>
+						}
+					</ul>
+				</div>
+			</div>
+		}
+		<p class="chart-note">Based on current market value, converted to USD at current exchange rates. Cash is excluded.</p>
+	</article>
+
+	<article class="chart-card" [attr.aria-busy]="investmentLoading()">
+		<header class="chart-header">
+			<div>
+				<p class="panel-kicker">Investment activity</p>
+				<h2>Net investment over time</h2>
+				<p class="chart-copy">Cumulative filled buys minus filled sells.</p>
+			</div>
+			<span class="chart-badge">All time · USD</span>
+		</header>
+
+		@if (investmentLoading()) {
+			<p class="chart-state" role="status">Loading investment history…</p>
+		} @else if (investmentError()) {
+			<p class="chart-state error" role="status">{{ investmentError() }}</p>
+		} @else if (trend(); as chart) {
+			<div class="investment-summary">
+				<span class="metric-label">Net invested</span>
+				<strong>{{ netInvestment() | currency:'USD' }}</strong>
+			</div>
+			<div class="chart-shell">
+				<div class="y-axis" aria-hidden="true">
+					@for (tick of chart.ticks; track $index) {
+						<span [style.top.%]="tick.y / 280 * 100">{{ tick.value | currency:'USD':'symbol':'1.0-0' }}</span>
+					}
+				</div>
+				<div class="chart-area">
+					<svg class="trend-chart" viewBox="0 0 640 280" preserveAspectRatio="none" role="img" aria-label="Net investment over time, not historical portfolio market value. Data is available below.">
+						<defs>
+							<linearGradient [attr.id]="gradientId" x1="0" x2="0" y1="0" y2="1">
+								<stop offset="0%" stop-color="#0b5ca5" stop-opacity="0.34" />
+								<stop offset="100%" stop-color="#0b5ca5" stop-opacity="0.04" />
+							</linearGradient>
+						</defs>
+						<g class="grid-lines">
+							@for (tick of chart.ticks; track $index) {
+								<line x1="16" x2="624" [attr.y1]="tick.y" [attr.y2]="tick.y" />
+							}
+						</g>
+						<path [attr.d]="chart.area" [attr.fill]="'url(#' + gradientId + ')'" />
+						<path class="trend-line" [attr.d]="chart.line" />
+						@for (point of chart.dots; track point.date) {
+							<circle [attr.cx]="point.x" [attr.cy]="point.y" r="4">
+								<title>{{ point.date | date:'mediumDate':'UTC' }}: {{ point.value | currency:'USD' }}</title>
+							</circle>
+						}
+					</svg>
+					<div class="x-axis">
+						<span>{{ chart.start | date:'MMM d, y':'UTC' }}</span>
+						@if (chart.end !== chart.start) {
+							<span>{{ chart.end | date:'MMM d, y':'UTC' }}</span>
+						}
+					</div>
+				</div>
+			</div>
+			<details class="chart-data">
+				<summary>View investment data</summary>
+				<div class="data-scroll" tabindex="0" aria-label="Investment history data">
+					<table>
+						<caption class="sr-only">Cumulative net investment by order creation date (UTC)</caption>
+						<thead><tr><th scope="col">Date (UTC)</th><th scope="col">Net invested (USD)</th></tr></thead>
+						<tbody>
+							@for (point of investmentPoints(); track point.date) {
+								<tr><td>{{ point.date | date:'mediumDate':'UTC' }}</td><td>{{ point.value | currency:'USD' }}</td></tr>
+							}
+						</tbody>
+					</table>
+				</div>
+			</details>
+		} @else {
+			<div class="chart-state">
+				<strong>No filled orders yet</strong>
+				<span>Your investment trend will appear when orders are filled.</span>
+			</div>
+		}
+		<p class="chart-note">Not historical portfolio value or returns. Uses filled execution amounts grouped by order creation date (UTC), with current—not historical—USD exchange rates.</p>
+	</article>
+</section>

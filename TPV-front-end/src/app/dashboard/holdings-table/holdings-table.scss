@@ -196,6 +196,12 @@ td {
     vertical-align: middle;
 }
 
+.empty-holdings {
+    padding: 1.5rem;
+    color: #6b7280;
+    text-align: center;
+}
+
 .holding-ticker {
     color: var(--color-brand-strong);
     font-weight: 800;

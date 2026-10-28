@@ -47,5 +47,6 @@
             <span class="frozen-warning__tooltip" role="tooltip">Your account is frozen</span>
         </span>
     }
-    <a class="nav-link" routerLink="/profile" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">Profile</a>
+    <a class="nav-link" routerLink="/profile" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">View Profile</a>
+    <a class="nav-link" (click)="logout()">Logout</a>
 </div>

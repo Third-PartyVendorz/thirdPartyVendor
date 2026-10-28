@@ -3,7 +3,7 @@ import { CommonModule, CurrencyPipe, DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Holding } from './holding.model';
 
-type SortColumn = 'ticker' | 'companyName' | 'assetType' | 'shares' | 'price' | 'marketValue' | 'dailyChangePercent' | null;
+type SortColumn = 'ticker' | 'companyName' | 'assetType' | 'shares' | 'price' | 'marketValue' | 'totalChange' | 'dailyChange' | null;
 type SortDirection = 'asc' | 'desc' | null;
 
 @Component({
@@ -56,9 +56,13 @@ export class HoldingsTable {
           aValue = a.marketValue || 0;
           bValue = b.marketValue || 0;
           break;
-        case 'dailyChangePercent':
-          aValue = a.dailyChangePercent || 0;
-          bValue = b.dailyChangePercent || 0;
+        case 'totalChange':
+          aValue = a.gainLoss || 0;
+          bValue = b.gainLoss || 0;
+          break;
+        case 'dailyChange':
+          aValue = a.change || 0;
+          bValue = b.change || 0;
           break;
         default:
           return 0;
@@ -147,7 +151,8 @@ export class HoldingsTable {
       case 'price': return 'Current Price';
       case 'marketValue': return 'Market Value';
       // case 'gainLoss': return 'Total Gain/Loss';
-      case 'dailyChangePercent': return 'Day Change';
+      case 'totalChange': return 'Total Change';
+      case 'dailyChange': return 'Day Change';
       default: return 'Sort by';
     }
   }
