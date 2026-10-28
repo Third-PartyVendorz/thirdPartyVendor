@@ -22,7 +22,24 @@ Build static frontend files with: npx ng build
 
 Go to AWS console and add static files in browser folder to S3 bucket
 
+--------------------------------------------------------------------------------------------------------------------------------
 
+To delete provisioned infrastructure:
 
+1. 
+
+Go to completed Jenkins TPV_DEPLOY_PIPELINE
+
+2. 
+
+Go to the workspaces folder on the left hand side
+
+3.
+
+Navigate to the terraform fodler and download the .state file
+
+4. 
+
+Move the state file to your local directory and run terraform destroy
 
 
