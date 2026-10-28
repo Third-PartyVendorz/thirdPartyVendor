@@ -104,7 +104,14 @@
 									</div>
 
 									<div class="chart-plot">
-										<svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+										<div class="chart-visual">
+										<svg
+										viewBox="0 0 100 100"
+										preserveAspectRatio="none"
+										aria-hidden="true"
+										(pointermove)="onChartPointerMove($event)"
+										(pointerleave)="clearChartHover()"
+									>
 											<defs>
 												<linearGradient id="asset-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
 													<stop offset="0%" stop-color="#033D6C" stop-opacity="0.35" />
@@ -114,7 +121,29 @@
 
 											<polyline class="chart-area" [attr.points]="chartAreaPoints"></polyline>
 											<polyline class="chart-line" [attr.points]="chartLinePoints"></polyline>
+											<ng-container *ngIf="hoveredCandle">
+												<line class="chart-hover-guide" [attr.x1]="chartHoverXPercent" [attr.x2]="chartHoverXPercent" y1="0" y2="100"></line>
+											</ng-container>
 										</svg>
+										<span
+											*ngIf="hoveredCandle"
+											class="chart-hover-dot"
+											[style.left.%]="chartHoverXPercent"
+											[style.top.%]="chartHoverYPercent"
+											aria-hidden="true"
+										></span>
+										<div
+											*ngIf="hoveredCandle as candle"
+											class="chart-hover-tooltip"
+											[class.chart-hover-tooltip--left]="chartHoverXPercent > 50"
+											[style.--chart-hover-x]="chartHoverXPercent + '%'"
+											[style.--chart-hover-y]="chartHoverYPercent + '%'"
+											role="tooltip"
+										>
+											<strong>{{ candle.adjclose | currency:currentQuote.currency:'symbol':'1.2-2' }}</strong>
+											<span>{{ candle.date | date:'mediumDate' }}</span>
+										</div>
+										</div>
 
 										<div class="chart-axis" [style.--chart-axis-columns]="chartAxisGridColumns">
 											<span *ngFor="let label of chartAxisLabels">{{ label }}</span>

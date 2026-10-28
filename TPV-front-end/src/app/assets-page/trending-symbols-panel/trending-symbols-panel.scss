@@ -1,0 +1,134 @@
+:host {
+	display: flex;
+	min-width: 0;
+}
+
+.trending-panel {
+	flex: 1;
+	min-width: 0;
+	padding: 1.1rem;
+}
+
+.trending-eyebrow {
+	margin: 0 0 0.35rem;
+	color: var(--color-text-subtle);
+	font-size: 0.7rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.1em;
+}
+
+.trending-heading h2 {
+	margin: 0;
+	color: var(--color-brand-deep);
+	font-size: 1.1rem;
+}
+
+.trending-feedback {
+	margin: 0.8rem 0 0;
+	color: var(--color-text-subtle);
+	font-size: 0.82rem;
+}
+
+.trending-feedback--error {
+	color: var(--color-negative);
+	font-weight: 700;
+}
+
+.trending-list {
+	display: grid;
+	margin: 0.65rem 0 0;
+	padding: 0;
+	list-style: none;
+}
+
+.trending-item {
+	display: grid;
+	grid-template-columns: 1.2rem minmax(0, 1fr) auto auto;
+	align-items: center;
+	gap: 0.45rem;
+	min-width: 0;
+	padding: 0.55rem 0;
+	border-bottom: 1px solid var(--color-border);
+}
+
+.trending-item:last-child {
+	border-bottom: 0;
+}
+
+.trending-rank {
+	color: var(--color-text-subtle);
+	font-size: 0.74rem;
+	font-weight: 800;
+}
+
+.trending-symbol {
+	display: grid;
+	justify-items: start;
+	gap: 0.12rem;
+	min-width: 0;
+	padding: 0;
+	border: 0;
+	background: transparent;
+	color: var(--color-brand-deep);
+	text-align: left;
+	cursor: pointer;
+}
+
+.trending-symbol strong,
+.trending-symbol span,
+.trending-quote strong,
+.trending-quote span {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.trending-symbol strong,
+.trending-quote strong {
+	font-size: 0.82rem;
+	font-weight: 800;
+}
+
+.trending-symbol span,
+.trending-quote span {
+	color: var(--color-text-subtle);
+	font-size: 0.68rem;
+}
+
+.trending-quote {
+	display: grid;
+	justify-items: end;
+	max-width: 6rem;
+}
+
+.trending-quote span {
+	color: var(--color-positive);
+	font-weight: 700;
+}
+
+.trending-quote span.negative-change {
+	color: var(--color-negative);
+}
+
+.trending-action {
+	display: grid;
+	place-items: center;
+	width: 1.9rem;
+	height: 1.9rem;
+	padding: 0;
+	border: 1px solid var(--color-border);
+	border-radius: 5px;
+	background: transparent;
+	color: var(--color-accent-deep);
+	cursor: pointer;
+}
+
+.trending-action:hover {
+	border-color: var(--color-accent-deep);
+	background: rgba(23, 105, 163, 0.06);
+}
+
+.trending-action .material-icons-outlined {
+	font-size: 1.05rem;
+}

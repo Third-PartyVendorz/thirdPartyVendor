@@ -12,7 +12,8 @@ import { WatchlistService } from '../services/watchlist.service';
 import { MessageService } from '../services/message.service';
 import { MarketApiService } from '../services/marketApi.service';
 import { OrderResponse } from '../dto/OrderResponse';
-	import { MarketQuoteData } from '../dto/MarketQuoteAPIResponse';
+import { MarketQuoteData } from '../dto/MarketQuoteAPIResponse';
+import { TrendingSymbolsPanel } from './trending-symbols-panel/trending-symbols-panel';
 import { forkJoin, of } from 'rxjs';
 import { catchError, distinctUntilChanged, map, retry, startWith, timeout } from 'rxjs/operators';
 import { CustomSliderComponent } from '../shared/custom-slider/custom-slider';
@@ -50,7 +51,7 @@ function storeRecentSearches(tickers: string[]): void {
 
 @Component({
 	standalone: true,
-	imports: [CommonModule, FormsModule, AssetResultComponent, PageHeader, CustomSliderComponent, MarketStatus],
+	imports: [CommonModule, FormsModule, AssetResultComponent, PageHeader, CustomSliderComponent, MarketStatus, TrendingSymbolsPanel],
 	selector: 'app-assets-page',
 	styleUrl: './assets-page.scss',
 	templateUrl: './assets-page.html',
@@ -262,6 +263,10 @@ export class AssetsPage implements OnInit {
 		this.marketType = 'equity';
 		this.searchTicker = symbol;
 		this.submitSearch();
+	}
+
+	tradeTrendingTicker(symbol: string): void {
+		this.router.navigate(['/trade'], { queryParams: { ticker: symbol } });
 	}
 
 	clearActiveAsset(): void {

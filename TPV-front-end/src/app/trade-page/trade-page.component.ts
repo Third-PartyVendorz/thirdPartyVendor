@@ -10,25 +10,11 @@ import { FrozenAccountModal } from '../shared/frozen-account-modal/frozen-accoun
 import { PageHeader } from '../shared/page-header/page-header';
 import { CustomSliderComponent } from '../shared/custom-slider/custom-slider';
 import { MarketStatus } from '../shared/market-status/market-status';
-import { Observable, of } from 'rxjs';
-import { catchError, map, switchMap } from 'rxjs/operators';
-import { MarketApiService } from '../services/marketApi.service';
-import { MarketQuoteData } from '../dto/MarketQuoteAPIResponse';
-import { TrendingService } from '../services/trending.service';
-import { TrendingTickerResponse } from '../dto/TrendingTickerResponse';
-
-export interface TrendingCard {
-	symbol: string;
-	orderCount: number;
-	price: number | null;
-	change: number | null;
-	changePercent: number | null;
-	currency: string;
-}
+import { TrendingSymbolsPanel } from '../assets-page/trending-symbols-panel/trending-symbols-panel';
 
 @Component({
 	standalone: true,
-	imports: [CommonModule, FormsModule, CurrencyPipe, DatePipe, AssetResultComponent, TradeFormComponent, FrozenAccountModal, PageHeader, CustomSliderComponent, MarketStatus, RouterLink],
+	imports: [CommonModule, FormsModule, CurrencyPipe, DatePipe, AssetResultComponent, TradeFormComponent, FrozenAccountModal, PageHeader, CustomSliderComponent, MarketStatus, TrendingSymbolsPanel, RouterLink],
 	selector: 'app-trade-page',
 	styleUrl: './trade-page.component.scss',
 	templateUrl: './trade-page.component.html',
@@ -38,8 +24,6 @@ export class TradePage implements OnInit {
 	private router = inject(Router);
 	private destroyRef = inject(DestroyRef);
 	private authService = inject(AuthService);
-	private trendingService = inject(TrendingService);
-	private marketApiService = inject(MarketApiService);
 
 	searchTicker = '';
 	cryptoCurrency = 'USD';
@@ -51,15 +35,7 @@ export class TradePage implements OnInit {
 	autoOpenTrade = true;
 	showFrozenAccountModal = false;
 
-	readonly trendingTickers = signal<TrendingCard[]>([]);
-	readonly trendingLoading = signal(false);
-	readonly trendingError = signal('');
-	private readonly trendingWindowMs = 24 * 60 * 60 * 1000;
-	private readonly trendingLimit = 5;
-
 	ngOnInit(): void {
-		this.loadTrendingTickers();
-
 		if (this.authService.isFrozen()) {
 			this.showFrozenAccountModal = true;
 		}
@@ -122,56 +98,8 @@ export class TradePage implements OnInit {
 		this.submitSearch();
 	}
 
-	private loadTrendingTickers(): void {
-		const to = new Date();
-		const from = new Date(to.getTime() - this.trendingWindowMs);
-
-		this.trendingLoading.set(true);
-		this.trendingError.set('');
-
-		this.trendingService.fetchTrendingTickers(from, to, this.trendingLimit)
-			.pipe(
-				switchMap((rows) => this.withQuotes(rows)),
-				takeUntilDestroyed(this.destroyRef),
-			)
-			.subscribe({
-				next: (cards) => {
-					this.trendingTickers.set(cards);
-					this.trendingLoading.set(false);
-				},
-				error: () => {
-					this.trendingTickers.set([]);
-					this.trendingError.set('Trending symbols could not be loaded.');
-					this.trendingLoading.set(false);
-				},
-			});
-	}
-
-	private withQuotes(rows: TrendingTickerResponse[]): Observable<TrendingCard[]> {
-		if (!rows.length) {
-			return of([]);
-		}
-
-		return this.marketApiService.fetchQuotes(rows.map((row) => row.ticker)).pipe(
-			map((response) => {
-				const quoteBySymbol = new Map<string, MarketQuoteData | null>(
-					(response.data?.quotes ?? []).map((item): [string, MarketQuoteData | null] => [item.symbol.toUpperCase(), item.quote]),
-				);
-				return rows.map((row) => this.toTrendingCard(row, quoteBySymbol.get(row.ticker) ?? null));
-			}),
-			catchError(() => of(rows.map((row) => this.toTrendingCard(row, null)))),
-		);
-	}
-
-	private toTrendingCard(row: TrendingTickerResponse, quote: MarketQuoteData | null): TrendingCard {
-		return {
-			symbol: row.ticker,
-			orderCount: row.orderCount,
-			price: quote?.price ?? null,
-			change: quote?.change ?? null,
-			changePercent: quote?.changePercent ?? null,
-			currency: quote?.currency || 'USD',
-		};
+	exploreTrendingTicker(symbol: string): void {
+		this.router.navigate(['/explore-assets'], { queryParams: { ticker: symbol } });
 	}
 
 	private buildTicker(): string {

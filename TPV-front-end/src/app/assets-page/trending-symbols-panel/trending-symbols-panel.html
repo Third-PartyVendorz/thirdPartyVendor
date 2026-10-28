@@ -1,0 +1,25 @@
+<section class="trending-panel command-panel" aria-labelledby="trending-assets-title">
+	<div class="trending-heading">
+		<p class="trending-eyebrow">Market watch · Last 24 hours</p>
+		<h2 id="trending-assets-title">Trending symbols</h2>
+	</div>
+	<p *ngIf="loading()" class="trending-feedback" role="status">Loading trending symbols...</p>
+	<p *ngIf="error()" class="trending-feedback trending-feedback--error" role="alert">{{ error() }}</p>
+	<p *ngIf="!loading() && !error() && !tickers().length" class="trending-feedback">No orders in the last 24 hours.</p>
+	<ul *ngIf="tickers().length" class="trending-list">
+		<li *ngFor="let asset of tickers(); let i = index" class="trending-item">
+			<span class="trending-rank">{{ i + 1 }}</span>
+			<button class="trending-symbol" type="button" (click)="exploreTicker.emit(asset.symbol)" [attr.aria-label]="'Explore ' + asset.symbol">
+				<strong>{{ asset.symbol }}</strong>
+				<span>{{ asset.orderCount }} {{ asset.orderCount === 1 ? 'order' : 'orders' }}</span>
+			</button>
+			<div class="trending-quote">
+				<strong>{{ asset.price !== null ? (asset.price | currency:asset.currency:'symbol':'1.2-2') : '--' }}</strong>
+				<span [class.negative-change]="asset.changePercent !== null && asset.changePercent < 0">{{ asset.changePercent === null ? '--' : ((asset.changePercent > 0 ? '+' : '') + (asset.changePercent | number:'1.2-2') + '%') }}</span>
+			</div>
+			<button class="trending-action" type="button" (click)="tradeTicker.emit(asset.symbol)" [attr.aria-label]="'Trade ' + asset.symbol" [attr.title]="'Trade ' + asset.symbol">
+				<span class="material-icons-outlined" aria-hidden="true">compare_arrows</span>
+			</button>
+		</li>
+	</ul>
+</section>

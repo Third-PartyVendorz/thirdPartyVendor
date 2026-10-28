@@ -49,6 +49,7 @@ export class AssetResultComponent implements OnInit {
 	readonly asset = signal<MarketSymbolData | null>(null);
 	readonly candles = signal<HistoricalCandle[]>([]);
 	readonly selectedRange = signal<HistoricalRange>('1y');
+	readonly hoveredCandleIndex = signal<number | null>(null);
 
 	readonly rangeOptions: HistoricalRangeOption[] = [
 		{ value: '7d', label: '7D' },
@@ -194,6 +195,23 @@ export class AssetResultComponent implements OnInit {
 		return this.buildAreaPoints();
 	}
 
+	get hoveredCandle(): HistoricalCandle | null {
+		const index = this.hoveredCandleIndex();
+		return index === null ? null : this.displayedCandles[index] ?? null;
+	}
+
+	get chartHoverXPercent(): number {
+		const candles = this.displayedCandles;
+		const index = this.hoveredCandleIndex();
+		return index === null || candles.length < 2 ? 0 : (index / (candles.length - 1)) * 100;
+	}
+
+	get chartHoverYPercent(): number {
+		const candle = this.hoveredCandle;
+		const valueRange = this.chartMax - this.chartMin || 1;
+		return candle ? 100 - ((candle.adjclose - this.chartMin) / valueRange) * 100 : 0;
+	}
+
 	get hasHistoricalData(): boolean {
 		return this.displayedCandles.length > 0;
 	}
@@ -334,6 +352,23 @@ export class AssetResultComponent implements OnInit {
 
 	setRange(range: HistoricalRange): void {
 		this.selectedRange.set(range);
+		this.hoveredCandleIndex.set(null);
+	}
+
+	onChartPointerMove(event: PointerEvent): void {
+		const candles = this.displayedCandles;
+		const plot = event.currentTarget as SVGSVGElement;
+		const bounds = plot.getBoundingClientRect();
+		if (candles.length === 0 || bounds.width === 0) {
+			return;
+		}
+
+		const ratio = Math.min(1, Math.max(0, (event.clientX - bounds.left) / bounds.width));
+		this.hoveredCandleIndex.set(Math.round(ratio * (candles.length - 1)));
+	}
+
+	clearChartHover(): void {
+		this.hoveredCandleIndex.set(null);
 	}
 
 	private buildLinePoints(): string {
