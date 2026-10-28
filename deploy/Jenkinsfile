@@ -11,7 +11,7 @@ pipeline {
 	stages {
 		stage('Package Lambda') {
 			steps {
-				sh 'bash mock-deploy/testing/build-lambda.sh'
+				sh 'bash deploy/scripts/build-lambda.sh'
 			}
 		}
 
