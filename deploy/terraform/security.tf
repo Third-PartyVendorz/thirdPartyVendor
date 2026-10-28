@@ -1,0 +1,130 @@
+#resource "aws_security_group" "alb_security" {
+#    name        = "tpv-load-balancer-security"
+#    description = "Controls access to the ALB"
+#    vpc_id      = aws_vpc.vpc.id
+
+#    ingress {
+#        protocol    = "tcp"
+#        from_port   = var.spring_port
+#        to_port     = var.spring_port
+#        cidr_blocks = ["0.0.0.0/0"]
+#    }
+
+    #Will also need HTTPS ingress here to address cokie issue
+
+#    egress {
+#        protocol    = "-1"
+#        from_port   = 0
+#        to_port     = 0
+#        cidr_blocks = ["0.0.0.0/0"]
+#    }
+#}
+
+#Will also need another security group for the flask api
+resource "aws_security_group" "ecs_security_spring" {
+    name        = "ecs-security-spring"
+    description = "Controls access to the ecs, ensure we only get traffic from alb"
+    vpc_id      = aws_vpc.vpc.id
+
+    ingress {
+        protocol    = "tcp"
+        from_port   = var.spring_port
+        to_port     = var.spring_port
+        security_groups = [aws_security_group.alb_security.id]
+    }
+
+    egress {
+        protocol    = "-1"
+        from_port   = 0
+        to_port     = 0
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+}
+
+
+resource "aws_security_group" "ecs_security_flask" {
+    name        = "ecs-security-flask"
+    description = "Controls access to the ecs, ensure we only get traffic from alb"
+    vpc_id      = aws_vpc.vpc.id
+
+    ingress {
+        protocol    = "tcp"
+        from_port   = var.flask_port
+        to_port     = var.flask_port
+        security_groups = [aws_security_group.alb_security.id]
+    }
+
+    egress {
+        protocol    = "-1"
+        from_port   = 0
+        to_port     = 0
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+}
+
+
+
+resource "aws_security_group" "lambda_security" {
+    name = "lambda-security"
+    vpc_id = aws_vpc.vpc.id    
+
+    egress {
+        protocol    = "-1"
+        from_port   = 0
+        to_port     = 0
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+}
+
+
+
+
+
+resource "aws_security_group" "rds_security" {
+    name        = "rds-security"
+    description = "Controls access to the rds instance, ensure we only get traffic from alb"
+    vpc_id      = aws_vpc.vpc.id
+
+    ingress {
+        protocol    = "tcp"
+        from_port   = var.primary_db_port
+        to_port     = var.primary_db_port
+        #security_groups = [aws_security_group.alb_security.id]
+        #Will also pass alb here when I ensure I can init db
+        security_groups = [aws_security_group.lambda_security.id, aws_security_group.ecs_security_spring.id, aws_security_group.ecs_security_flask.id]
+    }
+
+    egress {
+        protocol    = "-1"
+        from_port   = 0
+        to_port     = 0
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+}
+
+
+
+
+data "aws_ec2_managed_prefix_list" "cloudfront_origin_facing" {
+  name = "com.amazonaws.global.cloudfront.origin-facing"
+}
+
+resource "aws_security_group" "alb_security" {
+  name        = "tpv-load-balancer-security"
+  description = "Allow CloudFront to reach the ALB"
+  vpc_id      = aws_vpc.vpc.id
+
+  ingress {
+    protocol        = "tcp"
+    from_port       = var.spring_port
+    to_port         = var.spring_port
+    prefix_list_ids = [data.aws_ec2_managed_prefix_list.cloudfront_origin_facing.id]
+  }
+
+  egress {
+    protocol    = "-1"
+    from_port   = 0
+    to_port     = 0
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
