@@ -40,7 +40,7 @@ export class TrendingSymbolsPanel implements OnInit {
 		const from = new Date(to.getTime() - 24 * 60 * 60 * 1000);
 
 		this.loading.set(true);
-		this.trendingService.fetchTrendingTickers(from, to, 5)
+		this.trendingService.fetchTrendingTickers(from, to, 3)
 			.pipe(
 				switchMap((rows) => this.withQuotes(rows)),
 				takeUntilDestroyed(this.destroyRef),
