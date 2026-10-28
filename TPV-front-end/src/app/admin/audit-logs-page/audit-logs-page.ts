@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy } from '@angular/core';
+import { afterNextRender, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, inject, Injector, OnDestroy, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { finalize, Observable, Subscription } from 'rxjs';
 import { AuditClientResponse, AuditEventResponse, AuditEventType, AuditFilters, AuditService } from '../../services/audit.service';
@@ -14,6 +14,8 @@ import { MessageService } from '../../services/message.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AuditLogsPage implements OnDestroy {
+  private readonly injector = inject(Injector);
+  private readonly detailPanel = viewChild<ElementRef<HTMLElement>>('detailPanel');
   searchMode: 'client' | 'id' = 'client';
   clientSearch = '';
   submittedClientSearch = '';
@@ -23,7 +25,9 @@ export class AuditLogsPage implements OnDestroy {
   clientTotal = 0;
   eventPage = 0;
   eventTotal = 0;
+  hasAppliedFilters = false;
   readonly pageSize = 20;
+  readonly activityPageSize = 5;
   filters: AuditFilters = { type: '', from: '', to: '', instrument: '' };
   private appliedFilters: AuditFilters = { ...this.filters };
   private activeRequest?: Subscription;
@@ -48,7 +52,7 @@ export class AuditLogsPage implements OnDestroy {
   }
 
   get hasSearch(): boolean {
-    return this.selectedClient !== null || this.submittedSearchTerm.trim().length > 0;
+    return this.searchMode === 'client' ? this.hasAppliedFilters : this.submittedSearchTerm.trim().length > 0;
   }
 
   setMode(mode: 'client' | 'id'): void {
@@ -66,6 +70,8 @@ export class AuditLogsPage implements OnDestroy {
     this.selectedEvent = null;
     this.events = [];
     this.eventTotal = 0;
+    this.eventPage = 0;
+    this.hasAppliedFilters = false;
     this.clients = [];
     this.clientTotal = 0;
     this.submittedClientSearch = query;
@@ -78,21 +84,33 @@ export class AuditLogsPage implements OnDestroy {
 
   selectClient(client: AuditClientResponse): void {
     this.selectedClient = client;
+    this.clearActivityFilters();
+  }
+
+  clearActivityFilters(): void {
+    this.activeRequest?.unsubscribe();
     this.filters = { type: '', from: '', to: '', instrument: '' };
-    this.applyFilters();
+    this.appliedFilters = { ...this.filters };
+    this.hasAppliedFilters = false;
+    this.selectedEvent = null;
+    this.events = [];
+    this.eventTotal = 0;
+    this.eventPage = 0;
   }
 
   applyFilters(): void {
+    if (!this.selectedClient) return;
     if (this.filters.from && this.filters.to && this.filters.from > this.filters.to) {
       this.messageService.setErrorMessage('Start date must not be after end date.');
       return;
     }
     this.appliedFilters = { ...this.filters, instrument: this.filters.instrument.trim() };
+    this.hasAppliedFilters = true;
     this.loadActivity();
   }
 
   loadActivity(page = 0): void {
-    if (!this.selectedClient) return;
+    if (!this.selectedClient || !this.hasAppliedFilters) return;
     this.selectedEvent = null;
     this.events = [];
     this.eventTotal = 0;
@@ -144,6 +162,12 @@ export class AuditLogsPage implements OnDestroy {
 
   selectEvent(event: AuditEventResponse): void {
     this.selectedEvent = event;
+    afterNextRender(() => {
+      this.detailPanel()?.nativeElement.scrollIntoView({
+        behavior: window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+        block: 'start',
+      });
+    }, { injector: this.injector });
   }
 
   clearFilters(): void {
@@ -156,6 +180,7 @@ export class AuditLogsPage implements OnDestroy {
     this.clientTotal = 0;
     this.eventPage = 0;
     this.eventTotal = 0;
+    this.hasAppliedFilters = false;
     this.filters = { type: '', from: '', to: '', instrument: '' };
     this.searchInput = '';
     this.selectedType = 'Trade';

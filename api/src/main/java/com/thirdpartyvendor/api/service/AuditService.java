@@ -29,6 +29,7 @@ import com.thirdpartyvendor.api.util.AuthorizationUtil;
 
 @Service
 public class AuditService {
+    private static final int ACTIVITY_PAGE_SIZE = 5;
     private final AppUserRepository userRepository;
     private final OrderRepository orderRepository;
     private final TradeRepository tradeRepository;
@@ -106,8 +107,9 @@ public class AuditService {
             .sorted(Comparator.comparing(AuditEventResponse::timestamp).reversed()
                 .thenComparing(AuditEventResponse::type).thenComparing(AuditEventResponse::id))
             .toList();
-        List<AuditEventResponse> items = matches.stream().skip((long) page * 20).limit(20).toList();
-        return new AuditPageResponse<>(items, matches.size(), page, 20);
+        List<AuditEventResponse> items = matches.stream()
+            .skip((long) page * ACTIVITY_PAGE_SIZE).limit(ACTIVITY_PAGE_SIZE).toList();
+        return new AuditPageResponse<>(items, matches.size(), page, ACTIVITY_PAGE_SIZE);
     }
 
     private void validatePage(int page) {

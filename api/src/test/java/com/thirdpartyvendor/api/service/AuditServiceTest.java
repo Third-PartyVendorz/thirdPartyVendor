@@ -108,13 +108,19 @@ class AuditServiceTest {
         exchange.setFromCurrency("USD");
         exchange.setToCurrency("EUR");
         exchange.setExchangeTimestamp(LocalDateTime.of(2026, 10, 28, 12, 0));
-        when(forexLogRepository.findByUserId(1L)).thenReturn(java.util.Collections.nCopies(21, exchange));
+        when(forexLogRepository.findByUserId(1L)).thenReturn(java.util.Collections.nCopies(6, exchange));
+
+        var firstPage = auditService.searchEvents(1L, "forex", null, null, "usd/eur", 0, admin);
+        assertEquals(5, firstPage.items().size());
+        assertEquals(5, firstPage.pageSize());
 
         var result = auditService.searchEvents(1L, "forex", null, null, "usd/eur", 1, admin);
 
-        assertEquals(21, result.total());
+        assertEquals(6, result.total());
         assertEquals(1, result.items().size());
+        assertEquals(5, result.pageSize());
         assertEquals("Forex exchange", result.items().get(0).type());
+        assertTrue(auditService.searchEvents(1L, "forex", null, null, "usd/eur", 2, admin).items().isEmpty());
         verifyNoInteractions(orderRepository, tradeRepository);
     }
 

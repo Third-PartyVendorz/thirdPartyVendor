@@ -1,7 +1,7 @@
 <main class="audit-page">
-	<header class="audit-hero">
+	<header class="audit-hero audit-panel">
 		<div>
-			<p class="eyebrow">Administration / Dispute lookup</p>
+			<p class="eyebrow">Administration</p>
 			<h1>Transaction audit</h1>
 		</div>
 		<div class="record-count">
@@ -10,9 +10,10 @@
 		</div>
 	</header>
 
+	<section class="audit-panel search-panel" aria-label="Audit search">
 	<fieldset class="search-mode" aria-label="Search mode">
-		<label><input type="radio" name="searchMode" [checked]="searchMode === 'client'" (change)="setMode('client')" />Client activity</label>
-		<label><input type="radio" name="searchMode" [checked]="searchMode === 'id'" (change)="setMode('id')" />Transaction ID</label>
+		<label><input type="radio" name="searchMode" [checked]="searchMode === 'client'" (change)="setMode('client')" /><span>Client activity</span></label>
+		<label><input type="radio" name="searchMode" [checked]="searchMode === 'id'" (change)="setMode('id')" /><span>Transaction ID</span></label>
 	</fieldset>
 
 	<form *ngIf="searchMode === 'client'" class="search-controls" aria-label="Client search" (ngSubmit)="searchClients()">
@@ -23,7 +24,23 @@
 		<button type="button" class="clear-button" (click)="clearFilters()">Clear</button>
 	</form>
 
-	<section *ngIf="searchMode === 'client' && submittedClientSearch" aria-label="Matching clients">
+	<form *ngIf="searchMode === 'id'" class="search-controls" aria-label="Transaction lookup" (ngSubmit)="search()">
+		<label class="type-field">
+			Event type
+			<select name="selectedType" [(ngModel)]="selectedType">
+				<option *ngFor="let type of eventTypes" [ngValue]="type">{{ type }}</option>
+			</select>
+		</label>
+		<label class="search-field">
+			Search by ID
+			<input type="search" name="searchInput" [(ngModel)]="searchInput" placeholder="Enter transaction ID" />
+		</label>
+		<button type="submit" class="search-button" [disabled]="isLoading">Search</button>
+		<button type="button" class="clear-button" (click)="clearFilters()">Clear</button>
+	</form>
+	</section>
+
+	<section class="audit-panel clients-panel" *ngIf="searchMode === 'client' && submittedClientSearch" aria-label="Matching clients">
 		<div class="panel-heading"><h2>Clients</h2><span>{{ clientTotal }} matches</span></div>
 		<div class="table-wrap" *ngIf="clients.length">
 			<table>
@@ -42,33 +59,9 @@
 		</nav>
 	</section>
 
-	<form *ngIf="searchMode === 'id'" class="search-controls" aria-label="Transaction lookup" (ngSubmit)="search()">
-		<label class="type-field">
-			Event type
-			<select name="selectedType" [(ngModel)]="selectedType">
-				<option *ngFor="let type of eventTypes" [ngValue]="type">{{ type }}</option>
-			</select>
-		</label>
-		<label class="search-field">
-			Search by ID
-			<input type="search" name="searchInput" [(ngModel)]="searchInput" placeholder="Enter transaction ID" />
-		</label>
-		<button type="submit" class="search-button" [disabled]="isLoading">Search</button>
-		<button type="button" class="clear-button" (click)="clearFilters()">Clear</button>
-	</form>
-
-	<form *ngIf="searchMode === 'client' && selectedClient" class="activity-filters" aria-label="Activity filters" (ngSubmit)="applyFilters()">
-		<div class="client-heading"><h2>{{ selectedClient.name }}</h2><span>{{ selectedClient.email }}</span></div>
-		<label>Event type<select name="activityType" [(ngModel)]="filters.type"><option value="">All types</option><option *ngFor="let type of eventTypes" [ngValue]="type">{{ type }}</option></select></label>
-		<label>From<input type="date" name="from" [(ngModel)]="filters.from" [max]="filters.to" /></label>
-		<label>To<input type="date" name="to" [(ngModel)]="filters.to" [min]="filters.from" /></label>
-		<label>Asset / currency pair<input type="search" name="instrument" [(ngModel)]="filters.instrument" placeholder="AAPL or USD/EUR" /></label>
-		<button type="submit" class="search-button" [disabled]="isLoading">Apply filters</button>
-	</form>
-
 	<p *ngIf="isLoading" class="loading-state" role="status">Loading...</p>
 
-	<section class="results-panel" *ngIf="selectedClient || searchMode === 'id'" [attr.aria-busy]="isLoading">
+	<section class="audit-panel results-panel" *ngIf="selectedClient || searchMode === 'id'" [attr.aria-busy]="isLoading">
 		<div class="panel-heading">
 			<div>
 				<p class="eyebrow">Transaction records</p>
@@ -76,6 +69,18 @@
 			</div>
 			<span class="read-only-label">Read only</span>
 		</div>
+
+		<form *ngIf="searchMode === 'client' && selectedClient" class="activity-filters" aria-label="Activity filters" (ngSubmit)="applyFilters()">
+			<div class="client-heading"><h3>{{ selectedClient.name }}</h3><span>{{ selectedClient.email }}</span></div>
+			<label>Event type<select name="activityType" [(ngModel)]="filters.type"><option value="">All types</option><option *ngFor="let type of eventTypes" [ngValue]="type">{{ type }}</option></select></label>
+			<label>From<input type="date" name="from" [(ngModel)]="filters.from" [max]="filters.to" /></label>
+			<label>To<input type="date" name="to" [(ngModel)]="filters.to" [min]="filters.from" /></label>
+			<label>Asset / currency pair<input type="search" name="instrument" [(ngModel)]="filters.instrument" placeholder="AAPL or USD/EUR" /></label>
+			<div class="filter-actions">
+				<button type="submit" class="search-button" [disabled]="isLoading">Apply filters</button>
+				<button type="button" class="clear-button" [disabled]="isLoading" (click)="clearActivityFilters()">Clear filters</button>
+			</div>
+		</form>
 
 		<div class="table-wrap" *ngIf="filteredEvents.length; else emptyResults">
 			<table>
@@ -98,16 +103,16 @@
 		</div>
 		<ng-template #emptyResults>
 			<p class="empty-state" *ngIf="hasSearch && !isLoading; else searchPrompt">{{ searchMode === 'client' ? 'No activity matches these filters.' : 'No ' + submittedType.toLowerCase() + ' events match this ID.' }}</p>
-			<ng-template #searchPrompt><p class="empty-state" *ngIf="!isLoading">No transaction selected.</p></ng-template>
+			<ng-template #searchPrompt><p class="empty-state" *ngIf="!isLoading">{{ searchMode === 'client' ? 'No filters applied.' : 'No transaction selected.' }}</p></ng-template>
 		</ng-template>
-		<nav class="pagination" *ngIf="searchMode === 'client' && eventTotal > pageSize" aria-label="Activity pages">
+		<nav class="pagination" *ngIf="searchMode === 'client' && eventTotal > activityPageSize" aria-label="Activity pages">
 			<button type="button" class="clear-button" [disabled]="isLoading || eventPage === 0" (click)="loadActivity(eventPage - 1)">Previous</button>
 			<span>Page {{ eventPage + 1 }}</span>
-			<button type="button" class="clear-button" [disabled]="isLoading || (eventPage + 1) * pageSize >= eventTotal" (click)="loadActivity(eventPage + 1)">Next</button>
+			<button type="button" class="clear-button" [disabled]="isLoading || (eventPage + 1) * activityPageSize >= eventTotal" (click)="loadActivity(eventPage + 1)">Next</button>
 		</nav>
 	</section>
 
-	<aside class="detail-panel" *ngIf="selectedEvent as event" aria-label="Selected audit event">
+	<aside #detailPanel class="audit-panel detail-panel" *ngIf="selectedEvent as event" aria-label="Selected audit event">
 		<div class="panel-heading">
 			<div><p class="eyebrow">Dispute evidence / {{ event.id }}</p><h2>{{ event.action }}</h2></div>
 			<button type="button" class="close-button" (click)="selectedEvent = null" aria-label="Close event details">×</button>
