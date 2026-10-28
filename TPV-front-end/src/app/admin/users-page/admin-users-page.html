@@ -31,8 +31,8 @@
           <tr *ngFor="let user of filteredUsers">
             <td><strong>{{ user.firstName }} {{ user.lastName }}</strong><small>#{{ user.userId }}</small></td>
             <td>{{ user.email }}</td>
-            <td><span class="status" [class.status--frozen]="user.frozen">{{ user.frozen ? 'Frozen' : 'Active' }}</span></td>
-            <td><button type="button" class="freeze-action" (click)="toggleFreeze(user)" [disabled]="updatingUserId === user.userId">{{ user.frozen ? 'Unfreeze' : 'Freeze account' }}</button></td>
+            <td><span class="status" [class.status--deleted]="!user.active" [class.status--frozen]="user.active && user.frozen">{{ !user.active ? 'Deleted' : user.frozen ? 'Frozen' : 'Active' }}</span></td>
+            <td><button type="button" class="freeze-action" (click)="toggleFreeze(user)" [disabled]="!user.active || updatingUserId === user.userId">{{ user.frozen ? 'Unfreeze' : 'Freeze account' }}</button></td>
           </tr>
         </tbody>
       </table>

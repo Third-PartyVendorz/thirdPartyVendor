@@ -22,6 +22,7 @@ td:first-child { display: grid; gap: .15rem; }
 td small { color: #94a3b8; }
 .status { display: inline-flex; padding: .35rem .7rem; border-radius: 999px; color: #166534; background: #dcfce7; font-size: .85rem; font-weight: 700; }
 .status--frozen { color: #9a3412; background: #ffedd5; }
+.status--deleted { color: #475569; background: #e2e8f0; }
 .freeze-action { border: 0; color: #0b5ca5; background: rgba(11,92,165,.08); }
 .freeze-action:hover:not(:disabled) { background: rgba(11,92,165,.16); }
 button:disabled { cursor: wait; opacity: .6; }

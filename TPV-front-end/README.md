@@ -28,6 +28,14 @@ If you need a local API key or different local endpoints, update only your own c
 
 Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
 
+## Admin account statuses
+
+The admin Manage Users page shows soft-deleted accounts as **Deleted** when
+`active` is `false`, even if the account was previously frozen. Deleted accounts
+remain in the directory, but their freeze/unfreeze controls are disabled.
+Active accounts continue to show **Active** or **Frozen**. Use **Refresh** to
+fetch the latest account statuses after a user deletes their account.
+
 ## Code scaffolding
 
 Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
