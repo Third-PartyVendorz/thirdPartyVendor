@@ -18,7 +18,7 @@ pipeline {
 		stage('Provision ECR') {
 			steps {
 				withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) {
-					dir('mock-deploy/tf') {
+					dir('deploy/terraform') {
 						sh '''
 							terraform init
 							terraform apply -auto-approve -target=aws_ecr_repository.spring_repository -target=aws_ecr_repository.flask_repository
