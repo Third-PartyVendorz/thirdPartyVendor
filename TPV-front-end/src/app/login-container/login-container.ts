@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { AuthService } from '../services/auth.service';
 import { RegisterRequest } from '../dto/RegisterRequest';
 import { RegisterResponse } from '../dto/RegisterResponse';
@@ -25,14 +25,14 @@ export class LoginContainer {
     private router: Router,
   ) {}
 
-  activeTab: 'login' | 'register' = 'login';
+  readonly activeTab = signal<'login' | 'register'>('login');
 
   showLogin() {
-    this.activeTab = 'login';
+    this.activeTab.set('login');
   }
 
   showRegister() {
-    this.activeTab = 'register';
+    this.activeTab.set('register');
   }
 
   onRegister(event: Event) {
