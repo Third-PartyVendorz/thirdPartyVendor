@@ -1,0 +1,7 @@
+Flask
+Flask-Cors
+Flask-JWT-Extended
+numpy
+pandas
+psycopg2-binary==2.9.10
+python-dotenv
