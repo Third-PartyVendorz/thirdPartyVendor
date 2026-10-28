@@ -480,6 +480,65 @@
 	gap: 1rem;
 }
 
+.chart-visual {
+	position: relative;
+	min-width: 0;
+}
+
+.chart-plot > svg {
+	display: block;
+	width: 100%;
+	border-radius: 4px;
+	cursor: crosshair;
+	touch-action: pan-y;
+}
+
+.chart-hover-guide {
+	stroke: rgba(3, 61, 108, 0.38);
+	stroke-dasharray: 1.2 1.2;
+	vector-effect: non-scaling-stroke;
+}
+
+.chart-hover-dot {
+	position: absolute;
+	width: 0.65rem;
+	height: 0.65rem;
+	border: 2px solid #fff;
+	border-radius: 50%;
+	background: #033d6c;
+	box-shadow: 0 0 0 1px rgba(3, 61, 108, 0.24);
+	transform: translate(-50%, -50%);
+	pointer-events: none;
+}
+
+.chart-hover-tooltip {
+	position: absolute;
+	top: clamp(1.5rem, var(--chart-hover-y), calc(100% - 1.5rem));
+	left: var(--chart-hover-x);
+	z-index: 1;
+	display: grid;
+	gap: 0.15rem;
+	padding: 0.5rem 0.65rem;
+	border: 1px solid rgba(3, 61, 108, 0.14);
+	border-radius: 5px;
+	background: #fff;
+	box-shadow: 0 4px 14px rgba(7, 37, 62, 0.14);
+	color: #123f74;
+	font-size: 0.78rem;
+	white-space: nowrap;
+	transform: translate(0.65rem, -50%);
+	pointer-events: none;
+}
+
+.chart-hover-tooltip--left {
+	transform: translate(calc(-100% - 0.65rem), -50%);
+}
+
+.chart-hover-tooltip span {
+	color: #64748b;
+	font-size: 0.7rem;
+}
+
 .chart-placeholder {
 	margin: 0;
 	padding: 1.1rem 1.15rem;
