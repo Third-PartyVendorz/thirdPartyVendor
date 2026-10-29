@@ -39,12 +39,19 @@ export class LoginContainer {
     event.preventDefault();
     const form = event.target as HTMLFormElement;
     const formData = new FormData(form);
+    const password = String(formData.get('password') ?? '');
+    const confirmPassword = String(formData.get('confirmPassword') ?? '');
+
+    if (password !== confirmPassword) {
+      this.messageService.setErrorMessage('Passwords do not match.');
+      return;
+    }
 
     const request: RegisterRequest = {
       firstName: String(formData.get('firstName') ?? ''),
       lastName: String(formData.get('lastName') ?? ''),
       email: String(formData.get('email') ?? ''),
-      password: String(formData.get('password') ?? ''),
+      password,
       phoneNumber: String(formData.get('phoneNumber') ?? ''),
       dateOfBirth: new Date(String(formData.get('dateOfBirth') ?? '')),
     };

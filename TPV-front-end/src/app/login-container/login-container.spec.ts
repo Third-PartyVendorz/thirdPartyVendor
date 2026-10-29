@@ -13,16 +13,18 @@ describe('LoginContainer', () => {
   let fixture: ComponentFixture<LoginContainer>;
   let registerResult: Subject<RegisterResponse>;
   let register: ReturnType<typeof vi.fn>;
+  let setErrorMessage: ReturnType<typeof vi.fn>;
 
   beforeEach(async () => {
     registerResult = new Subject<RegisterResponse>();
     register = vi.fn(() => registerResult.asObservable());
+    setErrorMessage = vi.fn();
 
     await TestBed.configureTestingModule({
       imports: [LoginContainer],
       providers: [
         { provide: AuthService, useValue: { register, authenticate: vi.fn() } },
-        { provide: MessageService, useValue: { setSuccessMessage: vi.fn(), setErrorMessage: vi.fn() } },
+        { provide: MessageService, useValue: { setSuccessMessage: vi.fn(), setErrorMessage } },
         { provide: UserContextService, useValue: { setUserContext: vi.fn() } },
         { provide: Router, useValue: { navigateByUrl: vi.fn() } },
       ],
@@ -53,5 +55,29 @@ describe('LoginContainer', () => {
 
     expect(register).toHaveBeenCalledTimes(1);
     expect(component.activeTab()).toBe('login');
+  });
+
+  it('shows a confirmation password field on the registration form', () => {
+    component.showRegister();
+    fixture.detectChanges();
+
+    const confirmationInput = fixture.nativeElement.querySelector('#confirm-password') as HTMLInputElement;
+
+    expect(confirmationInput).toBeTruthy();
+    expect(confirmationInput.required).toBe(true);
+  });
+
+  it('does not submit registration when passwords do not match', () => {
+    component.showRegister();
+    fixture.detectChanges();
+
+    const form = fixture.nativeElement.querySelector('form') as HTMLFormElement;
+    (form.elements.namedItem('password') as HTMLInputElement).value = 'first-password';
+    (form.elements.namedItem('confirmPassword') as HTMLInputElement).value = 'different-password';
+
+    form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+
+    expect(register).not.toHaveBeenCalled();
+    expect(setErrorMessage).toHaveBeenCalledWith('Passwords do not match.');
   });
 });

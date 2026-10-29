@@ -66,6 +66,37 @@ describe('HistoryPage', () => {
     expect(rows[1].textContent).toContain('¥2,500');
   });
 
+  it('shows only the latest five orders without truncating full history or totals', () => {
+    const history = Array.from({ length: 8 }, (_, index) => ({
+      ...orders[0],
+      orderId: index + 1,
+      createdAt: `2026-10-${String(index + 1).padStart(2, '0')}T10:00:00`,
+      status: index === 7 ? OrderStatus.PENDING : OrderStatus.FILLED,
+    }));
+    TestBed.inject(OrderService).fetchOrders = () => of(history);
+
+    component.loadOrders();
+    fixture.detectChanges();
+
+    expect(component.recentOrderEntries.map(entry => entry.orderId)).toEqual([8, 7, 6, 5, 4]);
+    expect(fixture.nativeElement.querySelectorAll('.history-table tbody tr').length).toBe(5);
+    expect(component.historyEntries.length).toBe(8);
+    expect(component.summaryCards[0].value).toBe('8');
+
+    component.selectFilter('Filled');
+    fixture.detectChanges();
+
+    expect(component.recentOrderEntries.map(entry => entry.orderId)).toEqual([7, 6, 5, 4, 3]);
+    expect(component.historyEntries.length).toBe(7);
+    expect(fixture.nativeElement.querySelectorAll('.history-table tbody tr').length).toBe(5);
+
+    component.selectFilter('Pending');
+    fixture.detectChanges();
+
+    expect(component.recentOrderEntries.map(entry => entry.orderId)).toEqual([8]);
+    expect(fixture.nativeElement.querySelectorAll('.history-table tbody tr').length).toBe(1);
+  });
+
   it('formats cash transactions using their currency code', () => {
     expect(
       component.formatCashTransactionAmount({
