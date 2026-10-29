@@ -1,36 +1,36 @@
 <section class="auth-card">
     <div class="auth-card__header">
-        <h2 *ngIf="activeTab === 'register'">Register</h2>
-        <h2 *ngIf="activeTab === 'login'">Login</h2>
-        <p *ngIf="activeTab === 'register'">Set up access to manage assets and market activity.</p>
-        <p *ngIf="activeTab === 'login'">Use your credentials to continue.</p>
+        <h2 *ngIf="activeTab() === 'register'">Register</h2>
+        <h2 *ngIf="activeTab() === 'login'">Login</h2>
+        <p *ngIf="activeTab() === 'register'">Set up access to manage assets and market activity.</p>
+        <p *ngIf="activeTab() === 'login'">Use your credentials to continue.</p>
     </div>
 
     <div class="switch-card" role="tablist" aria-label="Authentication mode">
         <div class="tabs">
             <button
                 type="button"
-                [class.active]="activeTab === 'login'"
+                [class.active]="activeTab() === 'login'"
                 (click)="showLogin()"
                 role="tab"
-                [attr.aria-selected]="activeTab === 'login'"
+                [attr.aria-selected]="activeTab() === 'login'"
             >
                 Login
             </button>
 
             <button
                 type="button"
-                [class.active]="activeTab === 'register'"
+                [class.active]="activeTab() === 'register'"
                 (click)="showRegister()"
                 role="tab"
-                [attr.aria-selected]="activeTab === 'register'"
+                [attr.aria-selected]="activeTab() === 'register'"
             >
                 Register
             </button>
         </div>
     </div>
 
-    <form class="auth-form" *ngIf="activeTab === 'login'" (submit)="onLogin($event)">
+    <form class="auth-form" *ngIf="activeTab() === 'login'" (submit)="onLogin($event)">
         <div class="form-group">
             <label for="email">Email</label>
             <input type="email" id="email" name="email" required autocomplete="email" placeholder="you@example.com">
@@ -43,7 +43,7 @@
         <button type="submit" class="auth-button">Login</button>
     </form>
 
-    <form class="auth-form" *ngIf="activeTab === 'register'" (submit)="onRegister($event)">
+    <form class="auth-form" *ngIf="activeTab() === 'register'" (submit)="onRegister($event)">
         <div class="form-grid">
             <div class="form-group">
                 <label for="first-name">First Name</label>
@@ -61,6 +61,10 @@
         <div class="form-group">
             <label for="password">Password</label>
             <input type="password" id="password" name="password" required autocomplete="new-password" placeholder="Create a password">
+        </div>
+        <div class="form-group">
+            <label for="confirm-password">Confirm Password</label>
+            <input type="password" id="confirm-password" name="confirmPassword" required autocomplete="new-password" placeholder="Confirm your password">
         </div>
         <div class="form-grid">
             <div class="form-group">

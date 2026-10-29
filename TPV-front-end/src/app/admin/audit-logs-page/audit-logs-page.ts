@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
+import { afterNextRender, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, inject, Injector, OnDestroy, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { finalize } from 'rxjs';
-import { AuditEventResponse, AuditEventType, AuditService } from '../../services/audit.service';
+import { finalize, Observable, Subscription } from 'rxjs';
+import { AuditClientResponse, AuditEventResponse, AuditEventType, AuditFilters, AuditService } from '../../services/audit.service';
 import { MessageService } from '../../services/message.service';
 
 @Component({
@@ -13,7 +13,24 @@ import { MessageService } from '../../services/message.service';
   styleUrl: './audit-logs-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AuditLogsPage {
+export class AuditLogsPage implements OnDestroy {
+  private readonly injector = inject(Injector);
+  private readonly detailPanel = viewChild<ElementRef<HTMLElement>>('detailPanel');
+  searchMode: 'client' | 'id' = 'client';
+  clientSearch = '';
+  submittedClientSearch = '';
+  clients: AuditClientResponse[] = [];
+  selectedClient: AuditClientResponse | null = null;
+  clientPage = 0;
+  clientTotal = 0;
+  eventPage = 0;
+  eventTotal = 0;
+  hasAppliedFilters = false;
+  readonly pageSize = 20;
+  readonly activityPageSize = 5;
+  filters: AuditFilters = { type: '', from: '', to: '', instrument: '' };
+  private appliedFilters: AuditFilters = { ...this.filters };
+  private activeRequest?: Subscription;
   searchInput = '';
   selectedType: AuditEventType = 'Trade';
   submittedSearchTerm = '';
@@ -35,7 +52,73 @@ export class AuditLogsPage {
   }
 
   get hasSearch(): boolean {
-    return this.submittedSearchTerm.trim().length > 0;
+    return this.searchMode === 'client' ? this.hasAppliedFilters : this.submittedSearchTerm.trim().length > 0;
+  }
+
+  setMode(mode: 'client' | 'id'): void {
+    this.clearFilters();
+    this.searchMode = mode;
+  }
+
+  searchClients(page = 0): void {
+    const query = page === 0 ? this.clientSearch.trim() : this.submittedClientSearch;
+    if (!query) {
+      this.messageService.setErrorMessage('Enter a client name or email.');
+      return;
+    }
+    this.selectedClient = null;
+    this.selectedEvent = null;
+    this.events = [];
+    this.eventTotal = 0;
+    this.eventPage = 0;
+    this.hasAppliedFilters = false;
+    this.clients = [];
+    this.clientTotal = 0;
+    this.submittedClientSearch = query;
+    this.request(this.auditService.searchClients(query, page), (result) => {
+      this.clients = result.items;
+      this.clientTotal = result.total;
+      this.clientPage = result.page;
+    });
+  }
+
+  selectClient(client: AuditClientResponse): void {
+    this.selectedClient = client;
+    this.clearActivityFilters();
+  }
+
+  clearActivityFilters(): void {
+    this.activeRequest?.unsubscribe();
+    this.filters = { type: '', from: '', to: '', instrument: '' };
+    this.appliedFilters = { ...this.filters };
+    this.hasAppliedFilters = false;
+    this.selectedEvent = null;
+    this.events = [];
+    this.eventTotal = 0;
+    this.eventPage = 0;
+  }
+
+  applyFilters(): void {
+    if (!this.selectedClient) return;
+    if (this.filters.from && this.filters.to && this.filters.from > this.filters.to) {
+      this.messageService.setErrorMessage('Start date must not be after end date.');
+      return;
+    }
+    this.appliedFilters = { ...this.filters, instrument: this.filters.instrument.trim() };
+    this.hasAppliedFilters = true;
+    this.loadActivity();
+  }
+
+  loadActivity(page = 0): void {
+    if (!this.selectedClient || !this.hasAppliedFilters) return;
+    this.selectedEvent = null;
+    this.events = [];
+    this.eventTotal = 0;
+    this.request(this.auditService.searchEvents(this.selectedClient.id, this.appliedFilters, page), (result) => {
+      this.events = result.items;
+      this.eventTotal = result.total;
+      this.eventPage = result.page;
+    });
   }
 
   search(): void {
@@ -49,21 +132,29 @@ export class AuditLogsPage {
     this.submittedType = this.selectedType;
     this.selectedEvent = null;
     this.events = [];
-    this.isLoading = true;
+    this.eventTotal = 0;
+    this.request(this.auditService.findEvent(this.selectedType, id), (event) => {
+      this.events = [event];
+      this.eventTotal = 1;
+      this.selectedEvent = event;
+    });
+  }
 
-    this.auditService.findEvent(this.selectedType, id)
+  private request<T>(source: Observable<T>, onSuccess: (value: T) => void): void {
+    this.activeRequest?.unsubscribe();
+    this.isLoading = true;
+    this.activeRequest = source
       .pipe(finalize(() => {
         this.isLoading = false;
         this.changeDetectorRef.markForCheck();
       }))
       .subscribe({
-        next: (event) => {
-          this.events = [event];
-          this.selectedEvent = event;
+        next: (result) => {
+          onSuccess(result);
           this.changeDetectorRef.markForCheck();
         },
         error: (error) => {
-          this.messageService.setErrorMessage(error?.error?.message ?? 'Unable to find this audit record.');
+          this.messageService.setErrorMessage(error?.error?.message ?? 'Unable to load audit records.');
           this.changeDetectorRef.markForCheck();
         },
       });
@@ -71,15 +162,36 @@ export class AuditLogsPage {
 
   selectEvent(event: AuditEventResponse): void {
     this.selectedEvent = event;
+    afterNextRender(() => {
+      this.detailPanel()?.nativeElement.scrollIntoView({
+        behavior: window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+        block: 'start',
+      });
+    }, { injector: this.injector });
   }
 
   clearFilters(): void {
+    this.activeRequest?.unsubscribe();
+    this.clientSearch = '';
+    this.submittedClientSearch = '';
+    this.clients = [];
+    this.selectedClient = null;
+    this.clientPage = 0;
+    this.clientTotal = 0;
+    this.eventPage = 0;
+    this.eventTotal = 0;
+    this.hasAppliedFilters = false;
+    this.filters = { type: '', from: '', to: '', instrument: '' };
     this.searchInput = '';
     this.selectedType = 'Trade';
     this.submittedSearchTerm = '';
     this.submittedType = '';
     this.selectedEvent = null;
     this.events = [];
+  }
+
+  ngOnDestroy(): void {
+    this.activeRequest?.unsubscribe();
   }
 
   formatTimestamp(timestamp: string): string {

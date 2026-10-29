@@ -110,6 +110,10 @@ export class HistoryPage implements OnInit {
     return this.allHistoryEntries.filter((entry) => entry.status === this.selectedFilter);
   }
 
+  get recentOrderEntries(): OrderHistoryEntry[] {
+    return this.historyEntries.slice(0, 5);
+  }
+
   get activityFeed() {
     return this.allHistoryEntries.slice(0, 3).map((entry) => ({
       title: `Order ${entry.status.toLowerCase()}`,

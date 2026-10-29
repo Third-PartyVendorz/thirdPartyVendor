@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { AuthService } from '../services/auth.service';
 import { RegisterRequest } from '../dto/RegisterRequest';
 import { RegisterResponse } from '../dto/RegisterResponse';
@@ -25,26 +25,33 @@ export class LoginContainer {
     private router: Router,
   ) {}
 
-  activeTab: 'login' | 'register' = 'login';
+  readonly activeTab = signal<'login' | 'register'>('login');
 
   showLogin() {
-    this.activeTab = 'login';
+    this.activeTab.set('login');
   }
 
   showRegister() {
-    this.activeTab = 'register';
+    this.activeTab.set('register');
   }
 
   onRegister(event: Event) {
     event.preventDefault();
     const form = event.target as HTMLFormElement;
     const formData = new FormData(form);
+    const password = String(formData.get('password') ?? '');
+    const confirmPassword = String(formData.get('confirmPassword') ?? '');
+
+    if (password !== confirmPassword) {
+      this.messageService.setErrorMessage('Passwords do not match.');
+      return;
+    }
 
     const request: RegisterRequest = {
       firstName: String(formData.get('firstName') ?? ''),
       lastName: String(formData.get('lastName') ?? ''),
       email: String(formData.get('email') ?? ''),
-      password: String(formData.get('password') ?? ''),
+      password,
       phoneNumber: String(formData.get('phoneNumber') ?? ''),
       dateOfBirth: new Date(String(formData.get('dateOfBirth') ?? '')),
     };

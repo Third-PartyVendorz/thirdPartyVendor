@@ -288,6 +288,12 @@ polygon {
 	align-items: start;
 }
 
+.history-sidebar {
+	display: grid;
+	align-content: start;
+	gap: 1rem;
+}
+
 .history-table-panel,
 .sidebar-card {
 	padding: 1.5rem;

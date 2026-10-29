@@ -61,22 +61,6 @@
 .assets-search-form button .material-icons-outlined { font-size: 1.1rem; }
 .assets-search-error { margin: 0; color: #b91c1c; font-weight: 600; }
 
-.trending-assets { display: flex; align-items: flex-start; gap: 1.5rem; width: 100%; min-width: 0; overflow: hidden; margin-top: 0; padding: 1rem 1.25rem; }
-.trending-heading { flex: 0 0 11rem; }
-.trending-body { flex: 1; min-width: 0; overflow-x: auto; }
-.trending-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; color: var(--color-text); }
-.trending-table th { padding: 0.45rem 0.6rem; border-bottom: 1px solid var(--color-border); color: var(--color-text-subtle); font-size: 0.72rem; font-weight: 700; text-align: left; text-transform: uppercase; letter-spacing: 0.04em; }
-.trending-table td { padding: 0.55rem 0.6rem; border-bottom: 1px solid rgba(23, 105, 163, 0.1); white-space: nowrap; }
-.trending-table tbody tr:hover { background: rgba(23, 105, 163, 0.05); }
-.trending-table .rank { width: 3rem; color: var(--color-brand-deep); font-weight: 800; }
-.trending-table .ticker-symbol { font-size: 0.95rem; }
-.trending-table .ticker-change { color: var(--color-positive); font-weight: 800; }
-.trending-table .ticker-change.negative-change { color: var(--color-negative); }
-.trending-table .ticker-actions { display: flex; gap: 0.4rem; }
-@media (max-width: 768px) { .trending-assets { flex-direction: column; gap: 0.75rem; } .trending-heading { flex: none; } }
-.ticker-action { padding: 0.25rem 0.6rem; border: 1px solid var(--color-accent-deep); border-radius: 6px; background: transparent; color: var(--color-accent-deep); font: inherit; font-size: 0.74rem; font-weight: 700; text-decoration: none; cursor: pointer; }
-.ticker-action:hover { background: var(--color-accent-deep); color: #fff; }
-
 .trade-search-panel,
 .trade-empty-state {
 	border: 1px solid var(--color-border);
@@ -473,8 +457,6 @@ app-trade-form-selector { display: block; width: 100%; height: 100%; min-width: 
 
 @media (max-width: 700px) {
 	.assets-search-panel { padding: 1.1rem; border-radius: 10px; }
-	.trending-grid { gap: 0.65rem; padding-bottom: 0.25rem; }
-	.trending-grid .ticker-card { flex-basis: 9.5rem; }
 	.section-heading { align-items: flex-start; flex-direction: column; }
 }
 
@@ -482,7 +464,6 @@ app-trade-form-selector { display: block; width: 100%; height: 100%; min-width: 
 	.trade-page { padding: 0.85rem 0.65rem 1.5rem; }
 	.assets-search-form { align-items: stretch; flex-wrap: wrap; }
 	.assets-search-form button { width: 100%; }
-	.trending-grid { grid-template-columns: 1fr; }
 	.trade-search-form { flex-wrap: wrap; }
 	.trade-search-form label { width: 100%; }
 	.trade-search-form button { flex: 1; }
@@ -491,10 +472,6 @@ app-trade-form-selector { display: block; width: 100%; height: 100%; min-width: 
 	.stock-info-compact,
 	.order-card { padding: 1rem; }
 	.quote-stats { gap: 0.4rem; }
-}
-
-@media (max-width: 460px) {
-	.trending-grid { display: grid; grid-template-columns: 1fr; }
 }
 
 @media (max-width: 460px) {
